@@ -471,7 +471,7 @@ def main():
     global UDPSock
     global verbose
     
-    print "Artemisa v1.0.2  Copyright (C) 2009 Rodrigo do Carmo and Pablo Masri"
+    print "Artemisa v0.9.0  Copyright (C) 2009 Rodrigo do Carmo and Pablo Masri"
     print ""
     print "This program comes with ABSOLUTELY NO WARRANTY; for details type `show warranty'."
     print "This is free software, and you are welcome to redistribute it under certain"

@@ -24,3 +24,6 @@ From: \"3001\" <sip:3001@136.200.10.12>|Contact: <sip:3001@pole-nord.fr:5061>|c=
 From: \"3001\" <sip:3001@pole-nord.fr>|Contact: <sip:3001@pole-nord.fr:5061>|c=IN IP4 130.200.10.11|INVITE sip:3000@127.0.0.1 SIP/2.0|User-Agent: Twinkle/1.4.2|To: <sip:3000@127.0.0.1>
 From: \"3001\" <sip:3001@pole-nord.fr>|Contact: <sip:3001@pole-nord.fr:5061>|c=IN IP4 130.200.10.11|INVITE sip:3000@127.0.0.1 SIP/2.0|User-Agent: Twinkle/1.4.2|To: <sip:3000@127.0.0.1>
 From: \"3001\" <sip:3001@pole-nord.fr>|Contact: <sip:3001@pole-nord.fr:5061>|c=IN IP4 130.200.10.11|INVITE sip:3000@127.0.0.1 SIP/2.0|User-Agent: Twinkle/1.4.2|To: <sip:3000@127.0.0.1>
+From: \"3001\" <sip:3001@200.16.16.61>|Contact: <sip:3001@www.unc.edu.ar:5061>|c=IN IP4 200.16.16.61|INVITE sip:3000@200.16.16.61 SIP/2.0|User-Agent: Ekiga|To: <sip:3002@127.0.0.1>
+From: \"3001\" <sip:3001@www.ubp.edu.ar>|Contact: <sip:3001@www.ubp.edu.ar:5061>|c=IN IP4 200.69.136.134|INVITE sip:3000@127.0.0.1 SIP/2.0|User-Agent: Twinkle/1.4.2|To: <sip:3001@127.0.0.1>
+From: \"3001\" <sip:3001@136.200.10.12>|Contact: <sip:3001@pole-nord.fr:5061>|c=IN IP4 136.200.10.11|INVITE sip:3000@127.0.0.1 SIP/2.0|User-Agent: Ekiga|To: <sip:100@127.0.0.1>
