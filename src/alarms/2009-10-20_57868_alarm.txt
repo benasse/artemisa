@@ -1,0 +1,1 @@
+2009-10-20 14:02:22 An INVITE message considered CRAFTED arrived from pole-nord.fr. Check the log files for details.
