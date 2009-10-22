@@ -1,0 +1,1 @@
+2009-10-20 13:14:41 An INVITE message considered CRAFTED arrived from 136.200.10.12. Check the log files for details.
