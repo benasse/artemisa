@@ -1,0 +1,2014 @@
+2009-10-21 22:09:26
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bKd59a078d
+Max-Forwards: 70
+To: "3001" <sip:3001@127.0.0.1>
+From: "3001" <sip:3001@127.0.0.1>;tag=HMjoW
+Call-ID: iZxBLJZHLVTzWh@localhost
+CSeq: 500 REGISTER
+Contact: <sip:3001@127.0.0.1:5065>;expires=3600
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:09:26
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25c7363c;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5a19ac3e
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 5c148d5c354c0e2026c5f34500891cbf@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:09:26 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:09:26
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25c7363c;rport
+To: <sip:3001@127.0.0.1:5065>;tag=13632
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5a19ac3e
+Call-ID: 5c148d5c354c0e2026c5f34500891cbf@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:09:26
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bK1e5d0086;received=127.0.0.1;rport=5065
+From: "3001" <sip:3001@127.0.0.1>;tag=HMjoW
+To: "3001" <sip:3001@127.0.0.1>;tag=as75a52682
+Call-ID: iZxBLJZHLVTzWh@localhost
+CSeq: 501 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Expires: 3600
+Contact: <sip:3001@127.0.0.1:5065>;expires=3600
+Date: Thu, 22 Oct 2009 00:09:26 GMT
+Content-Length: 0
+
+
+2009-10-21 22:09:26
+SIP/2.0 401 Unauthorized
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bK3acc86a9;received=127.0.0.1;rport=33608
+From: "3000" <sip:3000@127.0.0.1>;tag=ilyod
+To: "3000" <sip:3000@127.0.0.1>;tag=as0c9aa0b1
+Call-ID: ckKvipHroEsYGC@localhost
+CSeq: 500 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+WWW-Authenticate: Digest algorithm=MD5, realm="asterisk", nonce="10dec3c3"
+Content-Length: 0
+
+
+2009-10-21 22:09:26
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bKc37a41a0
+Max-Forwards: 70
+To: "3000" <sip:3000@127.0.0.1>
+From: "3000" <sip:3000@127.0.0.1>;tag=ilyod
+Call-ID: ckKvipHroEsYGC@localhost
+CSeq: 501 REGISTER
+Contact: <sip:3000@127.0.0.1:5065>;expires=3600
+Authorization: Digest username="3000",realm="asterisk",nonce="10dec3c3",uri="sip:127.0.0.1",response="efdbd2c1fa3a2f4df88fe3957f9a2677",algorithm=MD5
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:09:26
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK69b0bd62;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as4a687d17
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 372a6cd40c050def0fb0f772198f69d3@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:09:26 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:09:26
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK69b0bd62;rport
+To: <sip:3000@127.0.0.1:5065>;tag=76137
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as4a687d17
+Call-ID: 372a6cd40c050def0fb0f772198f69d3@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:09:26
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bKc37a41a0;received=127.0.0.1;rport=5065
+From: "3000" <sip:3000@127.0.0.1>;tag=ilyod
+To: "3000" <sip:3000@127.0.0.1>;tag=as0c9aa0b1
+Call-ID: ckKvipHroEsYGC@localhost
+CSeq: 501 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Expires: 3600
+Contact: <sip:3000@127.0.0.1:5065>;expires=3600
+Date: Thu, 22 Oct 2009 00:09:26 GMT
+Content-Length: 0
+
+
+2009-10-21 22:09:26
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bK3acc86a9
+Max-Forwards: 70
+To: "3000" <sip:3000@127.0.0.1>
+From: "3000" <sip:3000@127.0.0.1>;tag=ilyod
+Call-ID: ckKvipHroEsYGC@localhost
+CSeq: 500 REGISTER
+Contact: <sip:3000@127.0.0.1:5065>;expires=3600
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:09:26
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bK6680c53c
+Max-Forwards: 70
+To: "3002" <sip:3002@127.0.0.1>
+From: "3002" <sip:3002@127.0.0.1>;tag=FLeHY
+Call-ID: XlZWQJyikzoYTw@localhost
+CSeq: 500 REGISTER
+Contact: <sip:3002@127.0.0.1:5065>;expires=3600
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:09:26
+SIP/2.0 401 Unauthorized
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bK6680c53c;received=127.0.0.1;rport=33608
+From: "3002" <sip:3002@127.0.0.1>;tag=FLeHY
+To: "3002" <sip:3002@127.0.0.1>;tag=as67d86366
+Call-ID: XlZWQJyikzoYTw@localhost
+CSeq: 500 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+WWW-Authenticate: Digest algorithm=MD5, realm="asterisk", nonce="603103e8"
+Content-Length: 0
+
+
+2009-10-21 22:09:26
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bK820f7449
+Max-Forwards: 70
+To: "3002" <sip:3002@127.0.0.1>
+From: "3002" <sip:3002@127.0.0.1>;tag=FLeHY
+Call-ID: XlZWQJyikzoYTw@localhost
+CSeq: 501 REGISTER
+Contact: <sip:3002@127.0.0.1:5065>;expires=3600
+Authorization: Digest username="3002",realm="asterisk",nonce="603103e8",uri="sip:127.0.0.1",response="f3c5682f98db8239fff633fd9c61d775",algorithm=MD5
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:09:26
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK05ea831c;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as082a0706
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 49fa4e310e4812651e0dad08567efffd@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:09:26 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:09:26
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK05ea831c;rport
+To: <sip:3002@127.0.0.1:5065>;tag=69753
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as082a0706
+Call-ID: 49fa4e310e4812651e0dad08567efffd@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:09:26
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bK820f7449;received=127.0.0.1;rport=5065
+From: "3002" <sip:3002@127.0.0.1>;tag=FLeHY
+To: "3002" <sip:3002@127.0.0.1>;tag=as67d86366
+Call-ID: XlZWQJyikzoYTw@localhost
+CSeq: 501 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Expires: 3600
+Contact: <sip:3002@127.0.0.1:5065>;expires=3600
+Date: Thu, 22 Oct 2009 00:09:26 GMT
+Content-Length: 0
+
+
+2009-10-21 22:09:54
+INVITE sip:3000@200.16.16.61 SIP/2.0
+Via: SIP/2.0/UDP 200.16.16.61:5061;rport;branch=z9hG4bKgupzswkn
+Max-Forwards: 70
+To: <sip:3002@127.0.0.1>
+From: \"3001\" <sip:3001@200.16.16.61>;tag=tnxzl
+Call-ID: ooasvqbpyypqxfl@pole-nord.fr
+CSeq: 949 INVITE
+Contact: <sip:3001@www.unc.edu.ar:5061>
+Content-Type: application/sdp
+Authorization: Digest username=\"3001\",realm=\"asterisk\",nonce=\"68bb9b4f\",uri=\"sip:3000@127.0.0.1\",response=\"a7a3527614346d1338ff91d6ed51f04b\",algorithm=MD5
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Supported: replaces,norefersub,100rel
+User-Agent: Ekiga
+Content-Length: 303
+
+v=0
+o=twinkle 1689742106 1029198862 IN IP4 200.16.16.61
+s=-
+c=IN IP4 200.16.16.61
+t=0 0
+m=audio 8000 RTP/AVP 98 97 8 0 3 101
+a=rtpmap:98 speex/16000
+a=rtpmap:97 speex/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:0 PCMU/8000
+a=rtpmap:3 GSM/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-15
+a=ptime:20
+
+
+2009-10-21 22:10:13
+SIP/2.0 401 Unauthorized
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bKac56eb40;received=127.0.0.1;rport=35890
+From: "3001" <sip:3001@127.0.0.1>;tag=PFzdP
+To: "3001" <sip:3001@127.0.0.1>;tag=as061da6c3
+Call-ID: xKhONnYeQjtrVb@localhost
+CSeq: 500 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+WWW-Authenticate: Digest algorithm=MD5, realm="asterisk", nonce="64d73c51"
+Content-Length: 0
+
+
+2009-10-21 22:10:13
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bKbac1cbe2
+Max-Forwards: 70
+To: "3001" <sip:3001@127.0.0.1>
+From: "3001" <sip:3001@127.0.0.1>;tag=PFzdP
+Call-ID: xKhONnYeQjtrVb@localhost
+CSeq: 501 REGISTER
+Contact: <sip:3001@127.0.0.1:5065>;expires=3600
+Authorization: Digest username="3001",realm="asterisk",nonce="64d73c51",uri="sip:127.0.0.1",response="8eea2b40a3a31ad4948b4066920984d8",algorithm=MD5
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:10:13
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK53e2e75e;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1773988f
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 35b6c4ba5f12537431f2ff9b19d2cc19@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:10:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:10:13
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK53e2e75e;rport
+To: <sip:3001@127.0.0.1:5065>;tag=94077
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1773988f
+Call-ID: 35b6c4ba5f12537431f2ff9b19d2cc19@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:10:13
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bKbac1cbe2;received=127.0.0.1;rport=5065
+From: "3001" <sip:3001@127.0.0.1>;tag=PFzdP
+To: "3001" <sip:3001@127.0.0.1>;tag=as061da6c3
+Call-ID: xKhONnYeQjtrVb@localhost
+CSeq: 501 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Expires: 3600
+Contact: <sip:3001@127.0.0.1:5065>;expires=3600
+Date: Thu, 22 Oct 2009 00:10:13 GMT
+Content-Length: 0
+
+
+2009-10-21 22:10:13
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bKac56eb40
+Max-Forwards: 70
+To: "3001" <sip:3001@127.0.0.1>
+From: "3001" <sip:3001@127.0.0.1>;tag=PFzdP
+Call-ID: xKhONnYeQjtrVb@localhost
+CSeq: 500 REGISTER
+Contact: <sip:3001@127.0.0.1:5065>;expires=3600
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:10:13
+SIP/2.0 401 Unauthorized
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bK0b0cdee0;received=127.0.0.1;rport=35890
+From: "3000" <sip:3000@127.0.0.1>;tag=ieWBj
+To: "3000" <sip:3000@127.0.0.1>;tag=as38b22c96
+Call-ID: FaahzBJIowJRnl@localhost
+CSeq: 500 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+WWW-Authenticate: Digest algorithm=MD5, realm="asterisk", nonce="0bc21145"
+Content-Length: 0
+
+
+2009-10-21 22:10:13
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bK89fb89ea
+Max-Forwards: 70
+To: "3000" <sip:3000@127.0.0.1>
+From: "3000" <sip:3000@127.0.0.1>;tag=ieWBj
+Call-ID: FaahzBJIowJRnl@localhost
+CSeq: 501 REGISTER
+Contact: <sip:3000@127.0.0.1:5065>;expires=3600
+Authorization: Digest username="3000",realm="asterisk",nonce="0bc21145",uri="sip:127.0.0.1",response="d7109bc7b93122bf9fb1921cf8ac4cdd",algorithm=MD5
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:10:13
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK76934aa4;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as0135ebde
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 6d3ab2104729fe8637f98607312c8937@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:10:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:10:13
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bK0b0cdee0
+Max-Forwards: 70
+To: "3000" <sip:3000@127.0.0.1>
+From: "3000" <sip:3000@127.0.0.1>;tag=ieWBj
+Call-ID: FaahzBJIowJRnl@localhost
+CSeq: 500 REGISTER
+Contact: <sip:3000@127.0.0.1:5065>;expires=3600
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:10:13
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bKc7f64964
+Max-Forwards: 70
+To: "3002" <sip:3002@127.0.0.1>
+From: "3002" <sip:3002@127.0.0.1>;tag=nWbnP
+Call-ID: yNsqLjPfnwjmMj@localhost
+CSeq: 500 REGISTER
+Contact: <sip:3002@127.0.0.1:5065>;expires=3600
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:10:13
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK76934aa4;rport
+To: <sip:3000@127.0.0.1:5065>;tag=45404
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as0135ebde
+Call-ID: 6d3ab2104729fe8637f98607312c8937@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:10:13
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bK89fb89ea;received=127.0.0.1;rport=5065
+From: "3000" <sip:3000@127.0.0.1>;tag=ieWBj
+To: "3000" <sip:3000@127.0.0.1>;tag=as38b22c96
+Call-ID: FaahzBJIowJRnl@localhost
+CSeq: 501 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Expires: 3600
+Contact: <sip:3000@127.0.0.1:5065>;expires=3600
+Date: Thu, 22 Oct 2009 00:10:13 GMT
+Content-Length: 0
+
+
+2009-10-21 22:10:13
+SIP/2.0 401 Unauthorized
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bKc7f64964;received=127.0.0.1;rport=35890
+From: "3002" <sip:3002@127.0.0.1>;tag=nWbnP
+To: "3002" <sip:3002@127.0.0.1>;tag=as22758cec
+Call-ID: yNsqLjPfnwjmMj@localhost
+CSeq: 500 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+WWW-Authenticate: Digest algorithm=MD5, realm="asterisk", nonce="6c026353"
+Content-Length: 0
+
+
+2009-10-21 22:10:13
+REGISTER sip:127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5065;rport;branch=z9hG4bKe126f447
+Max-Forwards: 70
+To: "3002" <sip:3002@127.0.0.1>
+From: "3002" <sip:3002@127.0.0.1>;tag=nWbnP
+Call-ID: yNsqLjPfnwjmMj@localhost
+CSeq: 501 REGISTER
+Contact: <sip:3002@127.0.0.1:5065>;expires=3600
+Authorization: Digest username="3002",realm="asterisk",nonce="6c026353",uri="sip:127.0.0.1",response="0fab4093dc83b6b34f5d665624f409db",algorithm=MD5
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+User-Agent: Twinkle/1.4.2
+Content-Length: 0
+
+
+
+
+
+2009-10-21 22:10:13
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5359aa08;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as3342c67e
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 1478fdde6af640f6152efad92e5705e3@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:10:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:10:13
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5359aa08;rport
+To: <sip:3002@127.0.0.1:5065>;tag=51976
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as3342c67e
+Call-ID: 1478fdde6af640f6152efad92e5705e3@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:10:13
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5065;branch=z9hG4bKe126f447;received=127.0.0.1;rport=5065
+From: "3002" <sip:3002@127.0.0.1>;tag=nWbnP
+To: "3002" <sip:3002@127.0.0.1>;tag=as22758cec
+Call-ID: yNsqLjPfnwjmMj@localhost
+CSeq: 501 REGISTER
+Server: Asterisk PBX 1.6.1.6
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Expires: 3600
+Contact: <sip:3002@127.0.0.1:5065>;expires=3600
+Date: Thu, 22 Oct 2009 00:10:13 GMT
+Content-Length: 0
+
+
+2009-10-21 22:10:19
+INVITE sip:3000@200.16.16.61 SIP/2.0
+Via: SIP/2.0/UDP 200.16.16.61:5061;rport;branch=z9hG4bKgupzswkn
+Max-Forwards: 70
+To: <sip:3002@127.0.0.1>
+From: \"3001\" <sip:3001@200.16.16.61>;tag=tnxzl
+Call-ID: ooasvqbpyypqxfl@pole-nord.fr
+CSeq: 949 INVITE
+Contact: <sip:3001@www.unc.edu.ar:5061>
+Content-Type: application/sdp
+Authorization: Digest username=\"3001\",realm=\"asterisk\",nonce=\"68bb9b4f\",uri=\"sip:3000@127.0.0.1\",response=\"a7a3527614346d1338ff91d6ed51f04b\",algorithm=MD5
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Supported: replaces,norefersub,100rel
+User-Agent: Ekiga
+Content-Length: 303
+
+v=0
+o=twinkle 1689742106 1029198862 IN IP4 200.16.16.61
+s=-
+c=IN IP4 200.16.16.61
+t=0 0
+m=audio 8000 RTP/AVP 98 97 8 0 3 101
+a=rtpmap:98 speex/16000
+a=rtpmap:97 speex/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:0 PCMU/8000
+a=rtpmap:3 GSM/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-15
+a=ptime:20
+
+
+2009-10-21 22:11:02
+INVITE sip:3000@127.0.0.1 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5061;rport;branch=z9hG4bKgupzswkn
+Max-Forwards: 70
+To: <sip:3001@127.0.0.1>
+From: \"3001\" <sip:3001@www.ubp.edu.ar>;tag=tnxzl
+Call-ID: ooasvqbpyypqxfl@localhost
+CSeq: 949 INVITE
+Contact: <sip:3001@www.ubp.edu.ar:5061>
+Content-Type: application/sdp
+Authorization: Digest username=\"3001\",realm=\"asterisk\",nonce=\"68bb9b4f\",uri=\"sip:3000@127.0.0.1\",response=\"a7a3527614346d1338ff91d6ed51f04b\",algorithm=MD5
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Supported: replaces,norefersub,100rel
+User-Agent: Twinkle/1.4.2
+Content-Length: 303
+
+v=0
+o=twinkle 1689742106 1029198862 IN IP4 127.0.0.1
+s=-
+c=IN IP4 200.69.136.134
+t=0 0
+m=audio 8000 RTP/AVP 98 97 8 0 3 101
+a=rtpmap:98 speex/16000
+a=rtpmap:97 speex/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:0 PCMU/8000
+a=rtpmap:3 GSM/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-15
+a=ptime:20
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+To: <sip:3001@127.0.0.1:5065>;tag=75087
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+To: <sip:3000@127.0.0.1:5065>;tag=99556
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+To: <sip:3002@127.0.0.1:5065>;tag=57383
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+To: <sip:3001@127.0.0.1:5065>;tag=81681
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+To: <sip:3000@127.0.0.1:5065>;tag=33801
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+To: <sip:3002@127.0.0.1:5065>;tag=80992
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+To: <sip:3001@127.0.0.1:5065>;tag=36710
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+To: <sip:3000@127.0.0.1:5065>;tag=41088
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+To: <sip:3002@127.0.0.1:5065>;tag=80669
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+To: <sip:3001@127.0.0.1:5065>;tag=48977
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+To: <sip:3000@127.0.0.1:5065>;tag=55493
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+To: <sip:3002@127.0.0.1:5065>;tag=88614
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK3b3248fd;rport
+To: <sip:3001@127.0.0.1:5065>;tag=49324
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as1ecf5fe7
+Call-ID: 3a26d49f58fcce9566b6e9203aabee6e@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK24484765;rport
+To: <sip:3000@127.0.0.1:5065>;tag=33723
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as5672eadd
+Call-ID: 06a6fb1619ee85b378a1047d6815a198@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:13 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK5fe114ab;rport
+To: <sip:3002@127.0.0.1:5065>;tag=68671
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as104c0efc
+Call-ID: 3cfedf3b5351c9e9650a7b5a09557dca@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+To: <sip:3001@127.0.0.1:5065>;tag=45218
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+To: <sip:3000@127.0.0.1:5065>;tag=96114
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+To: <sip:3002@127.0.0.1:5065>;tag=93161
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+To: <sip:3001@127.0.0.1:5065>;tag=99130
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+To: <sip:3000@127.0.0.1:5065>;tag=36104
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+To: <sip:3002@127.0.0.1:5065>;tag=13895
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+To: <sip:3001@127.0.0.1:5065>;tag=56921
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+To: <sip:3000@127.0.0.1:5065>;tag=44092
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+To: <sip:3002@127.0.0.1:5065>;tag=73069
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+To: <sip:3001@127.0.0.1:5065>;tag=59624
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+To: <sip:3000@127.0.0.1:5065>;tag=86632
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+To: <sip:3002@127.0.0.1:5065>;tag=84836
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK7fc455fa;rport
+To: <sip:3001@127.0.0.1:5065>;tag=35449
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as21611929
+Call-ID: 2f04f1560898b7736269a25c09e646c5@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK25eddfe6;rport
+To: <sip:3000@127.0.0.1:5065>;tag=65619
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as53837260
+Call-ID: 04022dff6951d7b6354e69ba65433283@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:37
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:27 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:37
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK68ce337f;rport
+To: <sip:3002@127.0.0.1:5065>;tag=54099
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as356af46e
+Call-ID: 34a8a6c951d21c2a6b0ab0c760b59c4d@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:41
+OPTIONS sip:3001@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK79ff25af;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as7905bbc8
+To: <sip:3001@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3a2c86e7176cd1e656291f400d62e171@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:41 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:41
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK79ff25af;rport
+To: <sip:3001@127.0.0.1:5065>;tag=95959
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as7905bbc8
+Call-ID: 3a2c86e7176cd1e656291f400d62e171@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:41
+OPTIONS sip:3000@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK55e1bb08;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as10a7db77
+To: <sip:3000@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 79b578e43a12440563e4ae845b9074e3@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:41 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:41
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK55e1bb08;rport
+To: <sip:3000@127.0.0.1:5065>;tag=56810
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as10a7db77
+Call-ID: 79b578e43a12440563e4ae845b9074e3@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
+2009-10-21 22:11:41
+OPTIONS sip:3002@127.0.0.1:5065 SIP/2.0
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK0c96e8c0;rport
+Max-Forwards: 70
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as47c5c04f
+To: <sip:3002@127.0.0.1:5065>
+Contact: <sip:asterisk@127.0.0.1>
+Call-ID: 3195533705934f9264e0fd7842ff327b@127.0.0.1
+CSeq: 102 OPTIONS
+User-Agent: Asterisk PBX 1.6.1.6
+Date: Thu, 22 Oct 2009 00:11:41 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO
+Supported: replaces, timer
+Content-Length: 0
+
+
+2009-10-21 22:11:41
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 127.0.0.1:5060;branch=z9hG4bK0c96e8c0;rport
+To: <sip:3002@127.0.0.1:5065>;tag=31838
+From: "asterisk" <sip:asterisk@127.0.0.1>;tag=as47c5c04f
+Call-ID: 3195533705934f9264e0fd7842ff327b@127.0.0.1
+CSeq: 102 OPTIONS
+Accept: application/sdp
+Accept-Encoding: identity
+Accept-Language: en
+Allow: INVITE,ACK,BYE,CANCEL,OPTIONS,PRACK,REFER,NOTIFY,SUBSCRIBE,INFO,MESSAGE
+Server: Twinkle/1.4.2
+Supported: replaces,norefersub,100rel
+Content-Length: 0
+}
+
+
+
+
+
+
+
+
+
