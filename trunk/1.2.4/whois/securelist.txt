@@ -1,0 +1,7 @@
+# This is a secure list for the whois analysis. Since whois servers give information with
+# different structures each one, it's difficult to obtain particular information of the
+# bunch. So, the honeypot will match every string in this file with the whois answer and if
+# it match will consider it as probably trusted.
+
+Universidad Blas Pascal
+Universidad Nacional de Cordoba
