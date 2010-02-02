@@ -1,0 +1,22 @@
+Artemisa 1.4
+************
+
+Troubleshooting
+===============
+
+
+1) Artemisa doesn't find my audio device.
+
+	The audio device must be under the file /dev/dsp.
+
+	If you are using Fedora or another distro that uses Pulse Audio, 
+	you can try, running as root, the following commands:
+
+	modprobe snd_mixer_oss
+	modprobe snd_pcm_oss
+	modprobe snd_seq_oss
+
+	This should create /dev/dsp.
+
+	Note: you can try running "artemisa.py -g" in order to get a list of the
+	available audio devices found by Artemisa.

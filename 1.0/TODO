@@ -1,0 +1,11 @@
+Artemisa 1.4
+************
+
+Ideas for future implementations:
+
+* Two fingerprint modes: passive and active (currently just passive mode is available).
+* Relate the traceroute results to google maps.
+* Develop the "aggressive" mode in order to counterattack the intruder.
+* Export some variables to be used by the automatically executed scripts (one can, for example configure a firewall automatically).
+
+
