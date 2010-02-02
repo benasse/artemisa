@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Artemisa v1.4
+# Artemisa v1.0
 # Copyright (C) 2009 Rodrigo do Carmo <rodrigodocarmo@gmail.com> 
 # and Pablo Masri <pablomasri87@gmail.com>
 # 
