@@ -1,1 +1,0 @@
-2009-10-21 10:23:27 An INVITE message considered SUSPICIOUS arrived from 200.16.16.61. Check the log files for details.

@@ -1,1 +1,0 @@
-2009-10-14 14:02:24 An INVITE message considered SUSPICIOUS arrived from pole-nord.fr. Check the log files for details.
