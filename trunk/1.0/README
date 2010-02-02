@@ -1,0 +1,39 @@
+Artemisa 1.4
+************
+
+Prerequisites
+=============
+
+Artemisa requires the following installed requisites:
+
+* Python
+* bind-utils (Red Hat, Fedora)
+* bind-tools (Gentoo)
+* dnsutils (Debian)
+* PJSUA Python Module (to install it follow the steps shown in http://trac.pjsip.org/repos/wiki/Python_SIP/Build_Install <http://trac.pjsip.org/repos/wiki/Python_SIP/Build_Install>)
+
+Downloading
+===========
+
+Artemisa is free and you can download the latest version from: http://www.sourceforge.net/projects/artemisa <http://www.sourceforge.net/projects/artemisa 
+
+There is also a SVN version for developers: https://artemisa.svn.sourceforge.net/svnroot/artemisa/ <https://artemisa.svn.sourceforge.net/svnroot/artemisa/>
+
+Installation
+============
+
+Artemisa doesn't require installation. You should unpack the downloaded source code and just run it typing:
+
+	$ ./artemisa.py
+	
+	or
+	
+	$ python artemisa.py
+
+
+DO NOT run Artemisa until having read and set up the configuration files found in /conf directory.
+    
+    
+   
+    
+Visit http://artemisa.sourceforge.net for a full documentation.

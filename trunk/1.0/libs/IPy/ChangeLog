@@ -1,0 +1,27 @@
+Version 0.70 (2009-10-29)
+	* New "major" version because it may break compatibility
+	* Fix __cmp__(): IP('0.0.0.0/0') and IP('0.0.0.0') are not equal
+	* Fix IP.net() of the network "::/0": "::" instead of "0.0.0.0".
+	  IPy 0.63 should fix this bug, but it wasn't.
+
+Version 0.64 (2009-08-19)
+	* Create MANIFEST.in to fix setup.py bdist_rpm, fix by Robert Nickel
+
+Version 0.63 (2009-06-23)
+	* Fix formatting of "IPv4 in IPv6" network, eg. IP('::ffff:192.168.10.0/120'),
+	  the netmask ("/120" in the example) was missing!
+
+Version 0.62 (2008-07-15)
+	* Fix reverse DNS of IPv6 address: use ".ip6.arpa." suffix instead of
+	  deprecated ".ip6.int." suffix
+
+Version 0.61 (2008-06-12)
+	* Patch from Aras Vaichas allowing the [-1] operator
+	  to work with an IP object of size 1.
+
+Version 0.60 (2008-05-16)
+	* strCompressed() formats '::ffff:a.b.c.d' correctly
+	* Use strCompressed() instead of strFullsize() to format IP addresses,
+	  ouput is smarter with IPv6 address
+	* Remove check_addr_prefixlen because it generates invalid IP address
+
