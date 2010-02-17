@@ -1,0 +1,11 @@
+# Artemisa
+#
+# This is a list for well-known fingerprints for attack tools.
+#
+# Format:
+# Tool = Fingerprint (User-Agent field)
+#
+# Example:
+# SIPVicious=friendly-scanner
+
+SIPVicious=friendly-scanner
