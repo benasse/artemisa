@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Artemisa v1.0
-# Copyright (C) 2009 Mohamed Nassar (nassar@loria.fr), Rodrigo do Carmo <rodrigodocarmo@gmail.com>, 
+# Copyright (C) 2009 Mohamed Nassar <nassar@loria.fr>, Rodrigo do Carmo <rodrigodocarmo@gmail.com>, 
 # and Pablo Masri <pablomasri87@gmail.com>
 # 
 # Artemisa is free software: you can redistribute it and/or modify
