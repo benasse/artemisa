@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Artemisa v1.0
-# Copyright (C) 2009 Rodrigo do Carmo <rodrigodocarmo@gmail.com> 
+# Copyright (C) 2009 Mohamed Nassar (nassar@loria.fr), Rodrigo do Carmo <rodrigodocarmo@gmail.com>, 
 # and Pablo Masri <pablomasri87@gmail.com>
 # 
 # Artemisa is free software: you can redistribute it and/or modify
@@ -18,9 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## @package artemisa
-#  Here is where the main functions are written.
-
 
 VERSION = "1.0.0"
 
@@ -35,7 +32,7 @@ from time import strftime, sleep, time
 import sched
 from logs import log                # Import class log from logs.py
 from commons import *               # Import functions from commons.py
-from inference import InferenceAnalysis # Inference engine (core of the honeypot).
+from classifier import Classifier   # 
 import threading                    # Use of threads.
 
 from subprocess import Popen, PIPE
@@ -600,29 +597,29 @@ def AnalyzeCall(strData):
     global VERSION
     global intNumCalls
     
-    inference_instance = InferenceAnalysis()
-    inference_instance.VERSION = VERSION
-    inference_instance.strLocal_IP = strLocal_IP
-    inference_instance.strLocal_port = strLocal_port
+    classifier_instance = Classifier()
+    classifier_instance.VERSION = VERSION
+    classifier_instance.strLocal_IP = strLocal_IP
+    classifier_instance.strLocal_port = strLocal_port
 
-    inference_instance.Behaviour = behaviour_mode
+    classifier_instance.Behaviour = behaviour_mode
     
     if behaviour_mode == "active":
-        inference_instance.Behaviour_actions = Active_mode
+        classifier_instance.Behaviour_actions = Active_mode
     elif behaviour_mode == "passive":
-        inference_instance.Behaviour_actions = Passive_mode
+        classifier_instance.Behaviour_actions = Passive_mode
     elif behaviour_mode == "aggressive":
-        inference_instance.Behaviour_actions = Aggressive_mode
+        classifier_instance.Behaviour_actions = Aggressive_mode
     
-    inference_instance.Message = strData
-    inference_instance.verbose = verbose
-    inference_instance.Extensions = Extensions
-    inference_instance.Start()
+    classifier_instance.Message = strData
+    classifier_instance.verbose = verbose
+    classifier_instance.Extensions = Extensions
+    classifier_instance.Start()
 
-    while inference_instance.Running:
+    while classifier_instance.Running:
         pass
     
-    del inference_instance
+    del classifier_instance
     
     intNumCalls -= 1
 
@@ -669,16 +666,6 @@ def ShowHelp(bCommands = True):
     print "verbose off              Turn verbose mode off."
     print ""
     print "show statistics, stats   Show the statistics."
-    print ""
-    print "show cpt dispersion      Show the CPT for dispersion analysis"
-    print "show cpt validdns        Show the CPT for validdns analysis"
-    print "show cpt historical      Show the CPT for historical analysis"
-    print "show cpt whois           Show the CPT for whois analysis"
-    print "show cpt fingerprint     Show the CPT for fingerprint analysis"
-    print "show cpt gl              Show the CPT for gl analysis"
-    print "show cpt reliability     Show the CPT for reliability analysis"
-    print "show cpt to              Show the CPT for \"to\" analysis"
-    print "show cpt trust           Show the CPT for trust"
     print ""
     print "clean historical         Remove the historical database."
     print "clean logs               Remove all log files."
@@ -735,7 +722,7 @@ def main():
             else:
                 print "Invalid argument: " + sys.argv[i]
                     
-    print "Artemisa v" + VERSION + " Copyright (C) 2009 Rodrigo do Carmo and Pablo Masri"
+    print "Artemisa v" + VERSION + " Copyright (C) 2009 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
     print ""
     print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
     print "This is free software, and you are welcome to redistribute it under certain"
@@ -857,117 +844,6 @@ def main():
             print "Flood detected?: " + strFLOOD
             print ""
                 
-        elif s == "show cpt dispersion":
-            CPT_matrix = GetCPTmatrix("dispersion")
-            if CPT_matrix != -1:
-                print ""
-                print "CPT (Dispersion/Nature)"
-                print ""
-                print ''.join([s.center(16) for s in ("Dispersion", "d <= 1", "1 < d <= 4", "d > 4")])
-                print "-------------------------------------------------------------------"
-                print ''.join([s.center(16) for s in ("Normal", str(round(CPT_matrix[0][0], 4)), str(round(CPT_matrix[1][0], 4)), str(round(CPT_matrix[2][0], 4)))])
-                print ''.join([s.center(16) for s in ("Suspicious", str(round(CPT_matrix[0][1], 4)), str(round(CPT_matrix[1][1], 4)), str(round(CPT_matrix[2][1], 4)))])
-                print ''.join([s.center(16) for s in ("Crafted", str(round(CPT_matrix[0][2], 4)), str(round(CPT_matrix[1][2], 4)), str(round(CPT_matrix[2][2], 4)))])
-                print ""
-
-        elif s == "show cpt validdns":
-            CPT_matrix = GetCPTmatrix("validdns")
-            if CPT_matrix != -1:
-                print ""
-                print "CPT (Valid DNS/Trust)"
-                print ""
-                print ''.join([s.center(16) for s in ("Is DNS valid?", "Yes", "No")])
-                print "-----------------------------------------------------"
-                print ''.join([s.center(16) for s in ("Trusted", str(round(CPT_matrix[0][0], 4)), str(round(CPT_matrix[1][0], 4)))])
-                print ''.join([s.center(16) for s in ("Distrusted", str(round(CPT_matrix[0][1], 4)), str(round(CPT_matrix[1][1], 4)))])
-                print ""
-
-        elif s == "show cpt historical":
-            CPT_matrix = GetCPTmatrix("historical")
-            if CPT_matrix != -1:
-                print ""
-                print "CPT (Historical/Trust)"
-                print ""
-                print ''.join([s.center(16) for s in ("Nº of matches", "0", "[1 - 2]", "[3 - inf]")])
-                print "-------------------------------------------------------------------"
-                print ''.join([s.center(16) for s in ("Trusted", str(round(CPT_matrix[0][0], 4)), str(round(CPT_matrix[1][0], 4)), str(round(CPT_matrix[2][0], 4)))])
-                print ''.join([s.center(16) for s in ("Distrusted", str(round(CPT_matrix[0][1], 4)), str(round(CPT_matrix[1][1], 4)), str(round(CPT_matrix[2][1], 4)))])
-                print ""
-                    
-        elif s == "show cpt whois":
-            CPT_matrix = GetCPTmatrix("whois")
-            if CPT_matrix != -1:
-                print ""
-                print "CPT (WHOIS/Trust)"
-                print ""
-                print ''.join([s.center(16) for s in ("Securelist?", "Yes", "No")])
-                print "-----------------------------------------------------"
-                print ''.join([s.center(16) for s in ("Trusted", str(round(CPT_matrix[0][0], 4)), str(round(CPT_matrix[1][0], 4)))])
-                print ''.join([s.center(16) for s in ("Distrusted", str(round(CPT_matrix[0][1], 4)), str(round(CPT_matrix[1][1], 4)))])
-                print ""
-                      
-        elif s == "show cpt to":
-            CPT_matrix = GetCPTmatrix("to")
-            if CPT_matrix != -1:
-                print ""
-                print "CPT (To/Nature)"
-                print ""
-                print ''.join([s.center(16) for s in ("Registered?", "Yes", "No")])
-                print "-----------------------------------------------------"
-                print ''.join([s.center(16) for s in ("Normal", str(round(CPT_matrix[0][0], 4)), str(round(CPT_matrix[1][0], 4)))])
-                print ''.join([s.center(16) for s in ("Suspicious", str(round(CPT_matrix[0][1], 4)), str(round(CPT_matrix[1][1], 4)))])
-                print ''.join([s.center(16) for s in ("Crafted", str(round(CPT_matrix[0][2], 4)), str(round(CPT_matrix[1][2], 4)))])
-                print ""
-
-        elif s == "show cpt trust":
-            CPT_matrix = GetCPTmatrix("trust")
-            if CPT_matrix != -1:
-                print ""
-                print "CPT (Trust/Nature)"
-                print ""
-                print ''.join([s.center(16) for s in ("", "T >= 0.75", "0.35 <= T < 0.75", "T < 0.35")])
-                print "-------------------------------------------------------------------"
-                print ''.join([s.center(16) for s in ("Normal", str(round(CPT_matrix[0][0], 4)), str(round(CPT_matrix[1][0], 4)), str(round(CPT_matrix[2][0], 4)))])
-                print ''.join([s.center(16) for s in ("Suspicious", str(round(CPT_matrix[0][1], 4)), str(round(CPT_matrix[1][1], 4)), str(round(CPT_matrix[2][1], 4)))])
-                print ''.join([s.center(16) for s in ("Crafted", str(round(CPT_matrix[0][2], 4)), str(round(CPT_matrix[1][2], 4)), str(round(CPT_matrix[2][2], 4)))])
-                print ""
-
-        elif s == "show cpt fingerprint":
-            CPT_matrix = GetCPTmatrix("fingerprint")
-            if CPT_matrix != -1:
-                print ""
-                print "CPT (Fingerprint/Trust)"
-                print ""
-                print ''.join([s.center(16) for s in ("", "Trusted", "Distrusted")])
-                print "-----------------------------------------------------"
-                for item in CPT_matrix:
-                    print ''.join([s.center(16) for s in (item[0], str(round(item[1], 4)), str(round(item[2], 4)))])
-                print ""
-
-        elif s == "show cpt gl":
-            CPT_matrix = GetCPTmatrix("gl")
-            if CPT_matrix != -1:
-                print ""
-                print "CPT (GL/Trust)"
-                print ""
-                print ''.join([s.center(16) for s in ("", "Trusted", "Distrusted")])
-                print "-----------------------------------------------------"
-                for item in CPT_matrix:
-                    print ''.join([s.center(16) for s in (item[0], str(round(item[1], 4)), str(round(item[2], 4)))])
-                print ""
-             
-        elif s == "show cpt reliability":
-            CPT_matrix = GetCPTmatrix("reliability")
-            if CPT_matrix != -1:
-                print ""
-                print "CPT (Reliability/Trust)"
-                print ""
-                print ''.join([s.center(16) for s in ("", "Trusted", "Distrusted")])
-                print "-----------------------------------------------------"
-                for item in CPT_matrix:
-                    print ''.join([s.center(16) for s in (item[0], str(round(item[1], 4)), str(round(item[2], 4)))])
-                print ""
-                                                         
         elif s == "hangup all":
             lib.hangup_all()
             print "Ok"
