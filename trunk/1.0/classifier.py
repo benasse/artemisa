@@ -80,13 +80,19 @@ class Classifier(PrintClass, log, CallData):
     
     SIP_Message = "" # Stores the SIP message to classify (usually the INVITE)
     
+    bACKReceived = False
+    bMediaReceived = False
+    
     Behaviour = ""
     Behaviour_actions = []
+    
+    Classification = [] # Stores the classification of the message
     
     Running = True # State of the analysis
 
     def __init__(self):
         self.Running = True
+        self.Classification = []
         CallData.__init__(self)
         
         
@@ -95,13 +101,6 @@ class Classifier(PrintClass, log, CallData):
     # This function starts the process. 
     
     def Start(self):
-
-        self.email = Email() # Creates an Email object.
-
-        if self.Behaviour_actions.count("investigate") == 0:
-            self.send_results(True)
-            self.Running = False
-            return
 
         self.GetCallData() # Retrieves all the necessary data from the message for further analysis
 
@@ -150,6 +149,7 @@ class Classifier(PrintClass, log, CallData):
             self.Print("|")            
             self.Print("| Category: Attack tool")
             self.Print("")
+            self.AddCategory("Attack tool")
         
         
         # ---------------------------------------------------------------------------------
@@ -180,13 +180,14 @@ class Classifier(PrintClass, log, CallData):
                 self.Print("| | DNS/IP cannot be resolved.")
                 self.Print("| |")
                 self.Print("| | Category: Spoofed message")
-                self.Print("")
+                self.AddCategory("Spoofed message")
             else:
                 self.Print("| | " + DNS_Result) 
                 self.Print("| |")
                 self.Print("| | Category: Interactive attack")
-                self.Print("")
+                self.AddCategory("Interactive attack")
     
+        self.Print("")
 
         # ---------------------------------------------------------------------------------
         # Check if SIP ports are opened
@@ -211,11 +212,13 @@ class Classifier(PrintClass, log, CallData):
                 self.Print("| |")
                 self.Print("| | Category: Spoofed message")
                 self.Print("")
+                self.AddCategory("Spoofed message")
             else:
                 self.Print("| | Result: Port opened") 
                 self.Print("| |")
                 self.Print("| | Category: Interactive attack")
                 self.Print("")
+                self.AddCategory("Interactive attack")
 
         # ---------------------------------------------------------------------------------
         # Check if media ports are opened
@@ -224,35 +227,49 @@ class Classifier(PrintClass, log, CallData):
         self.Print("+ Checking if media port is opened...")
 
         # FIXME: this parsing could be improved
-        strRTPPort = GetSIPHeader("m=audio", self.Message).split(" ")[1]
-
-        self.Print("|")
-        self.Print("| + Checking " + self.INVITE_IP + ":" + strRTPPort + "/" + "udp" + "...")
-        self.Print("| |")   
-            
-        strResult = CheckPort(self.INVITE_IP, strRTPPort, "udp")
-            
-        if strResult == 0 or strResult < 0:
-            self.Print("| | Error while scanning the port.")
-            self.Print("| |")
-            self.Print("| | Category: -")
+        strRTPPort = GetSIPHeader("m=audio", self.Message)
+        
+        if strRTPPort == "": # Could happen that no RTP was delivered
+            self.Print("|") 
+            self.Print("| No RTP info delivered.")
+            self.Print("|")
+            self.Print("| Category: Spoofed message")
             self.Print("")
+            self.AddCategory("Spoofed message")
         else:
-            if strResult.find("closed") != -1: 
-                self.Print("| | Result: Port closed") 
+            strRTPPort = strRTPPort.split(" ")[1]
+
+            self.Print("|")
+            self.Print("| + Checking " + self.INVITE_IP + ":" + strRTPPort + "/" + "udp" + "...")
+            self.Print("| |")   
+                
+            strResult = CheckPort(self.INVITE_IP, strRTPPort, "udp")
+                
+            if strResult == 0 or strResult < 0:
+                self.Print("| | Error while scanning the port.")
                 self.Print("| |")
-                self.Print("| | Category: Spoofed message")
+                self.Print("| | Category: -")
                 self.Print("")
             else:
-                self.Print("| | Result: Port opened") 
-                self.Print("| |")
-                self.Print("| | Category: Interactive attack")
-                self.Print("")
+                if strResult.find("closed") != -1: 
+                    self.Print("| | Result: Port closed") 
+                    self.Print("| |")
+                    self.Print("| | Category: Spoofed message")
+                    self.Print("")
+                    self.AddCategory("Spoofed message")
+                else:
+                    self.Print("| | Result: Port opened") 
+                    self.Print("| |")
+                    self.Print("| | Category: Interactive attack")
+                    self.Print("")
+                    self.AddCategory("Interactive attack")
                 
 
         # ---------------------------------------------------------------------------------
         # Check request URI
         # ---------------------------------------------------------------------------------
+
+        bRequestURI = False # Flag to know if this test gives a positive or negative result
 
         self.Print("+ Checking request URI...")
         self.Print("|")
@@ -268,54 +285,87 @@ class Classifier(PrintClass, log, CallData):
                 bFound = True
                 self.Print("| Request addressed to the honeypot? Yes")
                 self.Print("")
+                bRequestURI = True
                 break
                 
         if bFound == False:
             self.Print("| Request addressed to the honeypot? No")
             self.Print("")
-            
+            bRequestURI = False
 
         # ---------------------------------------------------------------------------------
         # Check if proxy in Via
         # ---------------------------------------------------------------------------------
 
-        # Via[0] is the first Via field, so that it has the IP of the last proxy.
-        
-        self.Print("+ Checking if proxy in Via...")
-        self.Print("|")
-        self.Print("| + Checking " + self.Via[0][0] + ":" + self.Via[0][1] + "/" + self.Via[0][2] + "...")
-        self.Print("| |")   
+        # This entire tests depends on the result of the previous
+        if bRequestURI == False:
 
-        # We determine the existence of the proxy by checking the port with nmap
-        strResult = CheckPort(self.Via[0][0], self.Via[0][1], self.Via[0][2])
+            # Via[0] is the first Via field, so that it has the IP of the last proxy.
             
-        if strResult == 0 or strResult < 0:
-            self.Print("| | Error while scanning.")
-            self.Print("| |")
-            self.Print("| | Category: -")
-            self.Print("")
-        else:
-            if strResult.find("closed") != -1: 
-                self.Print("| | Result: There is no SIP proxy") 
+            self.Print("+ Checking if proxy in Via...")
+            self.Print("|")
+            self.Print("| + Checking " + self.Via[0][0] + ":" + self.Via[0][1] + "/" + self.Via[0][2] + "...")
+            self.Print("| |")   
+    
+            # We determine the existence of the proxy by checking the port with nmap
+            strResult = CheckPort(self.Via[0][0], self.Via[0][1], self.Via[0][2])
+                
+            if strResult == 0 or strResult < 0:
+                self.Print("| | Error while scanning.")
                 self.Print("| |")
-                self.Print("| | Category: DialPlan fault")
+                self.Print("| | Category: -")
                 self.Print("")
             else:
-                self.Print("| | Result: There is a SIP proxy") 
-                self.Print("| |")
-                self.Print("| | Category: Direct attack")
-                self.Print("")
+                if strResult.find("closed") != -1: 
+                    self.Print("| | Result: There is no SIP proxy") 
+                    self.Print("| |")
+                    self.Print("| | Category: DialPlan fault")
+                    self.Print("")
+                    self.AddCategory("DialPlan fault")
+                else:
+                    self.Print("| | Result: There is a SIP proxy") 
+                    self.Print("| |")
+                    self.Print("| | Category: Direct attack")
+                    self.Print("")
+                    self.AddCategory("Direct attack")
         
 
         # ---------------------------------------------------------------------------------
         # Check for ACK
         # ---------------------------------------------------------------------------------
         
-
+        self.Print("+ Checking for ACK...")
+        self.Print("|")
+        
+        if self.bACKReceived == True:
+            self.Print("| ACK received: Yes")
+            self.Print("")
+        else:
+            self.Print("| ACK received: No")
+            self.Print("|")
+            self.Print("| Category: Scanning")
+            self.Print("")
+            self.AddCategory("Scanning")
 
         # ---------------------------------------------------------------------------------
         # Check received media
         # ---------------------------------------------------------------------------------
+
+        self.Print("+ Checking for received media...")
+        self.Print("|")
+        
+        if self.bMediaReceived == True:
+            self.Print("| Media received: Yes")
+            self.Print("|")
+            self.Print("| Category: SPIT")
+            self.Print("")
+            self.AddCategory("SPIT")
+        else:
+            self.Print("| Media received: No")
+            self.Print("|")
+            self.Print("| Category: Ringing")
+            self.Print("")
+            self.AddCategory("Ringing")       
 
 
         self.Running = False
@@ -378,6 +428,36 @@ class Classifier(PrintClass, log, CallData):
                 self.Via.append([GetIPfromSIP(line.strip()), GetPortfromSIP(line.strip()), strTransport])
         
         
+    # def AddCategory
+    
+    def AddCategory(self, strCategory):
         
+        bFound = False
         
+        for i in range(len(self.Classification)):
+            if self.Classification[i] == strCategory:
+                bFound = True
+                break
+
+        if bFound == True: return
+
+        self.Classification.append(strCategory)
+
+    
+    # def IfCategory
+    #
+    # Returns whether a category is found or not
+    
+    def IfCategory(self, strCategory):
+
+        bFound = False
         
+        for i in range(len(self.Classification)):
+            if self.Classification[i] == strCategory:
+                bFound = True
+                break
+
+        if bFound == True: 
+            return True
+        else:
+            return False

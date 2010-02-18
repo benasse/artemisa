@@ -94,6 +94,11 @@ LastINVITEreceived = ""             # Store the last INVITE message received in 
 intN_INVITE = 0
 strFLOOD = "no"
 
+strINVITETag = ""                   # Tag of the received INVITE
+bACKReceived = False                # We must know if an ACK was received
+
+bMediaReceived = False              # Flag to know whether media has been received
+
 # class Extensions
 #
 # Object created in order to keep the user data which an unique extension.
@@ -191,18 +196,34 @@ def log_cb(level, str, len):
     global intMaxCalls
     global intN_INVITE
     global strFLOOD
+    global bACKReceived
+    global strINVITETag
     
     strTemp = str.strip().splitlines(True)
     
     logging.PJSUA_Log(str)
     
     bFound = False
+    bAckFound = False
     
     for line in strTemp:
         if line.find("INVITE") != -1 and line.find("SIP/2.0") != -1:
             bFound = True
             break
-        
+        elif line.find("ACK") != -1 and line.find("SIP/2.0") != -1:
+            bAckFound = True
+            break
+
+    # Here we check if the ACK received is for the received INVITE.        
+    if bAckFound == True:
+        for line in strTemp:
+            line = line.strip()
+            if line.find("tag=") != -1:
+                if strINVITETag == line.split("tag=")[1]:
+                    bACKReceived = True
+                    break
+        return
+            
     if bFound == False: return # If False means that the received message was not an INVITE one
 
     intN_INVITE += 1
@@ -218,6 +239,12 @@ def log_cb(level, str, len):
                 strINVITEMessage = strINVITEMessage + "\n" + line
             else:
                 strINVITEMessage = line
+                
+    for line in strTemp:
+        line = line.strip()                
+        if line.find("tag=") != -1:
+            strINVITETag = line.split("tag=")[1] # Store the tag of the INVITE to be used later to identify the ACK
+            break
     
     if LastINVITEreceived == strINVITEMessage:
         #Output.Print("Duplicated INVITE arrived. Seq: " + str(nSeq))
@@ -370,6 +397,7 @@ class MyCallCallback(pj.CallCallback):
         
         global lib
         global Sound_enabled
+        global bMediaReceived
         
         if Sound_enabled == False: return
         
@@ -397,6 +425,8 @@ class MyCallCallback(pj.CallCallback):
                 lib.conf_connect(call_slot, self.rec_slot)
                 
                 Output.Print("Audio is now being recorded on file: " + strFilename)
+                
+                bMediaReceived = True
                 
             except Exception, e:
                 Output.Print("WARNING Error while trying to record the call. Error: " + str(e))
@@ -596,7 +626,23 @@ def AnalyzeCall(strData):
     global strLocal_port
     global VERSION
     global intNumCalls
+    global bACKReceived
+    global bMediaReceived
     
+    # Wait 5 seconds for an ACK and media events. FIXME: This could be better managed.
+    for i in range(5):
+        Output.Print("Waiting for SIP dialogs (" + str(5-i) + ")...")
+        sleep(1)
+    
+    
+    #self.email = Email() # Creates an Email object.
+
+    #if self.Behaviour_actions.count("investigate") == 0:
+    #    self.send_results(True)
+    #    self.Running = False
+    #    return
+        
+        
     classifier_instance = Classifier()
     classifier_instance.VERSION = VERSION
     classifier_instance.strLocal_IP = strLocal_IP
@@ -614,12 +660,24 @@ def AnalyzeCall(strData):
     classifier_instance.Message = strData
     classifier_instance.verbose = verbose
     classifier_instance.Extensions = Extensions
+    classifier_instance.bACKReceived = bACKReceived
+    classifier_instance.bMediaReceived = bMediaReceived
     classifier_instance.Start()
 
     while classifier_instance.Running:
         pass
     
+    
+    Output.Print("+ The messages is classified as:")
+    for i in range(len(classifier_instance.Classification)):
+        Output.Print("|   " + classifier_instance.Classification[i])
+    
+    Output.Print("")
+    
     del classifier_instance
+    
+    bACKReceived = False
+    bMediaReceived = False
     
     intNumCalls -= 1
 
