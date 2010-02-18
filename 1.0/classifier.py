@@ -112,7 +112,7 @@ class Classifier(PrintClass, log, CallData):
         self.Print("")
         self.Print("From: " + self.From_Extension + " in " + self.From_IP)
         self.Print("To: "  + self.To_Extension + " in " + self.To_IP)
-        self.Print("Contact: "  + self.Contact_Extension + " in " + self.Contact_IP)
+        self.Print("Contact: "  + self.Contact_Extension + " in " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport)
         self.Print("Connection: " + self.Connection)
         self.Print("Owner: " + self.Owner)
         
@@ -195,10 +195,10 @@ class Classifier(PrintClass, log, CallData):
         self.Print("+ Checking if SIP port is opened...")
 
         self.Print("|")
-        self.Print("| + Checking " + self.INVITE_IP + ":" + self.INVITE_Port + "/" + self.INVITE_Transport + "...")
+        self.Print("| + Checking " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport + "...")
         self.Print("| |")   
             
-        strResult = CheckPort(self.INVITE_IP, self.INVITE_Port, self.INVITE_Transport)
+        strResult = CheckPort(self.Contact_IP, self.Contact_Port, self.Contact_Transport)
             
         if strResult == 0 or strResult < 0:
             self.Print("| | Error while scanning the port.")
@@ -303,8 +303,16 @@ class Classifier(PrintClass, log, CallData):
         self.From_Extension = GetExtensionfromSIP(GetSIPHeader("From",self.Message))
         
         self.Contact_IP = GetIPfromSIP(GetSIPHeader("Contact",self.Message))
+        self.Contact_Port = GetPortfromSIP(GetSIPHeader("Contact",self.Message))
+        if self.Contact_Port == "": self.Contact_Port = "5060" # By default
         self.Contact_Extension = GetExtensionfromSIP(GetSIPHeader("Contact",self.Message))
-        
+        if GetSIPHeader("Contact",self.Message).find("udp") != -1 or GetSIPHeader("Contact",self.Message).find("UDP") != -1: 
+            self.Contact_Transport = "udp"
+        elif GetSIPHeader("Contact",self.Message).find("tcp") != -1 or GetSIPHeader("Contact",self.Message).find("TCP") != -1:
+            self.Contact_Transport = "tcp"
+        else:
+            self.Contact_Transport = "udp" # By default
+            
         self.Connection = GetIPfromSIP(GetSIPHeader("c=",self.Message))
         self.Owner = GetIPfromSIP(GetSIPHeader("c=",self.Message))
 
