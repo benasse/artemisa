@@ -6,5 +6,6 @@ Ideas for future implementations:
 * Relate the traceroute results to google maps.
 * Develop the "aggressive" mode in order to counterattack the intruder.
 * Export some variables to be used by the automatically executed scripts.
+* Implement advanced fingerprinting.
 
 

@@ -17,7 +17,7 @@
 
 
 
-from commons import PrintClass, GetSIPHeader, Search, GetTimeClass, GetIPfromSIP, GetExtensionfromSIP, RemoveComments, ResolveDNS
+from commons import PrintClass, GetSIPHeader, Search, GetTimeClass, GetIPfromSIP, GetPortfromSIP, GetExtensionfromSIP, RemoveComments, ResolveDNS
 
 from mail import Email
 from htmlresults import get_results_html
@@ -25,12 +25,18 @@ from logs import log                # Import class log from logs.py
 
 from check_fingerprint import CheckFingerprint
 from check_dns import CheckDNS
+from check_port import CheckPort
 
 # class CallData
 #
 # It stores information extracted from the SIP message.
 
 class CallData():
+    
+    INVITE_IP = "" # Corresponds to the first line of a INVITE message
+    INVITE_Port = ""
+    INVITE_Transport = ""
+    INVITE_Extension = ""
     
     To_IP = ""
     To_Extension = ""
@@ -39,6 +45,8 @@ class CallData():
     From_Extension = ""
     
     Contact_IP = ""
+    Contact_Port = ""
+    Contact_Transport = ""
     Contact_Extension = ""
     
     Via = []
@@ -172,18 +180,103 @@ class Classifier(PrintClass, log, CallData):
                 self.Print("| | DNS/IP cannot be resolved.")
                 self.Print("| |")
                 self.Print("| | Category: Spoofed message")
+                self.Print("")
             else:
                 self.Print("| | " + DNS_Result) 
                 self.Print("| |")
                 self.Print("| | Category: Interactive attack")
+                self.Print("")
     
-    
-                
+
         # ---------------------------------------------------------------------------------
         # Check if SIP ports are opened
         # ---------------------------------------------------------------------------------
 
+        self.Print("+ Checking if SIP port is opened...")
 
+        self.Print("|")
+        self.Print("| + Checking " + self.INVITE_IP + ":" + self.INVITE_Port + "/" + self.INVITE_Transport + "...")
+        self.Print("| |")   
+            
+        strResult = CheckPort(self.INVITE_IP, self.INVITE_Port, self.INVITE_Transport)
+            
+        if strResult == 0 or strResult < 0:
+            self.Print("| | Error while scanning the port.")
+            self.Print("| |")
+            self.Print("| | Category: -")
+            self.Print("")
+        else:
+            if strResult.find("closed") != -1: 
+                self.Print("| | Result: Port closed") 
+                self.Print("| |")
+                self.Print("| | Category: Spoofed message")
+                self.Print("")
+            else:
+                self.Print("| | Result: Port opened") 
+                self.Print("| |")
+                self.Print("| | Category: Interactive attack")
+                self.Print("")
+
+        # ---------------------------------------------------------------------------------
+        # Check if media ports are opened
+        # ---------------------------------------------------------------------------------
+
+        self.Print("+ Checking if media port is opened...")
+
+        # FIXME: this parsing could be improved
+        strRTPPort = GetSIPHeader("m=audio", self.Message).split(" ")[1]
+
+        self.Print("|")
+        self.Print("| + Checking " + self.INVITE_IP + ":" + strRTPPort + "/" + "udp" + "...")
+        self.Print("| |")   
+            
+        strResult = CheckPort(self.INVITE_IP, strRTPPort, "udp")
+            
+        if strResult == 0 or strResult < 0:
+            self.Print("| | Error while scanning the port.")
+            self.Print("| |")
+            self.Print("| | Category: -")
+            self.Print("")
+        else:
+            if strResult.find("closed") != -1: 
+                self.Print("| | Result: Port closed") 
+                self.Print("| |")
+                self.Print("| | Category: Spoofed message")
+                self.Print("")
+            else:
+                self.Print("| | Result: Port opened") 
+                self.Print("| |")
+                self.Print("| | Category: Interactive attack")
+                self.Print("")
+                
+
+        # ---------------------------------------------------------------------------------
+        # Check request URI
+        # ---------------------------------------------------------------------------------
+
+        self.Print("+ Checking request URI...")
+        self.Print("|")
+        self.Print("| Extension in field To: " + self.To_Extension)
+        self.Print("|")
+        
+        # Now it checks if the extension contained in the "To" field is one of the honeypot's registered
+        # extesions.
+        bFound = False
+        for i in range(len(self.Extensions)):
+            if str(self.Extensions[i].Extension) == self.To_Extension:
+                # The extension contained in the "To" field is an extension of the honeypot.
+                bFound = True
+                self.Print("| Request addressed to the honeypot? Yes")
+                break
+                
+        if bFound == False:
+            self.Print("| Request addressed to the honeypot? No")
+            self.Print("")
+            
+
+        self.Running = False
+        
+        return
 
 
     # def GetCallData
@@ -192,6 +285,17 @@ class Classifier(PrintClass, log, CallData):
     
     def GetCallData(self):
         
+        self.INVITE_IP = GetIPfromSIP(GetSIPHeader("INVITE",self.Message))
+        self.INVITE_Port = GetPortfromSIP(GetSIPHeader("INVITE",self.Message))
+        if self.INVITE_Port == "": self.INVITE_Port = "5060" # By default
+        self.INVITE_Extension = GetExtensionfromSIP(GetSIPHeader("INVITE",self.Message))
+        if GetSIPHeader("INVITE",self.Message).find("udp") != -1 or GetSIPHeader("INVITE",self.Message).find("UDP") != -1: 
+            self.INVITE_Transport = "udp"
+        elif GetSIPHeader("INVITE",self.Message).find("tcp") != -1 or GetSIPHeader("INVITE",self.Message).find("TCP") != -1:
+            self.INVITE_Transport = "tcp"
+        else:
+            self.INVITE_Transport = "udp" # By default
+            
         self.To_IP = GetIPfromSIP(GetSIPHeader("To",self.Message))
         self.To_Extension = GetExtensionfromSIP(GetSIPHeader("To",self.Message))
         

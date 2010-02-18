@@ -90,6 +90,44 @@ def GetIPfromSIP(strHeaderLine):
 	return strIP.strip()
 	
 
+
+# def GetPortfromSIP
+#
+# This function gets and returns the port number from a SIP header field.
+
+def GetPortfromSIP(strHeaderLine):
+
+	if strHeaderLine == "": return ""
+
+	if strHeaderLine.find("sip:") != -1:
+		strPort = strHeaderLine.split("sip:")[1]
+		strPort = strPort.split(" ")[0]
+		strPort = strPort.split(";")[0]
+		if strPort.find("@") != -1:
+			strPort = strPort.split("@")[1]
+		strPort = strPort.split(">")[0]
+		
+		if strPort.find(":") != -1:
+			strPort = strPort.split(":")[1].strip()
+		else:
+			return ""
+
+		return strPort.strip()
+
+	strPort = strHeaderLine.split(">")[0]
+	if strPort.find("@") != -1:
+		strPort = strPort.split("@")[1]
+	strPort = strPort.split(";")[0]
+	if strPort.find(" ") != -1:
+		strPort = strPort.split(" ")[len(strPort.split(" "))-1]
+
+	if strPort.find(":") != -1:
+		strPort = strPort.split(":")[1].strip()
+	else:
+		return ""
+	
+	
+
 # def GetExtensionfromSIP
 #
 # This function gets and returns the extension value from a SIP header field.
