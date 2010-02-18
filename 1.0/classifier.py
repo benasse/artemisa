@@ -117,7 +117,7 @@ class Classifier(PrintClass, log, CallData):
         self.Print("Owner: " + self.Owner)
         
         for i in range(len(self.Via)):
-            self.Print("Via " + str(i) + ": " + self.Via[i])
+            self.Print("Via " + str(i) + ": " + self.Via[i][0] + ":" + self.Via[i][1] + "/" + self.Via[i][2])
             
         self.Print(self.UserAgent)
         self.Print("")
@@ -166,7 +166,7 @@ class Classifier(PrintClass, log, CallData):
         if ip_to_analyze.count(self.Owner) == 0: ip_to_analyze.append(self.Owner)
         
         for i in range(len(self.Via)):
-                if ip_to_analyze.count(self.Via[i]) == 0: ip_to_analyze.append(self.Via[i])
+                if ip_to_analyze.count(self.Via[i][0]) == 0: ip_to_analyze.append(self.Via[i][0])
        
         
         # Analyze each IP address 
@@ -267,12 +267,56 @@ class Classifier(PrintClass, log, CallData):
                 # The extension contained in the "To" field is an extension of the honeypot.
                 bFound = True
                 self.Print("| Request addressed to the honeypot? Yes")
+                self.Print("")
                 break
                 
         if bFound == False:
             self.Print("| Request addressed to the honeypot? No")
             self.Print("")
             
+
+        # ---------------------------------------------------------------------------------
+        # Check if proxy in Via
+        # ---------------------------------------------------------------------------------
+
+        # Via[0] is the first Via field, so that it has the IP of the last proxy.
+        
+        self.Print("+ Checking if proxy in Via...")
+        self.Print("|")
+        self.Print("| + Checking " + self.Via[0][0] + ":" + self.Via[0][1] + "/" + self.Via[0][2] + "...")
+        self.Print("| |")   
+
+        # We determine the existence of the proxy by checking the port with nmap
+        strResult = CheckPort(self.Via[0][0], self.Via[0][1], self.Via[0][2])
+            
+        if strResult == 0 or strResult < 0:
+            self.Print("| | Error while scanning.")
+            self.Print("| |")
+            self.Print("| | Category: -")
+            self.Print("")
+        else:
+            if strResult.find("closed") != -1: 
+                self.Print("| | Result: There is no SIP proxy") 
+                self.Print("| |")
+                self.Print("| | Category: DialPlan fault")
+                self.Print("")
+            else:
+                self.Print("| | Result: There is a SIP proxy") 
+                self.Print("| |")
+                self.Print("| | Category: Direct attack")
+                self.Print("")
+        
+
+        # ---------------------------------------------------------------------------------
+        # Check for ACK
+        # ---------------------------------------------------------------------------------
+        
+
+
+        # ---------------------------------------------------------------------------------
+        # Check received media
+        # ---------------------------------------------------------------------------------
+
 
         self.Running = False
         
@@ -324,7 +368,14 @@ class Classifier(PrintClass, log, CallData):
     
         for line in strTemp:
             if line[0:4] == "Via:":
-                self.Via.append(GetIPfromSIP(line.strip()))
+                if line.find("UDP") != -1 or line.find("udp") != -1:
+                    strTransport = "udp"
+                elif line.find("TCP") != -1 or line.find("tcp") != -1:
+                    strTransport = "tcp"
+                else:
+                    strTransport = "other" #FIXME: this should be changed
+                                    
+                self.Via.append([GetIPfromSIP(line.strip()), GetPortfromSIP(line.strip()), strTransport])
         
         
         

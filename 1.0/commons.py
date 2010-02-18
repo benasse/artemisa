@@ -122,9 +122,11 @@ def GetPortfromSIP(strHeaderLine):
 		strPort = strPort.split(" ")[len(strPort.split(" "))-1]
 
 	if strPort.find(":") != -1:
-		strPort = strPort.split(":")[1].strip()
+		strPort = strPort.split(":")[len(strPort.split(":"))-1].strip()
 	else:
 		return ""
+	
+	return strPort.strip()
 	
 	
 
