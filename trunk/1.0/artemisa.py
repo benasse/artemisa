@@ -94,7 +94,7 @@ LastINVITEreceived = ""             # Store the last INVITE message received in 
 intN_INVITE = 0
 strFLOOD = "no"
 
-## class Extensions
+# class Extensions
 #
 # Object created in order to keep the user data which an unique extension.
 
@@ -105,7 +105,7 @@ class Extension():
     Password = ""
    
       
-## class Server
+# class Server
 #
 # Manage registration information.
 
@@ -131,7 +131,7 @@ class Server():
         self.acc_cfg = None
         self.acc_cb = None
         
-    ## def Register
+    # def Register
     #
     # This function registers the honeypot at the SIP server, and keep it alive sending REGISTRAR
     # messages within the time specified in the configuration file.
@@ -177,7 +177,7 @@ class Server():
     #    self.acc = None
 
 
-## def lob_cb
+# def lob_cb
 #
 # This function saves the data returned by PJSUA module. This shows also the SIP packet, so it's possible
 # to analyse it directly from here, and there is no need to use some capturing packet function.
@@ -249,7 +249,7 @@ def log_cb(level, str, len):
     thrAnalyzeCall.start()
 
 
-## class MyAccountCallback
+# class MyAccountCallback
 #
 # Callback to receive events from account.
 
@@ -325,7 +325,7 @@ class MyAccountCallback(pj.AccountCallback):
         #current_call.hangup()
         
 
-## class MyCallCallback
+# class MyCallCallback
 #         
 # Callback to receive events from Call
 
@@ -416,7 +416,7 @@ class MyCallCallback(pj.CallCallback):
             Output.Print("NOTICE Audio is inactive.") 
             
 
-## def LoadExtensions
+# def LoadExtensions
 #
 # Load configurations from file extensions.conf
 
@@ -450,7 +450,7 @@ def LoadExtensions():
     
     
 
-## def LoadServers
+# def LoadServers
 #
 # Load configurations from file servers.conf
 
@@ -498,7 +498,7 @@ def LoadServers():
     del config
     
     
-## def LoadConfiguration
+# def LoadConfiguration
 #
 # Load configurations from file artemisa.conf
 
@@ -580,7 +580,7 @@ def LoadConfiguration():
         
         
 
-## def AnalyzeCall
+# def AnalyzeCall
 #
 # Core of the program. Here is where the honeypot concludes if the packet received is trusted or not.
 
@@ -623,7 +623,8 @@ def AnalyzeCall(strData):
     
     intNumCalls -= 1
 
-## def EndConnection
+
+# def EndConnection
 #
 # Finalizes PJSUA.
 
@@ -642,7 +643,7 @@ def EndConnection():
     lib = None
     
     
-## def ShowHelp
+# def ShowHelp
 #
 # Shows the help.
 # Arguments: 
@@ -667,7 +668,7 @@ def ShowHelp(bCommands = True):
     print ""
     print "show statistics, stats   Show the statistics."
     print ""
-    print "clean historical         Remove the historical database."
+    #print "clean historical         Remove the historical database."
     print "clean logs               Remove all log files."
     print "clean results            Remove all results files."
     print "clean alarms             Remove all alarm files."
@@ -683,7 +684,7 @@ def ShowHelp(bCommands = True):
     print "s, q, quit, exit         Exit"
     
     
-## def main
+# def main
 #
 # Here starts Artemisa.
     
@@ -848,10 +849,10 @@ def main():
             lib.hangup_all()
             print "Ok"
             
-        elif s == "clean historical":
-            Process = Popen("rm -f ./historical/*", shell=True, stdout=PIPE)
-            Process.wait()
-            print "Cleaned"
+        #elif s == "clean historical":
+        #    Process = Popen("rm -f ./historical/*", shell=True, stdout=PIPE)
+        #    Process.wait()
+        #    print "Cleaned"
             
         elif s == "clean logs":
             Process = Popen("rm -f ./logs/*.log", shell=True, stdout=PIPE)
@@ -880,8 +881,8 @@ def main():
             print "Cleaned"
                         
         elif s == "clean all":
-            Process = Popen("rm -f ./historical/*", shell=True, stdout=PIPE)
-            Process.wait()
+            #Process = Popen("rm -f ./historical/*", shell=True, stdout=PIPE)
+            #Process.wait()
             Process = Popen("rm -f ./logs/*.log", shell=True, stdout=PIPE)
             Process.wait()
             Process = Popen("rm -f ./logs/invite_msgs/*.log", shell=True, stdout=PIPE)
