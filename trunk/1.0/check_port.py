@@ -32,14 +32,16 @@ def CheckPort(strIP, strPort, strTransport, verbose):
     
     try:        
         if strTransport == "udp":
-            Process = Popen("nmap -sU " + strIP + " -p " + strPort, shell=True, stdout=PIPE)
+            strCommand = "nmap -sU " + strIP + " -p " + strPort
+            Process = Popen(strCommand, shell=True, stdout=PIPE)
             if verbose == True:
-                Output.Print("| | Tool employed: " + "nmap -sU " + strIP + " -p " + strPort)
+                Output.Print("| | Tool employed: " + strCommand)
                 Output.Print("| |")
         elif strTransport == "tcp":
-            Process = Popen("nmap -sS " + strIP + " -p " + strPort, shell=True, stdout=PIPE)
+            strCommand = "nmap -sS " + strIP + " -p " + strPort
+            Process = Popen(strCommand, shell=True, stdout=PIPE)
             if verbose == True:
-                Output.Print("| | Tool employed: " + "nmap -sS " + strIP + " -p " + strPort)
+                Output.Print("| | Tool employed: " + strCommand)
                 Output.Print("| |")
                         
         Process.wait()
