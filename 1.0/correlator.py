@@ -15,3 +15,46 @@
 # You should have received a copy of the GNU General Public License
 # along with Artemisa. If not, see <http://www.gnu.org/licenses/>.
 
+from commons import PrintClass
+
+# def Correlator
+
+def Correlator(Classification, bFlood):
+    
+    Output = PrintClass()
+    
+    Output.Print("")
+    
+    Output.Print("===================================================================")
+    Output.Print("| Correlation                                                     |")
+    Output.Print("===================================================================")
+    Output.Print("")
+    
+    Output.Print("Correlation:")
+    
+    # FIXME: For now, this is a very simple correlator that should be improved.
+    
+    if bFlood == True:
+        Output.Print("Flood")
+         
+    elif IfCategory("SPIT", Classification) == True:
+        Output.Print("SPIT")
+        
+        
+# def IfCategory
+#
+# Returns whether a category is found or not
+    
+def IfCategory(strCategory, Classification):
+
+    bFound = False
+        
+    for i in range(len(Classification)):
+        if Classification[i] == strCategory:
+            bFound = True
+            break
+
+    if bFound == True: 
+        return True
+    else:
+        return False

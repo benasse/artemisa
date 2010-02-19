@@ -122,7 +122,7 @@ class Classifier(PrintClass, log, CallData):
         self.Print("")
 
         self.Print("===================================================================")
-        self.Print("| Information about the classification                            |")
+        self.Print("| Classification                                                  |")
         self.Print("===================================================================")
         self.Print("")
                 
@@ -444,20 +444,3 @@ class Classifier(PrintClass, log, CallData):
         self.Classification.append(strCategory)
 
     
-    # def IfCategory
-    #
-    # Returns whether a category is found or not
-    
-    def IfCategory(self, strCategory):
-
-        bFound = False
-        
-        for i in range(len(self.Classification)):
-            if self.Classification[i] == strCategory:
-                bFound = True
-                break
-
-        if bFound == True: 
-            return True
-        else:
-            return False
