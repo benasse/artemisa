@@ -26,6 +26,8 @@ def CheckDNS(strIP, verbose):
 
     if strIP == "": return 0
     
+    Output = PrintClass()
+    
     # Check if strIP is an IP or a host name
     bDNS = False
     try:
@@ -35,11 +37,21 @@ def CheckDNS(strIP, verbose):
             
     if bDNS == False: # It's an IP
         try:        
-            Process = Popen("dig -x " + strIP + " +short", shell=True, stdout=PIPE)
+            strCommand = "dig -x " + strIP + " +short"
+            Process = Popen(strCommand, shell=True, stdout=PIPE)
             Process.wait()
-            strData = Process.communicate()[0].strip().split("\n")[0]
+            strData = Process.communicate()[0].strip().split("\n")
                 
-            strIP = strData
+            if verbose == True:
+                Output.Print("| | Tool employed: " + strCommand)
+                Output.Print("| |")
+                
+                Output.Print("| | + Tool output:")
+                for line in strData:
+                    Output.Print("| | | " + line)
+                Output.Print("| |")
+                
+            strIP = strData[0]
             
             if strData == "": return 0
             
@@ -50,11 +62,21 @@ def CheckDNS(strIP, verbose):
             return -1
     else:
             
-        try:        
-            Process = Popen("dig " + strIP + " A +noall +answer +short", shell=True, stdout=PIPE)
+        try:      
+            strCommand = "dig " + strIP + " A +noall +answer +short"  
+            Process = Popen(strCommand, shell=True, stdout=PIPE)
             Process.wait()
             strData = Process.communicate()[0].strip().split("\n")
             strIP = strData[len(strData)-1]
+                            
+            if verbose == True:
+                Output.Print("| | Tool employed: " + strCommand)
+                Output.Print("| |")
+                
+                Output.Print("| | + Tool output:")
+                for line in strData:
+                    Output.Print("| | | " + line)
+                Output.Print("| |")
                             
             if strData == "": return 0
             
