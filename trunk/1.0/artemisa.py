@@ -668,7 +668,7 @@ def AnalyzeCall(strData):
         pass
     
     
-    Output.Print("+ The messages is classified as:")
+    Output.Print("+ The message is classified as:")
     for i in range(len(classifier_instance.Classification)):
         Output.Print("|   " + classifier_instance.Classification[i])
     

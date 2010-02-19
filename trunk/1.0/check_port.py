@@ -24,20 +24,34 @@ from libs.IPy.IPy import *       # Module to deal with IPs
 #
 # This function checks a given IP:port and it's used for both SIP and media ports analysis
 
-def CheckPort(strIP, strPort, strTransport):
+def CheckPort(strIP, strPort, strTransport, verbose):
 
     if strIP == "" or strPort == "": return -1
+    
+    Output = PrintClass()
     
     try:        
         if strTransport == "udp":
             Process = Popen("nmap -sU " + strIP + " -p " + strPort, shell=True, stdout=PIPE)
+            if verbose == True:
+                Output.Print("| | Tool employed: " + "nmap -sU " + strIP + " -p " + strPort)
+                Output.Print("| |")
         elif strTransport == "tcp":
             Process = Popen("nmap -sS " + strIP + " -p " + strPort, shell=True, stdout=PIPE)
-        
+            if verbose == True:
+                Output.Print("| | Tool employed: " + "nmap -sS " + strIP + " -p " + strPort)
+                Output.Print("| |")
+                        
         Process.wait()
         
         strData = Process.communicate()[0].strip().split("\n")
         
+        if verbose == True:
+            Output.Print("| | + Tool output:")
+            for line in strData:
+                Output.Print("| | | " + line)
+            Output.Print("| |")
+                
         strState = ""
         
         # FIXME: The following lines parse the output returned by nmap. This part can be modified
@@ -61,8 +75,8 @@ def CheckPort(strIP, strPort, strTransport):
     
     
 if __name__ == '__main__':
-    if len(sys.argv) == 4:
-        print CheckPort(sys.argv[1], sys.argv[2], sys.argv[3])
+    if len(sys.argv) == 5:
+        print CheckPort(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     else:
         print "Arguments are required!"
         sys.exit(1)
