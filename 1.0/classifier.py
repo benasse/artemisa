@@ -175,7 +175,7 @@ class Classifier(PrintClass, log, CallData):
             self.Print("|")
             self.Print("| + Checking " + ip_to_analyze[i] + "...")
             self.Print("| |")   
-            DNS_Result = CheckDNS(ip_to_analyze[i])
+            DNS_Result = CheckDNS(ip_to_analyze[i], self.verbose)
             if DNS_Result == 0 or DNS_Result < 0:
                 self.Print("| | DNS/IP cannot be resolved.")
                 self.Print("| |")
@@ -199,7 +199,7 @@ class Classifier(PrintClass, log, CallData):
         self.Print("| + Checking " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport + "...")
         self.Print("| |")   
             
-        strResult = CheckPort(self.Contact_IP, self.Contact_Port, self.Contact_Transport)
+        strResult = CheckPort(self.Contact_IP, self.Contact_Port, self.Contact_Transport, self.verbose)
             
         if strResult == 0 or strResult < 0:
             self.Print("| | Error while scanning the port.")
@@ -240,10 +240,10 @@ class Classifier(PrintClass, log, CallData):
             strRTPPort = strRTPPort.split(" ")[1]
 
             self.Print("|")
-            self.Print("| + Checking " + self.INVITE_IP + ":" + strRTPPort + "/" + "udp" + "...")
+            self.Print("| + Checking " + self.Contact_IP + ":" + strRTPPort + "/" + "udp" + "...")
             self.Print("| |")   
                 
-            strResult = CheckPort(self.INVITE_IP, strRTPPort, "udp")
+            strResult = CheckPort(self.Contact_IP, strRTPPort, "udp", self.verbose)
                 
             if strResult == 0 or strResult < 0:
                 self.Print("| | Error while scanning the port.")
@@ -308,7 +308,7 @@ class Classifier(PrintClass, log, CallData):
             self.Print("| |")   
     
             # We determine the existence of the proxy by checking the port with nmap
-            strResult = CheckPort(self.Via[0][0], self.Via[0][1], self.Via[0][2])
+            strResult = CheckPort(self.Via[0][0], self.Via[0][1], self.Via[0][2], self.verbose)
                 
             if strResult == 0 or strResult < 0:
                 self.Print("| | Error while scanning.")

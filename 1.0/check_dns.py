@@ -22,7 +22,7 @@ from libs.IPy.IPy import *       # Module to deal with IPs
 
 # def CheckDNS
 
-def CheckDNS(strIP):
+def CheckDNS(strIP, verbose):
 
     if strIP == "": return 0
     
@@ -67,8 +67,8 @@ def CheckDNS(strIP):
     
     
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-         print CheckDNS(sys.argv[1])
+    if len(sys.argv) > 2:
+         print CheckDNS(sys.argv[1], sys.argv[2])
     else:
         print "Arguments are required!"
         sys.exit(1)
