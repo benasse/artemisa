@@ -32,7 +32,8 @@ from time import strftime, sleep, time
 import sched
 from logs import log                # Import class log from logs.py
 from commons import *               # Import functions from commons.py
-from classifier import Classifier   # 
+from classifier import Classifier   # Message classifier 
+from correlator import Correlator   # Correlator
 import threading                    # Use of threads.
 
 from subprocess import Popen, PIPE
@@ -96,8 +97,8 @@ strFLOOD = "no"
 
 strINVITETag = ""                   # Tag of the received INVITE
 bACKReceived = False                # We must know if an ACK was received
-
 bMediaReceived = False              # Flag to know whether media has been received
+bFlood = False                      # Flag to know whether flood was detected
 
 # class Extensions
 #
@@ -198,6 +199,7 @@ def log_cb(level, str, len):
     global strFLOOD
     global bACKReceived
     global strINVITETag
+    global bFlood
     
     strTemp = str.strip().splitlines(True)
     
@@ -262,6 +264,7 @@ def log_cb(level, str, len):
         Output.Print("The maximum number of calls to analyze simultaneously has been reached.")
         Output.Print("Executing on_flood.sh ...")
         strFLOOD = "yes"
+        bFlood = True
         
         # Execute a script
         Process = Popen("bash ./scripts/on_flood.sh", shell=True, stdout=PIPE)
@@ -628,6 +631,7 @@ def AnalyzeCall(strData):
     global intNumCalls
     global bACKReceived
     global bMediaReceived
+    global bFlood
     
     # Wait 5 seconds for an ACK and media events. FIXME: This could be better managed.
     for i in range(5):
@@ -670,14 +674,23 @@ def AnalyzeCall(strData):
     
     Output.Print("+ The message is classified as:")
     for i in range(len(classifier_instance.Classification)):
-        Output.Print("|   " + classifier_instance.Classification[i])
+        Output.Print("| " + classifier_instance.Classification[i])
     
     Output.Print("")
+    
+    
+    # Call the correlator
+    Correlator(classifier_instance.Classification, bFlood)
+    
+    
+    
+    # End of the analysis
     
     del classifier_instance
     
     bACKReceived = False
     bMediaReceived = False
+    bFlood = False
     
     intNumCalls -= 1
 
