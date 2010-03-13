@@ -157,7 +157,7 @@ def GetExtensionfromSIP(strHeaderLine):
 
 class PrintClass(log, GetTimeClass):
 	
-	def Print(self, strData, bPrint=True):
+	def Print(self, strData, bPrint=True, strFilename=""):
 
 		strTemp = strData.splitlines()
 		
@@ -167,7 +167,20 @@ class PrintClass(log, GetTimeClass):
 			else:
 				for line in strTemp:
 					print self.GetTime() + " " + line.replace("\n","").replace("\r","")
-		   	   
+		   	
+		# if strFilename has a string value, it stores the results in a file   
+		if strFilename != "":
+			File = open(strFilename, "a")
+			
+			if strData == "":
+				File.write("\n")
+			else:
+				for line in strTemp:
+					File.write(line.replace("\n","").replace("\r","" + "\n") + "\n")
+					            
+			File.close()
+			
+			
 		self.Log(strData)
 		
 		
