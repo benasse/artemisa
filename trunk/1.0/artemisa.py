@@ -36,6 +36,9 @@ from classifier import Classifier   # Message classifier
 from correlator import Correlator   # Correlator
 import threading                    # Use of threads.
 
+from mail import Email
+from htmlresults import get_results_html
+
 from subprocess import Popen, PIPE
 
 try:
@@ -661,7 +664,7 @@ def AnalyzeCall(strData):
     elif behaviour_mode == "aggressive":
         classifier_instance.Behaviour_actions = Aggressive_mode
     
-    classifier_instance.Message = strData
+    classifier_instance.SIP_Message = strData
     classifier_instance.verbose = verbose
     classifier_instance.Extensions = Extensions
     classifier_instance.bACKReceived = bACKReceived
@@ -672,16 +675,36 @@ def AnalyzeCall(strData):
         pass
     
     
-    Output.Print("+ The message is classified as:")
+    Output.Print("+ The message is classified as:",True,classifier_instance.Results_file)
     for i in range(len(classifier_instance.Classification)):
-        Output.Print("| " + classifier_instance.Classification[i])
+        Output.Print("| " + classifier_instance.Classification[i],True,classifier_instance.Results_file)
     
-    Output.Print("")
+    Output.Print("",True,classifier_instance.Results_file)
     
     
     # Call the correlator
-    Correlator(classifier_instance.Classification, bFlood)
+    Correlator(classifier_instance.Classification, bFlood, classifier_instance.Results_file)
     
+    # Send the results by e-mail
+    email = Email() # Creates an Email object
+
+    if email.Enabled == False: 
+        Output.Print("NOTICE E-mail notification is disabled.")
+        return
+
+    strData = get_results_html(classifier_instance.Results_file, True, classifier_instance.SIP_Message, classifier_instance.From_Extension, classifier_instance.From_IP, classifier_instance.To_Extension, classifier_instance.To_IP, classifier_instance.Contact_Extension, classifier_instance.Contact_IP, classifier_instance.Connection, classifier_instance.Owner, classifier_instance.Via, classifier_instance.UserAgent, VERSION, strLocal_IP, strLocal_port)
+                
+    Output.Print("NOTICE Sending this report by e-mail...")
+    Output.Print(email.sendemail(strData))
+
+    del email
+
+    # Save the results in a HTML file
+    File = open(classifier_instance.Results_file + ".html", "w")
+        
+    File.write(get_results_html(classifier_instance.Results_file, False, classifier_instance.SIP_Message, classifier_instance.From_Extension, classifier_instance.From_IP, classifier_instance.To_Extension, classifier_instance.To_IP, classifier_instance.Contact_Extension, classifier_instance.Contact_IP, classifier_instance.Connection, classifier_instance.Owner, classifier_instance.Via, classifier_instance.UserAgent, VERSION, strLocal_IP, strLocal_port))
+            
+    File.close()
     
     
     # End of the analysis

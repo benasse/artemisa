@@ -89,6 +89,8 @@ class Classifier(PrintClass, log, CallData):
     Behaviour_actions = []
     
     Classification = [] # Stores the classification of the message
+
+    Results_file = ""
     
     Running = True # State of the analysis
 
@@ -114,68 +116,74 @@ class Classifier(PrintClass, log, CallData):
             a = 0
             while 1:
                         
-                strFilename = "./results/" + strftime("%Y-%m-%d") + "_" + str(a) + ".txt"
+                strFilename = "./results/" + strftime("%Y-%m-%d") + "_" + str(a) 
                         
-                if os.path.isfile(strFilename) == True:
+                if os.path.isfile(strFilename + ".txt") == True:
                     a += 1
                 else:
                     break
         except:
             pass
         
+        self.Results_file = strFilename
+        
         self.Print("")
-        self.Print("===================================================================",True,strFilename)
-        self.Print("| Information about the call                                      |",True,strFilename)
-        self.Print("===================================================================",True,strFilename)
-        self.Print("",True,strFilename)
-        self.Print("From: " + self.From_Extension + " in " + self.From_IP,True,strFilename)
-        self.Print("To: "  + self.To_Extension + " in " + self.To_IP,True,strFilename)
-        self.Print("Contact: "  + self.Contact_Extension + " in " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport,True,strFilename)
-        self.Print("Connection: " + self.Connection,True,strFilename)
-        self.Print("Owner: " + self.Owner,True,strFilename)
+        #self.Print("===================================================================",True,self.Results_file)
+        #self.Print("| Information about the call                                      |",True,self.Results_file)
+        #self.Print("===================================================================",True,self.Results_file)
+
+        self.Print("******************************* Information about the call *******************************",True,self.Results_file)
+        self.Print("",True,self.Results_file)
+        
+        self.Print("From: " + self.From_Extension + " in " + self.From_IP,True,self.Results_file)
+        self.Print("To: "  + self.To_Extension + " in " + self.To_IP,True,self.Results_file)
+        self.Print("Contact: "  + self.Contact_Extension + " in " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport,True,self.Results_file)
+        self.Print("Connection: " + self.Connection,True,self.Results_file)
+        self.Print("Owner: " + self.Owner,True,self.Results_file)
         
         for i in range(len(self.Via)):
-            self.Print("Via " + str(i) + ": " + self.Via[i][0] + ":" + self.Via[i][1] + "/" + self.Via[i][2],True,strFilename)
+            self.Print("Via " + str(i) + ": " + self.Via[i][0] + ":" + self.Via[i][1] + "/" + self.Via[i][2],True,self.Results_file)
             
-        self.Print(self.UserAgent,True,strFilename)
-        self.Print("",True,strFilename)
+        self.Print(self.UserAgent,True,self.Results_file)
 
-        self.Print("===================================================================",True,strFilename)
-        self.Print("| Classification                                                  |",True,strFilename)
-        self.Print("===================================================================",True,strFilename)
-        self.Print("")
+        self.Print("",True,self.Results_file)
+
+        #self.Print("===================================================================",True,self.Results_file)
+        #self.Print("| Classification                                                  |",True,self.Results_file)
+        #self.Print("===================================================================",True,self.Results_file)
+        
+        self.Print("************************************* Classification *************************************",True,self.Results_file)
+        self.Print("",True,self.Results_file)
                 
         # ---------------------------------------------------------------------------------
         # Check fingerprint
         # ---------------------------------------------------------------------------------
         
-        self.Print("+ Checking fingerprint...",True,strFilename)
-        self.Print("|",True,strFilename)
-        self.Print("| " + self.UserAgent,True,strFilename)
+        self.Print("+ Checking fingerprint...",True,self.Results_file)
+        self.Print("|",True,self.Results_file)
+        self.Print("| " + self.UserAgent,True,self.Results_file)
         
         ToolName = CheckFingerprint(self.UserAgent)
         if ToolName < 0:
-            self.Print("|",True,strFilename)
-            self.Print("| Fingerprint check failed.",True,strFilename)
-            self.Print("",True,strFilename)
+            self.Print("|",True,self.Results_file)
+            self.Print("| Fingerprint check failed.",True,self.Results_file)
         elif ToolName == 0:
-            self.Print("|",True,strFilename)
-            self.Print("| No fingerprint found.",True,strFilename)
-            self.Print("",True,strFilename)
+            self.Print("|",True,self.Results_file)
+            self.Print("| No fingerprint found.",True,self.Results_file)
         else:
-            self.Print("|",True,strFilename)
-            self.Print("| Fingerprint found. The following attack tool was employed: " + ToolName,True,strFilename)
-            self.Print("|",True,strFilename)            
-            self.Print("| Category: Attack tool",True,strFilename)
-            self.Print("",True,strFilename)
-            self.AddCategory("Attack tool",True,strFilename)
+            self.Print("|",True,self.Results_file)
+            self.Print("| Fingerprint found. The following attack tool was employed: " + ToolName,True,self.Results_file)
+            self.Print("|",True,self.Results_file)            
+            self.Print("| Category: Attack tool",True,self.Results_file)
+            self.AddCategory("Attack tool",True,self.Results_file)
         
+        self.Print("",True,self.Results_file)
         
         # ---------------------------------------------------------------------------------
         # Check DNS
         # ---------------------------------------------------------------------------------
         
-        self.Print("+ Checking DNS...",True,strFilename)
+        self.Print("+ Checking DNS...",True,self.Results_file)
         
         ip_to_analyze = [] # IPs that will be analyzed
                 
@@ -191,98 +199,94 @@ class Classifier(PrintClass, log, CallData):
         # Analyze each IP address 
        
         for i in range(len(ip_to_analyze)):
-            self.Print("|",True,strFilename)
-            self.Print("| + Checking " + ip_to_analyze[i] + "...",True,strFilename)
-            self.Print("| |",True,strFilename)   
+            self.Print("|",True,self.Results_file)
+            self.Print("| + Checking " + ip_to_analyze[i] + "...",True,self.Results_file)
+            self.Print("| |",True,self.Results_file)   
             DNS_Result = CheckDNS(ip_to_analyze[i], self.verbose)
             if DNS_Result == 0 or DNS_Result < 0:
-                self.Print("| | DNS/IP cannot be resolved.",True,strFilename)
-                self.Print("| |",True,strFilename)
-                self.Print("| | Category: Spoofed message",True,strFilename)
+                self.Print("| | DNS/IP cannot be resolved.",True,self.Results_file)
+                self.Print("| |",True,self.Results_file)
+                self.Print("| | Category: Spoofed message",True,self.Results_file)
                 self.AddCategory("Spoofed message")
             else:
-                self.Print("| | " + DNS_Result,True,strFilename) 
-                self.Print("| |",True,strFilename)
-                self.Print("| | Category: Interactive attack",True,strFilename)
+                self.Print("| | " + DNS_Result,True,self.Results_file) 
+                self.Print("| |",True,self.Results_file)
+                self.Print("| | Category: Interactive attack",True,self.Results_file)
                 self.AddCategory("Interactive attack")
     
-        self.Print("")
+        self.Print("",True,self.Results_file)
 
         # ---------------------------------------------------------------------------------
         # Check if SIP ports are opened
         # ---------------------------------------------------------------------------------
 
-        self.Print("+ Checking if SIP port is opened...",True,strFilename)
+        self.Print("+ Checking if SIP port is opened...",True,self.Results_file)
 
-        self.Print("|",True,strFilename)
-        self.Print("| + Checking " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport + "...",True,strFilename)
-        self.Print("| |",True,strFilename)   
+        self.Print("|",True,self.Results_file)
+        self.Print("| + Checking " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport + "...",True,self.Results_file)
+        self.Print("| |",True,self.Results_file)   
             
         strResult = CheckPort(self.Contact_IP, self.Contact_Port, self.Contact_Transport, self.verbose)
             
         if strResult == 0 or strResult < 0:
-            self.Print("| | Error while scanning the port.",True,strFilename)
-            self.Print("| |",True,strFilename)
-            self.Print("| | Category: -",True,strFilename)
-            self.Print("",True,strFilename)
+            self.Print("| | Error while scanning the port.",True,self.Results_file)
+            self.Print("| |",True,self.Results_file)
+            self.Print("| | Category: -",True,self.Results_file)
         else:
             if strResult.find("closed") != -1: 
-                self.Print("| | Result: Port closed",True,strFilename) 
-                self.Print("| |",True,strFilename)
-                self.Print("| | Category: Spoofed message",True,strFilename)
-                self.Print("")
+                self.Print("| | Result: Port closed",True,self.Results_file) 
+                self.Print("| |",True,self.Results_file)
+                self.Print("| | Category: Spoofed message",True,self.Results_file)
                 self.AddCategory("Spoofed message")
             else:
-                self.Print("| | Result: Port opened",True,strFilename) 
-                self.Print("| |",True,strFilename)
-                self.Print("| | Category: Interactive attack",True,strFilename)
-                self.Print("",True,strFilename)
+                self.Print("| | Result: Port opened",True,self.Results_file) 
+                self.Print("| |",True,self.Results_file)
+                self.Print("| | Category: Interactive attack",True,self.Results_file)
                 self.AddCategory("Interactive attack")
+                
+        self.Print("",True,self.Results_file)
 
         # ---------------------------------------------------------------------------------
         # Check if media ports are opened
         # ---------------------------------------------------------------------------------
 
-        self.Print("+ Checking if media port is opened...",True,strFilename)
+        self.Print("+ Checking if media port is opened...",True,self.Results_file)
 
         # FIXME: this parsing could be improved
-        strRTPPort = GetSIPHeader("m=audio", self.Message)
+        strRTPPort = GetSIPHeader("m=audio", self.SIP_Message)
         
         if strRTPPort == "": # Could happen that no RTP was delivered
-            self.Print("|",True,strFilename) 
-            self.Print("| No RTP info delivered.",True,strFilename)
-            self.Print("|",True,strFilename)
-            self.Print("| Category: Spoofed message",True,strFilename)
-            self.Print("")
+            self.Print("|",True,self.Results_file) 
+            self.Print("| No RTP info delivered.",True,self.Results_file)
+            self.Print("|",True,self.Results_file)
+            self.Print("| Category: Spoofed message",True,self.Results_file)
             self.AddCategory("Spoofed message")
         else:
             strRTPPort = strRTPPort.split(" ")[1]
 
-            self.Print("|",True,strFilename)
-            self.Print("| + Checking " + self.Contact_IP + ":" + strRTPPort + "/" + "udp" + "...",True,strFilename)
-            self.Print("| |",True,strFilename)   
+            self.Print("|",True,self.Results_file)
+            self.Print("| + Checking " + self.Contact_IP + ":" + strRTPPort + "/" + "udp" + "...",True,self.Results_file)
+            self.Print("| |",True,self.Results_file)   
                 
             strResult = CheckPort(self.Contact_IP, strRTPPort, "udp", self.verbose)
                 
             if strResult == 0 or strResult < 0:
-                self.Print("| | Error while scanning the port.",True,strFilename)
-                self.Print("| |",True,strFilename)
-                self.Print("| | Category: -",True,strFilename)
-                self.Print("",True,strFilename)
+                self.Print("| | Error while scanning the port.",True,self.Results_file)
+                self.Print("| |",True,self.Results_file)
+                self.Print("| | Category: -",True,self.Results_file)
             else:
                 if strResult.find("closed") != -1: 
-                    self.Print("| | Result: Port closed",True,strFilename) 
-                    self.Print("| |",True,strFilename)
-                    self.Print("| | Category: Spoofed message",True,strFilename)
-                    self.Print("",True,strFilename)
+                    self.Print("| | Result: Port closed",True,self.Results_file) 
+                    self.Print("| |",True,self.Results_file)
+                    self.Print("| | Category: Spoofed message",True,self.Results_file)
                     self.AddCategory("Spoofed message")
                 else:
-                    self.Print("| | Result: Port opened",True,strFilename) 
-                    self.Print("| |",True,strFilename)
-                    self.Print("| | Category: Interactive attack",True,strFilename)
-                    self.Print("",True,strFilename)
+                    self.Print("| | Result: Port opened",True,self.Results_file) 
+                    self.Print("| |",True,self.Results_file)
+                    self.Print("| | Category: Interactive attack",True,self.Results_file)
                     self.AddCategory("Interactive attack")
                 
+        self.Print("",True,self.Results_file)
 
         # ---------------------------------------------------------------------------------
         # Check request URI
@@ -290,10 +294,10 @@ class Classifier(PrintClass, log, CallData):
 
         bRequestURI = False # Flag to know if this test gives a positive or negative result
 
-        self.Print("+ Checking request URI...",True,strFilename)
-        self.Print("|",True,strFilename)
-        self.Print("| Extension in field To: " + self.To_Extension,True,strFilename)
-        self.Print("|",True,strFilename)
+        self.Print("+ Checking request URI...",True,self.Results_file)
+        self.Print("|",True,self.Results_file)
+        self.Print("| Extension in field To: " + self.To_Extension,True,self.Results_file)
+        self.Print("|",True,self.Results_file)
         
         # Now it checks if the extension contained in the "To" field is one of the honeypot's registered
         # extesions.
@@ -302,15 +306,15 @@ class Classifier(PrintClass, log, CallData):
             if str(self.Extensions[i].Extension) == self.To_Extension:
                 # The extension contained in the "To" field is an extension of the honeypot.
                 bFound = True
-                self.Print("| Request addressed to the honeypot? Yes",True,strFilename)
-                self.Print("",True,strFilename)
+                self.Print("| Request addressed to the honeypot? Yes",True,self.Results_file)
                 bRequestURI = True
                 break
                 
         if bFound == False:
-            self.Print("| Request addressed to the honeypot? No",True,strFilename)
-            self.Print("",True,strFilename)
+            self.Print("| Request addressed to the honeypot? No",True,self.Results_file)
             bRequestURI = False
+
+        self.Print("",True,self.Results_file)
 
         # ---------------------------------------------------------------------------------
         # Check if proxy in Via
@@ -321,71 +325,68 @@ class Classifier(PrintClass, log, CallData):
 
             # Via[0] is the first Via field, so that it has the IP of the last proxy.
             
-            self.Print("+ Checking if proxy in Via...",True,strFilename)
-            self.Print("|",True,strFilename)
-            self.Print("| + Checking " + self.Via[0][0] + ":" + self.Via[0][1] + "/" + self.Via[0][2] + "...",True,strFilename)
-            self.Print("| |",True,strFilename)   
+            self.Print("+ Checking if proxy in Via...",True,self.Results_file)
+            self.Print("|",True,self.Results_file)
+            self.Print("| + Checking " + self.Via[0][0] + ":" + self.Via[0][1] + "/" + self.Via[0][2] + "...",True,self.Results_file)
+            self.Print("| |",True,self.Results_file)   
     
             # We determine the existence of the proxy by checking the port with nmap
             strResult = CheckPort(self.Via[0][0], self.Via[0][1], self.Via[0][2], self.verbose)
                 
             if strResult == 0 or strResult < 0:
-                self.Print("| | Error while scanning.",True,strFilename)
-                self.Print("| |",True,strFilename)
-                self.Print("| | Category: -",True,strFilename)
-                self.Print("",True,strFilename)
+                self.Print("| | Error while scanning.",True,self.Results_file)
+                self.Print("| |",True,self.Results_file)
+                self.Print("| | Category: -",True,self.Results_file)
             else:
                 if strResult.find("closed") != -1: 
-                    self.Print("| | Result: There is no SIP proxy",True,strFilename) 
-                    self.Print("| |",True,strFilename)
-                    self.Print("| | Category: DialPlan fault",True,strFilename)
-                    self.Print("",True,strFilename)
+                    self.Print("| | Result: There is no SIP proxy",True,self.Results_file) 
+                    self.Print("| |",True,self.Results_file)
+                    self.Print("| | Category: DialPlan fault",True,self.Results_file)
                     self.AddCategory("DialPlan fault")
                 else:
-                    self.Print("| | Result: There is a SIP proxy",True,strFilename) 
-                    self.Print("| |",True,strFilename)
-                    self.Print("| | Category: Direct attack",True,strFilename)
-                    self.Print("",True,strFilename)
+                    self.Print("| | Result: There is a SIP proxy",True,self.Results_file) 
+                    self.Print("| |",True,self.Results_file)
+                    self.Print("| | Category: Direct attack",True,self.Results_file)
                     self.AddCategory("Direct attack")
         
+            self.Print("",True,self.Results_file)
 
         # ---------------------------------------------------------------------------------
         # Check for ACK
         # ---------------------------------------------------------------------------------
         
-        self.Print("+ Checking for ACK...",True,strFilename)
-        self.Print("|",True,strFilename)
+        self.Print("+ Checking for ACK...",True,self.Results_file)
+        self.Print("|",True,self.Results_file)
         
         if self.bACKReceived == True:
-            self.Print("| ACK received: Yes",True,strFilename)
-            self.Print("",True,strFilename)
+            self.Print("| ACK received: Yes",True,self.Results_file)
         else:
-            self.Print("| ACK received: No",True,strFilename)
-            self.Print("|",True,strFilename)
-            self.Print("| Category: Scanning",True,strFilename)
-            self.Print("",True,strFilename)
+            self.Print("| ACK received: No",True,self.Results_file)
+            self.Print("|",True,self.Results_file)
+            self.Print("| Category: Scanning",True,self.Results_file)
             self.AddCategory("Scanning")
+
+        self.Print("",True,self.Results_file)
 
         # ---------------------------------------------------------------------------------
         # Check received media
         # ---------------------------------------------------------------------------------
 
-        self.Print("+ Checking for received media...",True,strFilename)
-        self.Print("|",True,strFilename)
+        self.Print("+ Checking for received media...",True,self.Results_file)
+        self.Print("|",True,self.Results_file)
         
         if self.bMediaReceived == True:
-            self.Print("| Media received: Yes",True,strFilename)
-            self.Print("|",True,strFilename)
-            self.Print("| Category: SPIT",True,strFilename)
-            self.Print("",True,strFilename)
+            self.Print("| Media received: Yes",True,self.Results_file)
+            self.Print("|",True,self.Results_file)
+            self.Print("| Category: SPIT",True,self.Results_file)
             self.AddCategory("SPIT")
         else:
-            self.Print("| Media received: No",True,strFilename)
-            self.Print("|",True,strFilename)
-            self.Print("| Category: Ringing",True,strFilename)
-            self.Print("",True,strFilename)
+            self.Print("| Media received: No",True,self.Results_file)
+            self.Print("|",True,self.Results_file)
+            self.Print("| Category: Ringing",True,self.Results_file)
             self.AddCategory("Ringing")       
 
+        self.Print("",True,self.Results_file)
 
         self.Running = False
         
@@ -398,42 +399,42 @@ class Classifier(PrintClass, log, CallData):
     
     def GetCallData(self):
         
-        self.INVITE_IP = GetIPfromSIP(GetSIPHeader("INVITE",self.Message))
-        self.INVITE_Port = GetPortfromSIP(GetSIPHeader("INVITE",self.Message))
+        self.INVITE_IP = GetIPfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
+        self.INVITE_Port = GetPortfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
         if self.INVITE_Port == "": self.INVITE_Port = "5060" # By default
-        self.INVITE_Extension = GetExtensionfromSIP(GetSIPHeader("INVITE",self.Message))
-        if GetSIPHeader("INVITE",self.Message).find("udp") != -1 or GetSIPHeader("INVITE",self.Message).find("UDP") != -1: 
+        self.INVITE_Extension = GetExtensionfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
+        if GetSIPHeader("INVITE",self.SIP_Message).find("udp") != -1 or GetSIPHeader("INVITE",self.SIP_Message).find("UDP") != -1: 
             self.INVITE_Transport = "udp"
-        elif GetSIPHeader("INVITE",self.Message).find("tcp") != -1 or GetSIPHeader("INVITE",self.Message).find("TCP") != -1:
+        elif GetSIPHeader("INVITE",self.SIP_Message).find("tcp") != -1 or GetSIPHeader("INVITE",self.SIP_Message).find("TCP") != -1:
             self.INVITE_Transport = "tcp"
         else:
             self.INVITE_Transport = "udp" # By default
             
-        self.To_IP = GetIPfromSIP(GetSIPHeader("To",self.Message))
-        self.To_Extension = GetExtensionfromSIP(GetSIPHeader("To",self.Message))
+        self.To_IP = GetIPfromSIP(GetSIPHeader("To",self.SIP_Message))
+        self.To_Extension = GetExtensionfromSIP(GetSIPHeader("To",self.SIP_Message))
         
-        self.From_IP = GetIPfromSIP(GetSIPHeader("From",self.Message))
-        self.From_Extension = GetExtensionfromSIP(GetSIPHeader("From",self.Message))
+        self.From_IP = GetIPfromSIP(GetSIPHeader("From",self.SIP_Message))
+        self.From_Extension = GetExtensionfromSIP(GetSIPHeader("From",self.SIP_Message))
         
-        self.Contact_IP = GetIPfromSIP(GetSIPHeader("Contact",self.Message))
-        self.Contact_Port = GetPortfromSIP(GetSIPHeader("Contact",self.Message))
+        self.Contact_IP = GetIPfromSIP(GetSIPHeader("Contact",self.SIP_Message))
+        self.Contact_Port = GetPortfromSIP(GetSIPHeader("Contact",self.SIP_Message))
         if self.Contact_Port == "": self.Contact_Port = "5060" # By default
-        self.Contact_Extension = GetExtensionfromSIP(GetSIPHeader("Contact",self.Message))
-        if GetSIPHeader("Contact",self.Message).find("udp") != -1 or GetSIPHeader("Contact",self.Message).find("UDP") != -1: 
+        self.Contact_Extension = GetExtensionfromSIP(GetSIPHeader("Contact",self.SIP_Message))
+        if GetSIPHeader("Contact",self.SIP_Message).find("udp") != -1 or GetSIPHeader("Contact",self.SIP_Message).find("UDP") != -1: 
             self.Contact_Transport = "udp"
-        elif GetSIPHeader("Contact",self.Message).find("tcp") != -1 or GetSIPHeader("Contact",self.Message).find("TCP") != -1:
+        elif GetSIPHeader("Contact",self.SIP_Message).find("tcp") != -1 or GetSIPHeader("Contact",self.SIP_Message).find("TCP") != -1:
             self.Contact_Transport = "tcp"
         else:
             self.Contact_Transport = "udp" # By default
             
-        self.Connection = GetIPfromSIP(GetSIPHeader("c=",self.Message))
-        self.Owner = GetIPfromSIP(GetSIPHeader("c=",self.Message))
+        self.Connection = GetIPfromSIP(GetSIPHeader("c=",self.SIP_Message))
+        self.Owner = GetIPfromSIP(GetSIPHeader("c=",self.SIP_Message))
 
-        self.UserAgent = GetSIPHeader("User-Agent",self.Message)
+        self.UserAgent = GetSIPHeader("User-Agent",self.SIP_Message)
     
-        #self.Record_Route = GetSIPHeader("Record-Route",self.Message)
+        #self.Record_Route = GetSIPHeader("Record-Route",self.SIP_Message)
         
-        strTemp = self.Message.splitlines()
+        strTemp = self.SIP_Message.splitlines()
     
         for line in strTemp:
             if line[0:4] == "Via:":

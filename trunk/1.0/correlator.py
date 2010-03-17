@@ -19,26 +19,30 @@ from commons import PrintClass
 
 # def Correlator
 
-def Correlator(Classification, bFlood):
+def Correlator(Classification, bFlood, Results_file):
     
     Output = PrintClass()
     
-    Output.Print("")
     
-    Output.Print("===================================================================")
-    Output.Print("| Correlation                                                     |")
-    Output.Print("===================================================================")
-    Output.Print("")
-    
-    Output.Print("Correlation:")
+    #Output.Print("===================================================================")
+    #Output.Print("| Correlation                                                     |")
+    #Output.Print("===================================================================")
+
+    Output.Print("************************************** Correlation ***************************************",True,Results_file)
+    Output.Print("",True,Results_file)
     
     # FIXME: For now, this is a very simple correlator that should be improved.
     
     if bFlood == True:
-        Output.Print("Flood")
+        Output.Print("Flood",True,Results_file)
          
     elif IfCategory("SPIT", Classification) == True:
-        Output.Print("SPIT")
+        Output.Print("SPIT",True,Results_file)
+        
+    else:
+        Output.Print("No results.",True,Results_file)
+        
+    Output.Print("",True,Results_file)
         
         
 # def IfCategory

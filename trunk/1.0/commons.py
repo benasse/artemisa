@@ -170,7 +170,7 @@ class PrintClass(log, GetTimeClass):
 		   	
 		# if strFilename has a string value, it stores the results in a file   
 		if strFilename != "":
-			File = open(strFilename, "a")
+			File = open(strFilename + ".txt", "a")
 			
 			if strData == "":
 				File.write("\n")
