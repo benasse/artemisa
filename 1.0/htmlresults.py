@@ -21,7 +21,7 @@ from time import strftime
 #
 # This function returns the results in HTML format.
 
-def get_results_html(strFilename, ForEmail, Message, NormalProb, SuspiciousProb, CraftedProb, MessageNature, From_Extension, From_IP, To_Extension, To_IP, Contact_Extension, Contact_IP, Connection, Owner, Via, UserAgent, DetailedInfo, VERSION, LocalIP, LocalPort):
+def get_results_html(strFilename, ForEmail, Message, From_Extension, From_IP, To_Extension, To_IP, Contact_Extension, Contact_IP, Connection, Owner, Via, UserAgent, VERSION, LocalIP, LocalPort):
 
 	Message = Message.replace("<", "&lt;")
 	Message = Message.replace(">", "&gt;")	
@@ -38,48 +38,63 @@ def get_results_html(strFilename, ForEmail, Message, NormalProb, SuspiciousProb,
 		strPage = strPage + "<body>" + "\n"
 	
 	if ForEmail == False:
-		strPage = strPage + "<img style=\"width: 300px; height: 114px;\" alt=\"\" src=\"../../res/weblogo.gif\"><br>" + "\n"
+		strPage = strPage + "<img style=\"width: 300px; height: 114px;\" alt=\"\" src=\"../res/weblogo.gif\"><br>" + "\n"
 	else:
 		strPage = "<img style=\"width: 300px; height: 114px;\" alt=\"\" src=\"cid:weblogo\"><br>" + "\n"
 		
 	strPage = strPage + "<br>" + "\n"
+	
 	strPage = strPage + "<big style=\"color: rgb(165, 148, 137);\"><big>Artemisa's report</big></big><br><br>" + "\n"
-	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><big>Inferred results<br></big>" + "\n"
-	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><br>" + "\n" 
-	strPage = strPage + "The probability of the message of being normal is = " + str(NormalProb) + "<br>" + "\n"
-	strPage = strPage + "The probability of the message of being suspicious is = " + str(SuspiciousProb) + "<br>" + "\n"
-	strPage = strPage + "The probability of the message of being crafted is = " + str(CraftedProb) + "<br>" + "\n"
-	strPage = strPage + "<br>" + "\n"
-	strPage = strPage + "The message is therefore considered " + MessageNature + ".<br>" + "\n"
-	strPage = strPage + "<br>" + "\n"
-	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><big>Information about the call</big>" + "\n"
+	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><big>Results<br></big>" + "\n"
 	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><br>"
-	strPage = strPage + "From: " + From_Extension + " in " + From_IP + "<br>" + "\n"
-	strPage = strPage + "To: " + To_Extension + " in " + To_IP + "<br>" + "\n"
-	strPage = strPage + "Contact: " + Contact_Extension + " in " + Contact_IP + "<br>" + "\n"
-	strPage = strPage + "Connection: " +  Connection + "<br>" + "\n"
-	strPage = strPage + "Owner: " + Owner + "<br>" + "\n"
 	
-	for i in range(len(Via)):
-         strPage = strPage + "Via " + str(i) + ": " + Via[i] + "<br>" + "\n"
+	File = open(strFilename  + ".txt", "r")
+	strData = File.read()
+	File.close()
+	   	   
+	strData = strData.replace("<", "&lt;")
+	strData = strData.replace(">", "&gt;")	
+	strData = strData.replace("\n", "<br>")
+	strData = strData.replace("\r", "<br>")
 	
-	strPage = strPage + UserAgent + "<br><br>" + "\n"
+	strPage = strPage + "<big><small>" + strData + "</small></big><br>" + "\n"
 
-	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\">"
-	strPage = strPage + "<big>Detailed information about the inference analysis</big><br>" + "\n"
-	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><br>"
-		
-	for item in DetailedInfo:
-		strPage = strPage + item + "<br>" + "\n"
+
+#	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><br>" + "\n" 
+#	strPage = strPage + "The probability of the message of being normal is = " + str(NormalProb) + "<br>" + "\n"
+#	strPage = strPage + "The probability of the message of being suspicious is = " + str(SuspiciousProb) + "<br>" + "\n"
+#	strPage = strPage + "The probability of the message of being crafted is = " + str(CraftedProb) + "<br>" + "\n"
+#	strPage = strPage + "<br>" + "\n"
+#	strPage = strPage + "The message is therefore considered " + MessageNature + ".<br>" + "\n"
+#	strPage = strPage + "<br>" + "\n"
+#	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><big>Information about the call</big>" + "\n"
+#	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><br>"
+#	strPage = strPage + "From: " + From_Extension + " in " + From_IP + "<br>" + "\n"
+#	strPage = strPage + "To: " + To_Extension + " in " + To_IP + "<br>" + "\n"
+#	strPage = strPage + "Contact: " + Contact_Extension + " in " + Contact_IP + "<br>" + "\n"
+#	strPage = strPage + "Connection: " +  Connection + "<br>" + "\n"
+#	strPage = strPage + "Owner: " + Owner + "<br>" + "\n"
 	
-	strPage = strPage + "<br>" + "\n"
+#	for i in range(len(Via)):
+#         strPage = strPage + "Via " + str(i) + ": " + Via[i] + "<br>" + "\n"
+	
+#	strPage = strPage + UserAgent + "<br><br>" + "\n"
+
+#	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\">"
+#	strPage = strPage + "<big>Detailed information about the inference analysis</big><br>" + "\n"
+#	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><br>"
+		
+#	for item in DetailedInfo:
+#		strPage = strPage + item + "<br>" + "\n"
+	
+#	strPage = strPage + "<br>" + "\n"
 	
 	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\">"
 	strPage = strPage + "<big>Raw SIP message</big><br>" + "\n"
 	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\"><br>"
 	strPage = strPage + "<big><small>" + Message + "</small></big><br>" + "\n"
 	strPage = strPage + "<hr style=\"width: 100%; height: 2px;\">"
-	strPage = strPage + "<small><span dir=\"ltr\" id=\":3s\">" + strFilename + ": This is an automatically generated report by Artemisa version " + VERSION + " on " + strftime("%b %d %Y %H:%M:%S") + " running at " + LocalIP + ":" + LocalPort + ". </span></small><br>"  + "\n"
+	strPage = strPage + "<small><span dir=\"ltr\" id=\":3s\">" + strFilename + ".html" + ": This is an automatically generated report by Artemisa version " + VERSION + " on " + strftime("%b %d %Y %H:%M:%S") + " running at " + LocalIP + ":" + LocalPort + ". </span></small><br>"  + "\n"
 	strPage = strPage + "</body>" + "\n"
 	strPage = strPage + "</html>" + "\n"
 
