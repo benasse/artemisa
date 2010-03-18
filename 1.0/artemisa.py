@@ -572,26 +572,26 @@ def LoadConfiguration():
             Investigate_sec = GetConfigSection("./conf/behaviour.conf", "investigate") 
                 
             # Now checks if the items read are known
-            for item in Active_mode:
-                if (item != "send_180") and (item != "send_200") and (item != "inference") and (item != "investigate") and (item != "validdns") and (item != "fingerprint") and (item != "historical") and (item != "whois") and (item != "gl") and (item != "reliability") and (item != "to") and (item != "dispersion"):
-                    Active_mode.remove(item)
-                        
-                elif item == "investigate":
-                    Active_mode = Active_mode + Investigate_sec
-
-            for item in Passive_mode:
-                if (item != "send_180") and (item != "send_200") and (item != "inference") and (item != "investigate") and (item != "validdns") and (item != "fingerprint") and (item != "historical") and (item != "whois") and (item != "gl") and (item != "reliability") and (item != "to") and (item != "dispersion"):
-                    Passive_mode.remove(item)
-                        
-                elif item == "investigate":
-                    Passive_mode = Passive_mode + Investigate_sec                     
-
-            for item in Aggressive_mode:
-                if (item != "send_180") and (item != "send_200") and (item != "inference") and (item != "investigate") and (item != "validdns") and (item != "fingerprint") and (item != "historical") and (item != "whois") and (item != "gl") and (item != "reliability") and (item != "to") and (item != "dispersion"):
-                    Aggressive_mode.remove(item)
-                        
-                elif item == "investigate":
-                    Aggressive_mode = Aggressive_mode + Investigate_sec   
+            #for item in Active_mode:
+            #    if (item != "send_180") and (item != "send_200") and (item != "inference") and (item != "investigate") and (item != "validdns") and (item != "fingerprint") and (item != "historical") and (item != "whois") and (item != "gl") and (item != "reliability") and (item != "to") and (item != "dispersion"):
+            #        Active_mode.remove(item)
+            #            
+            #    elif item == "investigate":
+            #        Active_mode = Active_mode + Investigate_sec
+            #
+            #for item in Passive_mode:
+            #    if (item != "send_180") and (item != "send_200") and (item != "inference") and (item != "investigate") and (item != "validdns") and (item != "fingerprint") and (item != "historical") and (item != "whois") and (item != "gl") and (item != "reliability") and (item != "to") and (item != "dispersion"):
+            #        Passive_mode.remove(item)
+            #            
+            #    elif item == "investigate":
+            #        Passive_mode = Passive_mode + Investigate_sec                     
+            #
+            #for item in Aggressive_mode:
+            #    if (item != "send_180") and (item != "send_200") and (item != "inference") and (item != "investigate") and (item != "validdns") and (item != "fingerprint") and (item != "historical") and (item != "whois") and (item != "gl") and (item != "reliability") and (item != "to") and (item != "dispersion"):
+            #        Aggressive_mode.remove(item)
+            #            
+            #    elif item == "investigate":
+            #        Aggressive_mode = Aggressive_mode + Investigate_sec   
                     
             strLocal_IP = config.get("environment", "local_ip")
             strLocal_port = config.get("environment", "local_port")
