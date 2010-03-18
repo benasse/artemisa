@@ -22,32 +22,50 @@ from commons import PrintClass
 def Correlator(Classification, bFlood, Results_file):
     
     Output = PrintClass()
-    
-    
+
     #Output.Print("===================================================================")
     #Output.Print("| Correlation                                                     |")
     #Output.Print("===================================================================")
 
     Output.Print("************************************** Correlation ***************************************",True,Results_file)
     Output.Print("",True,Results_file)
+    Output.Print("Artemisa concludes that the arrived message is likely to be:",True,Results_file)
+    Output.Print("",True,Results_file)
     
-    # FIXME: For now, this is a very simple correlator that should be improved.
+    ####################################################################################
+    ####################################################################################
+    ##                                                                                ##
+    ## FIXME: For now, this is a very simple correlator that should be improved.      ##
+    ##                                                                                ##
+    ####################################################################################
+    ####################################################################################
     
     if bFlood == True:
-        Output.Print("Flood",True,Results_file)
-         
-    elif IfCategory("SPIT", Classification) == True:
-        Output.Print("SPIT",True,Results_file)
+        Output.Print("* A flooding attack.",True,Results_file)
+        Output.Print("",True,Results_file)
+        return
+     
+    if IfCategory("SPIT", Classification) == True:
+        Output.Print("* A SPIT call.",True,Results_file)
+        Output.Print("",True,Results_file)
+        return
+
+    if IfCategory("Scanning", Classification) == True:
+        Output.Print("* A scanning attempt.",True,Results_file)
+
+    if IfCategory("Ringing", Classification) == True:
+        Output.Print("* The message belongs to a ringing attack.",True,Results_file)
         
-    else:
-        Output.Print("No results.",True,Results_file)
+    
+        
+    #Output.Print("No conclusion arrived!",True,Results_file)
         
     Output.Print("",True,Results_file)
         
         
 # def IfCategory
 #
-# Returns whether a category is found or not
+# Returns whether a category is found or not.
     
 def IfCategory(strCategory, Classification):
 

@@ -956,11 +956,7 @@ def main():
             print "Cleaned"
             
         elif s == "clean results":
-            Process = Popen("rm -f ./results/normal/*", shell=True, stdout=PIPE)
-            Process.wait()
-            Process = Popen("rm -f ./results/crafted/*", shell=True, stdout=PIPE)
-            Process.wait()
-            Process = Popen("rm -f ./results/suspicious/*", shell=True, stdout=PIPE)                        
+            Process = Popen("rm -f ./results/*", shell=True, stdout=PIPE)
             Process.wait()
             print "Cleaned"
             
@@ -981,11 +977,7 @@ def main():
             Process.wait()
             Process = Popen("rm -f ./logs/invite_msgs/*.log", shell=True, stdout=PIPE)
             Process.wait()
-            Process = Popen("rm -f ./results/normal/*", shell=True, stdout=PIPE)
-            Process.wait()
-            Process = Popen("rm -f ./results/crafted/*", shell=True, stdout=PIPE)
-            Process.wait()
-            Process = Popen("rm -f ./results/suspicious/*", shell=True, stdout=PIPE)                        
+            Process = Popen("rm -f ./results/*", shell=True, stdout=PIPE)
             Process.wait()
             Process = Popen("rm -f ./alarms/*", shell=True, stdout=PIPE)
             Process.wait()
