@@ -572,23 +572,26 @@ def LoadConfiguration():
             Investigate_sec = GetConfigSection("./conf/behaviour.conf", "investigate") 
                 
             # Now checks if the items read are known
-            #for item in Active_mode:
+            for item in Active_mode:
             #    if (item != "send_180") and (item != "send_200") and (item != "inference") and (item != "investigate") and (item != "validdns") and (item != "fingerprint") and (item != "historical") and (item != "whois") and (item != "gl") and (item != "reliability") and (item != "to") and (item != "dispersion"):
-            #        Active_mode.remove(item)
+                if (item != "send_180") and (item != "send_200"):
+                    Active_mode.remove(item)
             #            
             #    elif item == "investigate":
             #        Active_mode = Active_mode + Investigate_sec
             #
-            #for item in Passive_mode:
+            for item in Passive_mode:
             #    if (item != "send_180") and (item != "send_200") and (item != "inference") and (item != "investigate") and (item != "validdns") and (item != "fingerprint") and (item != "historical") and (item != "whois") and (item != "gl") and (item != "reliability") and (item != "to") and (item != "dispersion"):
-            #        Passive_mode.remove(item)
+                if (item != "send_180") and (item != "send_200"):
+                    Passive_mode.remove(item)
             #            
             #    elif item == "investigate":
             #        Passive_mode = Passive_mode + Investigate_sec                     
             #
-            #for item in Aggressive_mode:
+            for item in Aggressive_mode:
             #    if (item != "send_180") and (item != "send_200") and (item != "inference") and (item != "investigate") and (item != "validdns") and (item != "fingerprint") and (item != "historical") and (item != "whois") and (item != "gl") and (item != "reliability") and (item != "to") and (item != "dispersion"):
-            #        Aggressive_mode.remove(item)
+                if (item != "send_180") and (item != "send_200"):
+                    Aggressive_mode.remove(item)
             #            
             #    elif item == "investigate":
             #        Aggressive_mode = Aggressive_mode + Investigate_sec   
@@ -690,14 +693,14 @@ def AnalyzeCall(strData):
 
     if email.Enabled == False: 
         Output.Print("NOTICE E-mail notification is disabled.")
-        return
-
-    strData = get_results_html(classifier_instance.Results_file, True, classifier_instance.SIP_Message, classifier_instance.From_Extension, classifier_instance.From_IP, classifier_instance.To_Extension, classifier_instance.To_IP, classifier_instance.Contact_Extension, classifier_instance.Contact_IP, classifier_instance.Connection, classifier_instance.Owner, classifier_instance.Via, classifier_instance.UserAgent, VERSION, strLocal_IP, strLocal_port)
-                
-    Output.Print("NOTICE Sending this report by e-mail...")
-    Output.Print(email.sendemail(strData))
-
-    del email
+    else:
+    
+        strData = get_results_html(classifier_instance.Results_file, True, classifier_instance.SIP_Message, classifier_instance.From_Extension, classifier_instance.From_IP, classifier_instance.To_Extension, classifier_instance.To_IP, classifier_instance.Contact_Extension, classifier_instance.Contact_IP, classifier_instance.Connection, classifier_instance.Owner, classifier_instance.Via, classifier_instance.UserAgent, VERSION, strLocal_IP, strLocal_port)
+                    
+        Output.Print("NOTICE Sending this report by e-mail...")
+        Output.Print(email.sendemail(strData))
+    
+        del email
 
     # Save the results in a HTML file
     File = open(classifier_instance.Results_file + ".html", "w")
