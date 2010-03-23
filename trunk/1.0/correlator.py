@@ -40,6 +40,9 @@ def Correlator(Classification, bFlood, Results_file, ToolName):
     ####################################################################################
     ####################################################################################
     
+    if IfCategory("Attack tool", Classification) == True:
+        Output.Print("* The attack was created employing the tool " + ToolName + ".",True,Results_file)
+        
     if bFlood == True:
         Output.Print("* A flooding attack.",True,Results_file)
         Output.Print("",True,Results_file)
@@ -56,9 +59,6 @@ def Correlator(Classification, bFlood, Results_file, ToolName):
     if IfCategory("Ringing", Classification) == True:
         Output.Print("* The message belongs to a ringing attack.",True,Results_file)
 
-    if IfCategory("Attack tool", Classification) == True:
-        Output.Print("* The attack was created employing the tool " + ToolName + ".",True,Results_file)
-                
             
     #Output.Print("No conclusion arrived!",True,Results_file)
         

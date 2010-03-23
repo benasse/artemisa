@@ -763,7 +763,7 @@ def ShowHelp(bCommands = True):
     print "verbose on               Turn verbose mode on (it shows more information)."
     print "verbose off              Turn verbose mode off."
     print ""
-    print "show statistics, stats   Show the statistics."
+    print "show statistics, stats   Show the statistics of the current instance."
     print ""
     #print "clean historical         Remove the historical database."
     print "clean logs               Remove all log files."
@@ -820,7 +820,7 @@ def main():
             else:
                 print "Invalid argument: " + sys.argv[i]
                     
-    print "Artemisa v" + VERSION + " Copyright (C) 2009 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
+    print "Artemisa v" + VERSION + " Copyright (C) 2009-2010 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
     print ""
     print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
     print "This is free software, and you are welcome to redistribute it under certain"
@@ -935,7 +935,7 @@ def main():
             ShowHelp()
         
         elif s == "show statistics" or s == "stats":
-            print "Artemisa's statistics"
+            print "Artemisa's instance statistics"
             print "-------------------------------------------------------------------"
             print ""
             print "INVITE messages received: " + str(intN_INVITE)
