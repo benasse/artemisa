@@ -19,7 +19,7 @@ from commons import PrintClass
 
 # def Correlator
 
-def Correlator(Classification, bFlood, Results_file):
+def Correlator(Classification, bFlood, Results_file, ToolName):
     
     Output = PrintClass()
 
@@ -55,7 +55,10 @@ def Correlator(Classification, bFlood, Results_file):
 
     if IfCategory("Ringing", Classification) == True:
         Output.Print("* The message belongs to a ringing attack.",True,Results_file)
-        
+
+    if IfCategory("Attack tool", Classification) == True:
+        Output.Print("* The attack was created employing the tool " + ToolName + ".",True,Results_file)
+                
             
     #Output.Print("No conclusion arrived!",True,Results_file)
         
