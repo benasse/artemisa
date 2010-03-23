@@ -28,31 +28,31 @@ def CheckPort(strIP, strPort, strTransport, verbose):
 
     if strIP == "" or strPort == "": return -1
     
-    Output = PrintClass()
+    strDataToSend = ""
     
     try:        
         if strTransport == "udp":
             strCommand = "nmap -sU " + strIP + " -p " + strPort
             Process = Popen(strCommand, shell=True, stdout=PIPE)
-            if verbose == True:
-                Output.Print("| | Tool employed: " + strCommand)
-                Output.Print("| |")
+
         elif strTransport == "tcp":
             strCommand = "nmap -sS " + strIP + " -p " + strPort
             Process = Popen(strCommand, shell=True, stdout=PIPE)
-            if verbose == True:
-                Output.Print("| | Tool employed: " + strCommand)
-                Output.Print("| |")
+            
+        if verbose == True:
+            strDataToSend = "+ Verbose" + "\n"
+            strDataToSend = strDataToSend + "| Tool employed: " + strCommand + "\n"
+            strDataToSend = strDataToSend + "|" + "\n"
                         
         Process.wait()
         
         strData = Process.communicate()[0].strip().split("\n")
         
         if verbose == True:
-            Output.Print("| | + Tool output:")
+            strDataToSend = strDataToSend + "| Tool output:" + "\n"
             for line in strData:
-                Output.Print("| | | " + line)
-            Output.Print("| |")
+                strDataToSend = strDataToSend + "| " + line + "\n"
+            strDataToSend = strDataToSend + "\n"
                 
         strState = ""
         
@@ -64,7 +64,7 @@ def CheckPort(strIP, strPort, strTransport, verbose):
                 break
                 
         if strState != "":
-            return "Port state: " + strState
+            return strDataToSend + "Port state: " + strState
         else:
             return -1
             

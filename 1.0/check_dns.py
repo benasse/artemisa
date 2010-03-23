@@ -26,7 +26,7 @@ def CheckDNS(strIP, verbose):
 
     if strIP == "": return 0
     
-    Output = PrintClass()
+    strDataToSend = ""
     
     # Check if strIP is an IP or a host name
     bDNS = False
@@ -43,19 +43,20 @@ def CheckDNS(strIP, verbose):
             strData = Process.communicate()[0].strip().split("\n")
                 
             if verbose == True:
-                Output.Print("| | Tool employed: " + strCommand)
-                Output.Print("| |")
+                strDataToSend = "+ Verbose" + "\n"
+                strDataToSend = strDataToSend + "| Tool employed: " + strCommand + "\n"
+                strDataToSend = strDataToSend + "|" + "\n"
                 
-                Output.Print("| | + Tool output:")
+                strDataToSend = strDataToSend + "| Tool output:" + "\n"
                 for line in strData:
-                    Output.Print("| | | " + line)
-                Output.Print("| |")
+                    strDataToSend = strDataToSend + "| " + line + "\n"
+                strDataToSend = strDataToSend + "\n"
                 
             strIP = strData[0]
             
             if strData == "": return 0
             
-            return "Domain name resolved: " + strIP
+            return strDataToSend + "Domain name resolved: " + strIP
                 
         except OSError:
             print "WARNING dig command is not installed."
@@ -70,17 +71,18 @@ def CheckDNS(strIP, verbose):
             strIP = strData[len(strData)-1]
                             
             if verbose == True:
-                Output.Print("| | Tool employed: " + strCommand)
-                Output.Print("| |")
+                strDataToSend = "+ Verbose" + "\n"
+                strDataToSend = strDataToSend + "| Tool employed: " + strCommand + "\n"
+                strDataToSend = strDataToSend + "|" + "\n"
                 
-                Output.Print("| | + Tool output:")
+                strDataToSend = strDataToSend + "| Tool output:" + "\n"
                 for line in strData:
-                    Output.Print("| | | " + line)
-                Output.Print("| |")
+                    strDataToSend = strDataToSend + "| " + line + "\n"
+                strDataToSend = strDataToSend + "\n"
                             
             if strData == "": return 0
             
-            return "IP resolved: " + strIP
+            return strDataToSend + "IP resolved: " + strIP
                 
         except OSError:
             print "WARNING dig command is not installed."
