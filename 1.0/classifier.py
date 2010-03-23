@@ -283,13 +283,19 @@ class Classifier(PrintClass, log, CallData):
                 self.Print("| |",True,self.Results_file)
                 self.Print("| | Category: -",True,self.Results_file)
             else:
-                if strResult.find("closed") != -1: 
-                    self.Print("| | Result: Port closed",True,self.Results_file) 
+                if strResult.find("closed") != -1:
+                    strResult = strResult.splitlines()
+                    for line in strResult:
+                        self.Print("| | " + line,True,self.Results_file)   
+                    #self.Print("| | Result: Port closed",True,self.Results_file) 
                     self.Print("| |",True,self.Results_file)
                     self.Print("| | Category: Spoofed message",True,self.Results_file)
                     self.AddCategory("Spoofed message")
                 else:
-                    self.Print("| | Result: Port opened",True,self.Results_file) 
+                    strResult = strResult.splitlines()
+                    for line in strResult:
+                        self.Print("| | " + line,True,self.Results_file)  
+                    #self.Print("| | Result: Port opened",True,self.Results_file) 
                     self.Print("| |",True,self.Results_file)
                     self.Print("| | Category: Interactive attack",True,self.Results_file)
                     self.AddCategory("Interactive attack")
