@@ -89,6 +89,9 @@ class Classifier(PrintClass, log, CallData):
     Behaviour_actions = []
     
     Classification = [] # Stores the classification of the message
+    
+    # Information:
+    ToolName = "" # Flag to store the attack tool detected
 
     Results_file = ""
     
@@ -163,16 +166,16 @@ class Classifier(PrintClass, log, CallData):
         self.Print("|",True,self.Results_file)
         self.Print("| " + self.UserAgent,True,self.Results_file)
         
-        ToolName = CheckFingerprint(self.UserAgent)
-        if ToolName < 0:
+        self.ToolName = CheckFingerprint(self.UserAgent)
+        if self.ToolName < 0:
             self.Print("|",True,self.Results_file)
             self.Print("| Fingerprint check failed.",True,self.Results_file)
-        elif ToolName == 0:
+        elif self.ToolName == 0:
             self.Print("|",True,self.Results_file)
             self.Print("| No fingerprint found.",True,self.Results_file)
         else:
             self.Print("|",True,self.Results_file)
-            self.Print("| Fingerprint found. The following attack tool was employed: " + ToolName,True,self.Results_file)
+            self.Print("| Fingerprint found. The following attack tool was employed: " + self.ToolName,True,self.Results_file)
             self.Print("|",True,self.Results_file)            
             self.Print("| Category: Attack tool",True,self.Results_file)
             self.AddCategory("Attack tool")
@@ -203,18 +206,26 @@ class Classifier(PrintClass, log, CallData):
             self.Print("| + Checking " + ip_to_analyze[i] + "...",True,self.Results_file)
             self.Print("| |",True,self.Results_file)   
             DNS_Result = CheckDNS(ip_to_analyze[i], self.verbose)
-            if DNS_Result == 0 or DNS_Result < 0:
+            if DNS_Result <= 0:
                 self.Print("| | DNS/IP cannot be resolved.",True,self.Results_file)
                 self.Print("| |",True,self.Results_file)
                 self.Print("| | Category: Spoofed message",True,self.Results_file)
                 self.AddCategory("Spoofed message")
             else:
-                DNS_Result = DNS_Result.splitlines()
-                for line in DNS_Result:
-                    self.Print("| | " + line,True,self.Results_file) 
-                self.Print("| |",True,self.Results_file)
-                self.Print("| | Category: Interactive attack",True,self.Results_file)
-                self.AddCategory("Interactive attack")
+                if DNS_Result.find("none") == -1:
+                    DNS_Result = DNS_Result.splitlines()
+                    for line in DNS_Result:
+                        self.Print("| | " + line,True,self.Results_file) 
+                    self.Print("| |",True,self.Results_file)
+                    self.Print("| | Category: Spoofed message",True,self.Results_file)
+                    self.AddCategory("Spoofed message")                
+                else:
+                    DNS_Result = DNS_Result.splitlines()
+                    for line in DNS_Result:
+                        self.Print("| | " + line,True,self.Results_file) 
+                    self.Print("| |",True,self.Results_file)
+                    self.Print("| | Category: Interactive attack",True,self.Results_file)
+                    self.AddCategory("Interactive attack")
     
         self.Print("",True,self.Results_file)
 

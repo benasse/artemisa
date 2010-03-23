@@ -686,7 +686,7 @@ def AnalyzeCall(strData):
     
     
     # Call the correlator
-    Correlator(classifier_instance.Classification, bFlood, classifier_instance.Results_file)
+    Correlator(classifier_instance.Classification, bFlood, classifier_instance.Results_file, classifier_instance.ToolName)
     
     # Send the results by e-mail
     email = Email() # Creates an Email object

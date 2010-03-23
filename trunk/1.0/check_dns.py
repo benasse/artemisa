@@ -54,9 +54,10 @@ def CheckDNS(strIP, verbose):
                 
             strIP = strData[0]
             
-            if strIP == "": return 0
-            
-            return strDataToSend + "Domain name resolved: " + strIP
+            if strIP == "": 
+                return strDataToSend + "Domain name resolved: none"
+            else:
+                return strDataToSend + "Domain name resolved: " + strIP
                 
         except OSError:
             print "WARNING dig command is not installed."
@@ -80,9 +81,10 @@ def CheckDNS(strIP, verbose):
                     strDataToSend = strDataToSend + "| " + line + "\n"
                 strDataToSend = strDataToSend + "\n"
                             
-            if strIP == "": return 0
-            
-            return strDataToSend + "IP resolved: " + strIP
+            if strIP == "": 
+                return strDataToSend + "IP resolved: none"
+            else:
+                return strDataToSend + "IP resolved: " + strIP
                 
         except OSError:
             print "WARNING dig command is not installed."
