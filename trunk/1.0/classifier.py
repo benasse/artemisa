@@ -175,7 +175,7 @@ class Classifier(PrintClass, log, CallData):
             self.Print("| Fingerprint found. The following attack tool was employed: " + ToolName,True,self.Results_file)
             self.Print("|",True,self.Results_file)            
             self.Print("| Category: Attack tool",True,self.Results_file)
-            self.AddCategory("Attack tool",True,self.Results_file)
+            self.AddCategory("Attack tool")
         
         self.Print("",True,self.Results_file)
         

@@ -54,7 +54,7 @@ def CheckDNS(strIP, verbose):
                 
             strIP = strData[0]
             
-            if strData == "": return 0
+            if strIP == "": return 0
             
             return strDataToSend + "Domain name resolved: " + strIP
                 
@@ -80,7 +80,7 @@ def CheckDNS(strIP, verbose):
                     strDataToSend = strDataToSend + "| " + line + "\n"
                 strDataToSend = strDataToSend + "\n"
                             
-            if strData == "": return 0
+            if strIP == "": return 0
             
             return strDataToSend + "IP resolved: " + strIP
                 

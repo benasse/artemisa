@@ -56,8 +56,7 @@ def Correlator(Classification, bFlood, Results_file):
     if IfCategory("Ringing", Classification) == True:
         Output.Print("* The message belongs to a ringing attack.",True,Results_file)
         
-    
-        
+            
     #Output.Print("No conclusion arrived!",True,Results_file)
         
     Output.Print("",True,Results_file)
