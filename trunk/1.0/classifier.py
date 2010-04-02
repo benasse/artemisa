@@ -44,6 +44,8 @@ class CallData():
     To_Extension = ""
     
     From_IP = ""
+    From_Port = ""
+    From_Transport = ""
     From_Extension = ""
     
     Contact_IP = ""
@@ -138,7 +140,7 @@ class Classifier(PrintClass, log, CallData):
         self.Print("******************************* Information about the call *******************************",True,self.Results_file)
         self.Print("",True,self.Results_file)
         
-        self.Print("From: " + self.From_Extension + " in " + self.From_IP,True,self.Results_file)
+        self.Print("From: " + self.From_Extension + " in " + self.From_IP + ":" + self.From_Port + "/" + self.From_Transport,True,self.Results_file)
         self.Print("To: "  + self.To_Extension + " in " + self.To_IP,True,self.Results_file)
         self.Print("Contact: "  + self.Contact_Extension + " in " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport,True,self.Results_file)
         self.Print("Connection: " + self.Connection,True,self.Results_file)
@@ -441,7 +443,15 @@ class Classifier(PrintClass, log, CallData):
         self.To_Extension = GetExtensionfromSIP(GetSIPHeader("To",self.SIP_Message))
         
         self.From_IP = GetIPfromSIP(GetSIPHeader("From",self.SIP_Message))
+        self.From_Port = GetPortfromSIP(GetSIPHeader("From",self.SIP_Message))
+        if self.From_Port == "": self.From_Port = "5060" # By default
         self.From_Extension = GetExtensionfromSIP(GetSIPHeader("From",self.SIP_Message))
+        if GetSIPHeader("From",self.SIP_Message).find("udp") != -1 or GetSIPHeader("From",self.SIP_Message).find("UDP") != -1: 
+            self.From_Transport = "udp"
+        elif GetSIPHeader("From",self.SIP_Message).find("tcp") != -1 or GetSIPHeader("From",self.SIP_Message).find("TCP") != -1:
+            self.From_Transport = "tcp"
+        else:
+            self.From_Transport = "udp" # By default
         
         self.Contact_IP = GetIPfromSIP(GetSIPHeader("Contact",self.SIP_Message))
         self.Contact_Port = GetPortfromSIP(GetSIPHeader("Contact",self.SIP_Message))
@@ -455,8 +465,9 @@ class Classifier(PrintClass, log, CallData):
             self.Contact_Transport = "udp" # By default
             
         self.Connection = GetIPfromSIP(GetSIPHeader("c=",self.SIP_Message))
-        self.Owner = GetIPfromSIP(GetSIPHeader("c=",self.SIP_Message))
-
+        
+        self.Owner = GetIPfromSIP(GetSIPHeader("o=",self.SIP_Message))
+            
         self.UserAgent = GetSIPHeader("User-Agent",self.SIP_Message)
     
         #self.Record_Route = GetSIPHeader("Record-Route",self.SIP_Message)

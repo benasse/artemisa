@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-VERSION = "1.0.0"
+VERSION = "1.0.75"
 
 import sys
 import os
@@ -34,6 +34,7 @@ from logs import log                # Import class log from logs.py
 from commons import *               # Import functions from commons.py
 from classifier import Classifier   # Message classifier 
 from correlator import Correlator   # Correlator
+from correlator import IfCategory
 import threading                    # Use of threads
 
 from mail import Email
@@ -46,13 +47,20 @@ try:
 except ImportError:
     print ""
     print "Critical error:"
-    print "Python SIP module MUST be installed!"
+    print "PJSIP library module MUST be installed!"
     print ""
     print "Download it from:"
     print "http://www.pjsip.org/download.htm"
     print ""
     print "Installation steps:"
     print "http://trac.pjsip.org/repos/wiki/Python_SIP/Build_Install"
+    print ""
+    print "   In a nutshell:"
+    print ""
+    print "   1) Check that make, gcc, binutils, Python, and Python-devel are installed."
+    print "   2) Build the PJSIP libraries first with the usual \"./configure && make dep && make\" commands."
+    print "   3) Go to pjsip-apps/src/python directory."
+    print "   4) Run \'sudo python ./setup.py install\' or just \'sudo make\'."
     print ""
     sys.exit(1)
 
@@ -75,6 +83,10 @@ behaviour_mode = "active"           # Inference analysis behaviour
 Active_mode = []
 Passive_mode = []
 Aggressive_mode = []
+
+On_flood_parameters = ""            # Parameters to send when calling on_flood.sh
+On_SPIT_parameters = ""             # Parameters to send when calling on_spit.sh
+On_scanning_parameters = ""         # Parameters to send when calling on_scanning.sh
 
 current_call = None
 
@@ -265,12 +277,8 @@ def log_cb(level, str, len):
 
     if intNumCalls == intMaxCalls:
         Output.Print("The maximum number of calls to analyze simultaneously has been reached.")
-        Output.Print("Executing on_flood.sh ...")
         strFLOOD = "yes"
         bFlood = True
-        
-        # Execute a script
-        Process = Popen("bash ./scripts/on_flood.sh", shell=True, stdout=PIPE)
              
         return
 
@@ -555,6 +563,10 @@ def LoadConfiguration():
     global Passive_mode
     global Aggressive_mode
 
+    global On_flood_parameters
+    global On_SPIT_parameters
+    global On_scanning_parameters
+    
     config = ConfigParser.ConfigParser()
     strTemp = config.read("./conf/artemisa.conf")
     
@@ -617,7 +629,25 @@ def LoadConfiguration():
 
     del config
         
-        
+    # Now ir reads the actions.conf file to load the user-defined parameters to sent when calling the scripts
+    config = ConfigParser.ConfigParser()
+    strTemp = config.read("./conf/actions.conf")
+    
+    if strTemp == []:
+        Output.Print("CRITICAL The configuration file actions.conf cannot be read.")
+        sys.exit(1)
+    else:
+        try:
+            # Gets the parameters for the on_flood.sh
+            On_flood_parameters = config.get("actions", "on_flood")
+            On_SPIT_parameters = config.get("actions", "on_spit")
+            On_scanning_parameters = config.get("actions", "on_scanning")
+            
+        except:
+            Output.Print("CRITICAL The configuration file actions.conf cannot be correctly read. Check it out carefully.")
+            sys.exit(1)
+
+    del config            
 
 # def AnalyzeCall
 #
@@ -638,6 +668,10 @@ def AnalyzeCall(strData):
     global bACKReceived
     global bMediaReceived
     global bFlood
+    
+    global On_flood_parameters
+    global On_SPIT_parameters
+    global On_scanning_parameters
     
     # Wait 5 seconds for an ACK and media events. 
     # TODO: This could be better handled.
@@ -700,7 +734,59 @@ def AnalyzeCall(strData):
     File.close()
     
     Output.Print("NOTICE This report has been saved on file " + classifier_instance.Results_file + ".html")
+
+
+    # If a flooding has been detected then run the script
+    if bFlood == True:
         
+        On_flood_parameters = On_flood_parameters.replace("$From_IP$", classifier_instance.From_IP)
+        On_flood_parameters = On_flood_parameters.replace("$From_Port$", classifier_instance.From_Port)
+        On_flood_parameters = On_flood_parameters.replace("$From_Transport$", classifier_instance.From_Transport)
+        On_flood_parameters = On_flood_parameters.replace("$Contact_IP$", classifier_instance.Contact_IP)
+        On_flood_parameters = On_flood_parameters.replace("$Contact_Port$", classifier_instance.Contact_Port)
+        On_flood_parameters = On_flood_parameters.replace("$Contact_Transport$", classifier_instance.Contact_Transport)
+        On_flood_parameters = On_flood_parameters.replace("$Connection_IP$", classifier_instance.Connection)
+        On_flood_parameters = On_flood_parameters.replace("$Owner_IP$", classifier_instance.Owner)
+        
+        strCommand = "bash ./scripts/on_flood.sh " + On_flood_parameters
+        Output.Print("Executing " + strCommand + " ...")
+        # Execute a script
+        Process = Popen(strCommand, shell=True, stdout=PIPE)
+        
+    # If SPIT has been detected then run the script
+    if IfCategory("SPIT",classifier_instance.Classification) == True:
+        
+        On_SPIT_parameters = On_SPIT_parameters.replace("$From_IP$", classifier_instance.From_IP)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$From_Port$", classifier_instance.From_Port)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$From_Transport$", classifier_instance.From_Transport)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_IP$", classifier_instance.Contact_IP)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Port$", classifier_instance.Contact_Port)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Transport$", classifier_instance.Contact_Transport)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Connection_IP$", classifier_instance.Connection)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Owner_IP$", classifier_instance.Owner)
+        
+        strCommand = "bash ./scripts/on_spit.sh " + On_SPIT_parameters
+        Output.Print("Executing " + strCommand + " ...")
+        # Execute a script
+        Process = Popen(strCommand, shell=True, stdout=PIPE)
+        
+    # If a scanning has been detected then run the script
+    if IfCategory("Scanning",classifier_instance.Classification) == True:
+        
+        On_scanning_parameters = On_scanning_parameters.replace("$From_IP$", classifier_instance.From_IP)
+        On_scanning_parameters = On_scanning_parameters.replace("$From_Port$", classifier_instance.From_Port)
+        On_scanning_parameters = On_scanning_parameters.replace("$From_Transport$", classifier_instance.From_Transport)
+        On_scanning_parameters = On_scanning_parameters.replace("$Contact_IP$", classifier_instance.Contact_IP)
+        On_scanning_parameters = On_scanning_parameters.replace("$Contact_Port$", classifier_instance.Contact_Port)
+        On_scanning_parameters = On_scanning_parameters.replace("$Contact_Transport$", classifier_instance.Contact_Transport)
+        On_scanning_parameters = On_scanning_parameters.replace("$Connection_IP$", classifier_instance.Connection)
+        On_scanning_parameters = On_scanning_parameters.replace("$Owner_IP$", classifier_instance.Owner)
+        
+        strCommand = "bash ./scripts/on_scanning.sh " + On_scanning_parameters
+        Output.Print("Executing " + strCommand + " ...")
+        # Execute a script
+        Process = Popen(strCommand, shell=True, stdout=PIPE)
+                
     # Send the results by e-mail
     email = Email() # Creates an Email object
 
@@ -714,7 +800,6 @@ def AnalyzeCall(strData):
         Output.Print(email.sendemail(strData))
     
         del email
-
 
     
     # End of the analysis
