@@ -207,18 +207,20 @@ class Classifier(PrintClass, log, CallData):
             self.Print("| |",True,self.Results_file)   
             DNS_Result = CheckDNS(ip_to_analyze[i], self.verbose)
             if DNS_Result <= 0:
-                self.Print("| | DNS/IP cannot be resolved.",True,self.Results_file)
+                self.Print("| | IP cannot be resolved.",True,self.Results_file)
                 self.Print("| |",True,self.Results_file)
                 self.Print("| | Category: Spoofed message",True,self.Results_file)
                 self.AddCategory("Spoofed message")
             else:
-                if DNS_Result.find("none") == -1:
+                if (DNS_Result.find("WHOIS data not found") != -1 or DNS_Result.find("none") != -1) and DNS_Result.find("not DNS") == -1:
                     DNS_Result = DNS_Result.splitlines()
                     for line in DNS_Result:
                         self.Print("| | " + line,True,self.Results_file) 
                     self.Print("| |",True,self.Results_file)
                     self.Print("| | Category: Spoofed message",True,self.Results_file)
-                    self.AddCategory("Spoofed message")                
+                    self.AddCategory("Spoofed message")
+                elif DNS_Result.find("not DNS") != -1:
+                    self.Print("| | This is already an IP address. Nothing done.",True,self.Results_file)
                 else:
                     DNS_Result = DNS_Result.splitlines()
                     for line in DNS_Result:
