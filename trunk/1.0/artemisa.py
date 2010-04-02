@@ -24,7 +24,7 @@ VERSION = "1.0.0"
 import sys
 import os
 
-import ConfigParser                 # Read configuration files.
+import ConfigParser                 # Read configuration files
 
 import csv                          # Used to print CTP matrices
 
@@ -34,7 +34,7 @@ from logs import log                # Import class log from logs.py
 from commons import *               # Import functions from commons.py
 from classifier import Classifier   # Message classifier 
 from correlator import Correlator   # Correlator
-import threading                    # Use of threads.
+import threading                    # Use of threads
 
 from mail import Email
 from htmlresults import get_results_html
@@ -427,12 +427,12 @@ class MyCallCallback(pj.CallCallback):
                     self.rec_id = lib.create_recorder(strFilename)
                     self.rec_slot = lib.recorder_get_slot(self.rec_id)
                 
-                # Connect the call with the WAV recorder
-                lib.conf_connect(call_slot, self.rec_slot)
-                
-                Output.Print("Audio is now being recorded on file: " + strFilename)
-                
-                bMediaReceived = True
+                    # Connect the call with the WAV recorder
+                    lib.conf_connect(call_slot, self.rec_slot)
+                    
+                    Output.Print("Audio is now being recorded on file: " + strFilename)
+                    
+                    bMediaReceived = True
                 
             except Exception, e:
                 Output.Print("WARNING Error while trying to record the call. Error: " + str(e))
@@ -449,7 +449,7 @@ class MyCallCallback(pj.CallCallback):
             except Exception, e:
                 Output.Print("WARNING Error: " + str(e))
             
-            Output.Print("NOTICE Audio is inactive.") 
+            Output.Print("NOTICE Audio is inactive. Check the configuration file.") 
             
 
 # def LoadExtensions
@@ -639,7 +639,9 @@ def AnalyzeCall(strData):
     global bMediaReceived
     global bFlood
     
-    # Wait 5 seconds for an ACK and media events. FIXME: This could be better managed.
+    # Wait 5 seconds for an ACK and media events. 
+    # TODO: This could be better handled.
+    
     for i in range(5):
         Output.Print("Waiting for SIP dialogs (" + str(5-i) + ")...")
         sleep(1)
@@ -688,6 +690,17 @@ def AnalyzeCall(strData):
     # Call the correlator
     Correlator(classifier_instance.Classification, bFlood, classifier_instance.Results_file, classifier_instance.ToolName)
     
+    Output.Print("NOTICE This report has been saved on file " + classifier_instance.Results_file + ".txt")
+
+    # Save the results in a HTML file
+    File = open(classifier_instance.Results_file + ".html", "w")
+        
+    File.write(get_results_html(classifier_instance.Results_file, False, classifier_instance.SIP_Message, classifier_instance.From_Extension, classifier_instance.From_IP, classifier_instance.To_Extension, classifier_instance.To_IP, classifier_instance.Contact_Extension, classifier_instance.Contact_IP, classifier_instance.Connection, classifier_instance.Owner, classifier_instance.Via, classifier_instance.UserAgent, VERSION, strLocal_IP, strLocal_port))
+            
+    File.close()
+    
+    Output.Print("NOTICE This report has been saved on file " + classifier_instance.Results_file + ".html")
+        
     # Send the results by e-mail
     email = Email() # Creates an Email object
 
@@ -702,13 +715,7 @@ def AnalyzeCall(strData):
     
         del email
 
-    # Save the results in a HTML file
-    File = open(classifier_instance.Results_file + ".html", "w")
-        
-    File.write(get_results_html(classifier_instance.Results_file, False, classifier_instance.SIP_Message, classifier_instance.From_Extension, classifier_instance.From_IP, classifier_instance.To_Extension, classifier_instance.To_IP, classifier_instance.Contact_Extension, classifier_instance.Contact_IP, classifier_instance.Connection, classifier_instance.Owner, classifier_instance.Via, classifier_instance.UserAgent, VERSION, strLocal_IP, strLocal_port))
-            
-    File.close()
-    
+
     
     # End of the analysis
     
