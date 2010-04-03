@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-VERSION = "1.0.75"
+VERSION = "1.0.76"
 
 import sys
 import os
@@ -179,7 +179,7 @@ class Server():
             pass
         
         for i in range(len(self.Extensions)):
-            self.acc_cfg = pj.AccountConfig(self.Registrar_IP, self.Extensions[i].Extension, self.Extensions[i].Password, self.Extensions[i].Username)
+            self.acc_cfg = pj.AccountConfig(self.Registrar_IP + ":" + self.Registrar_port, self.Extensions[i].Extension, self.Extensions[i].Password, self.Extensions[i].Username)
             self.acc_cfg.reg_timeout = self.Registrar_time * 60
             self.acc_cfg.ka_interval = self.NAT_ka_inverval
             self.acc = lib.create_account(self.acc_cfg)
@@ -839,7 +839,7 @@ def EndConnection():
 #     bCommands: when True the commands list is shown. 
 
 def ShowHelp(bCommands = True):
-    print "Usage: artemisa [-v] [-g]"
+    print "Usage: artemisa [Options]"
     print "  -v, --verbose             Verbose mode (it shows more information)."
     print "  -g, --get_sound_devices   Show the available sound devices."
     
