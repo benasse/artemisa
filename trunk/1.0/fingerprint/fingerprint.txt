@@ -9,3 +9,4 @@
 # SIPVicious=friendly-scanner
 
 SIPVicious=friendly-scanner
+SIPSCAN=X-Lite

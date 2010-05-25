@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-VERSION = "1.0.76"
+VERSION = "1.0.77"
 
 import sys
 import os
@@ -108,7 +108,14 @@ LastINVITEreceived = ""             # Store the last INVITE message received in 
 
 # Statistics
 intN_INVITE = 0
+intN_OPTIONS = 0
 strFLOOD = "no"
+
+bOPTIONSReceived = False             # Flag to know if a OPTIONS was received
+
+# TODO: Anti-flood mechanism for OPTIONS flood not yet implemented
+#intOPTIONS_Flood_timer0 = 0          # Flag to set a timer to detect OPTIONS flood
+#intOPTIONS_Flood_timer1 = 0          # Flag to set a timer to detect OPTIONS flood
 
 strINVITETag = ""                   # Tag of the received INVITE
 bACKReceived = False                # We must know if an ACK was received
@@ -211,8 +218,10 @@ def log_cb(level, str, len):
     global intNumCalls
     global intMaxCalls
     global intN_INVITE
+    global intN_OPTIONS
     global strFLOOD
     global bACKReceived
+    global bOPTIONSReceived 
     global strINVITETag
     global bFlood
     
@@ -230,6 +239,12 @@ def log_cb(level, str, len):
         elif line.find("ACK") != -1 and line.find("SIP/2.0") != -1:
             bAckFound = True
             break
+        elif line.find("OPTIONS") != -1 and line.find("SIP/2.0") != -1:
+            bOPTIONSReceived = True
+            break
+
+    if bOPTIONSReceived == True:
+        intN_OPTIONS += 1
 
     # Here we check if the ACK received is for the received INVITE.        
     if bAckFound == True:
@@ -724,6 +739,11 @@ def AnalyzeCall(strData):
     # Call the correlator
     Correlator(classifier_instance.Classification, bFlood, classifier_instance.Results_file, classifier_instance.ToolName)
     
+    # Save the raw SIP message in the report file
+    Output.Print("************************************** SIP message ***************************************",False,classifier_instance.Results_file)
+    Output.Print("",False,classifier_instance.Results_file)
+    Output.Print(classifier_instance.SIP_Message,False,classifier_instance.Results_file)
+    
     Output.Print("NOTICE This report has been saved on file " + classifier_instance.Results_file + ".txt")
 
     # Save the results in a HTML file
@@ -881,6 +901,7 @@ def main():
 
     global verbose
     global lib
+    global strLocal_IP
     global strLocal_port
     global strUserAgent
     global intMaxCalls
@@ -895,6 +916,7 @@ def main():
 
     # Stats' variables
     global intN_INVITE
+    global intN_OPTIONS
     global strFLOOD
     
     Show_sound_devices = False
@@ -999,6 +1021,8 @@ def main():
                 
     Unregister = False
 
+    Output.Print("User Agent listening on: " + strLocal_IP + ":" + strLocal_port)
+    
     Output.Print("Behaviour mode: " + behaviour_mode)
 
     if len(Servers) == 0:
@@ -1031,6 +1055,7 @@ def main():
             print "-------------------------------------------------------------------"
             print ""
             print "INVITE messages received: " + str(intN_INVITE)
+            print "OPTIONS messages received: " + str(intN_OPTIONS)
             print "Flood detected?: " + strFLOOD
             print ""
                 
