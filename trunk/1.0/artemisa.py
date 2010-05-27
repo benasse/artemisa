@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-VERSION = "1.0.77"
+VERSION = "1.0.78"
 
 import sys
 import os
@@ -58,9 +58,10 @@ except ImportError:
     print "   In a nutshell:"
     print ""
     print "   1) Check that make, gcc, binutils, Python, and Python-devel are installed."
-    print "   2) Build the PJSIP libraries first with the usual \"./configure && make dep && make\" commands."
-    print "   3) Go to pjsip-apps/src/python directory."
-    print "   4) Run \'sudo python ./setup.py install\' or just \'sudo make\'."
+    print "   2) Build the PJSIP libraries first with \"# ./configure && make dep && make\" commands."
+    print "      Note: if fails try:./configure CFLAGS=-fPIC"
+    print "   3) Go to the pjsip-apps/src/python directory."
+    print "   4) Run \'# python ./setup.py install\' or just \'# make\'."
     print ""
     sys.exit(1)
 

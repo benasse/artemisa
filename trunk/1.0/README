@@ -6,9 +6,9 @@ Prerequisites
 
 Artemisa requires the following installed components:
 
-* Python
+* Python (=> 2.5.5)
 * bind-utils (Red Hat, Fedora), bind-tools (Gentoo), dnsutils (Debian)
-* PJSIP with PJSUA Python Module (http://www.pjsip.org/)
+* PJSIP with the PJSUA Python Module (http://www.pjsip.org/)
 * nmap (http://nmap.org/)
 * jwhois (http://www.gnu.org/software/jwhois/)
 
