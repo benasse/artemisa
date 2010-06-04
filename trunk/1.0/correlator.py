@@ -17,8 +17,6 @@
 
 from commons import PrintClass
 
-# def Correlator
-
 def Correlator(Classification, bFlood, Results_file, ToolName):
     
     Output = PrintClass()
@@ -65,12 +63,10 @@ def Correlator(Classification, bFlood, Results_file, ToolName):
     Output.Print("",True,Results_file)
         
         
-# def IfCategory
-#
-# Returns whether a category is found or not.
-    
 def IfCategory(strCategory, Classification):
-
+	"""
+	Returns whether a category is found or not.
+	"""
     bFound = False
         
     for i in range(len(Classification)):

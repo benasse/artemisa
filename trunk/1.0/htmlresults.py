@@ -17,12 +17,11 @@
 
 from time import strftime
 
-# def get_results_html
-#
-# This function returns the results in HTML format.
-
 def get_results_html(strFilename, ForEmail, Message, From_Extension, From_IP, To_Extension, To_IP, Contact_Extension, Contact_IP, Connection, Owner, Via, UserAgent, VERSION, LocalIP, LocalPort):
-
+	"""
+	This function returns the results in HTML format.
+	"""
+	
 	Message = Message.replace("<", "&lt;")
 	Message = Message.replace(">", "&gt;")	
 	Message = Message.replace("\n", "<br>")

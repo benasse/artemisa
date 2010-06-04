@@ -19,7 +19,7 @@
 import os
 from time import strftime
 
-from commons import PrintClass, GetSIPHeader, Search, GetTimeClass, GetIPfromSIP, GetPortfromSIP, GetExtensionfromSIP, RemoveComments, ResolveDNS
+from commons import PrintClass, GetSIPHeader, Search, GetTimeClass, GetIPfromSIP, GetPortfromSIP, GetExtensionfromSIP, GetTransportfromSIP, RemoveComments, ResolveDNS
 
 from mail import Email
 from htmlresults import get_results_html
@@ -34,87 +34,69 @@ from check_port import CheckPort
 # It stores information extracted from the SIP message.
 
 class CallData():
-    
-    INVITE_IP = "" # Corresponds to the first line of a INVITE message
-    INVITE_Port = ""
-    INVITE_Transport = ""
-    INVITE_Extension = ""
-    
-    To_IP = ""
-    To_Extension = ""
-    
-    From_IP = ""
-    From_Port = ""
-    From_Transport = ""
-    From_Extension = ""
-    
-    Contact_IP = ""
-    Contact_Port = ""
-    Contact_Transport = ""
-    Contact_Extension = ""
-    
-    Via = []
-    
-    Record_Route = ""
-    
-    Connection = ""
-    Owner = ""
-
-    UserAgent = ""
-    
+    """
+	Class employed to store some data about the received call
+	"""
+	
     def __init__(self):
 
-        self.Via = []
+	    self.INVITE_IP = "" # Corresponds to the first line of a INVITE message
+		self.INVITE_Port = ""
+		self.INVITE_Transport = ""
+		self.INVITE_Extension = ""
+		
+		self.To_IP = ""
+		self.To_Extension = ""
+		
+		self.From_IP = ""
+		self.From_Port = ""
+		self.From_Transport = ""
+		self.From_Extension = ""
+		
+		self.Contact_IP = ""
+		self.Contact_Port = ""
+		self.Contact_Transport = ""
+		self.Contact_Extension = ""
+		
+		self.Via = []
+		
+		self.Record_Route = ""
+		
+		self.Connection = ""
+		self.Owner = ""
+
+		self.UserAgent = ""
         
-        
-# class Classifier
-#
-# This class performs the classification of the received SIP message.
+class Classifier(PrintClass, log):
+    """
+	This class performs the classification of the received SIP message.
+	"""
+	
+    def __init__(self, VERSION, verbose, strLocal_IP, strLocal_port, behaviour_mode, behaviour_actions, strData, Extensions, bACKReceived, bMediaReceived):
+		self.VERSION = VERSION # Artemisa's version
+		self.strLocal_IP = strLocal_IP
+		self.strLocal_port = strLocal_port
+		self.verbose = verbose # Flag to know whether the verbose mode is set or not
+		self.Extensions = Extensions # Extensions registered by Artemisa
+		self.SIP_Message = strData # Stores the SIP message to classify (usually the INVITE)
+		self.bACKReceived = bACKReceived
+		self.bMediaReceived = bMediaReceived
+		self.Behaviour = behaviour_mode
+		self.Behaviour_actions = behaviour_actions
+		
+		self.ToolName = "" # Flag to store the attack tool detected
+		self.Results_file = ""
+        self.Running = True # State of the analysis
 
-class Classifier(PrintClass, log, CallData):
-    
-    VERSION = "" # Artemisa's version
-    
-    verbose = False # Flag to know whether the verbose mode is set or not
-    
-    strLocal_IP = ""
-    strLocal_port = ""
-    
-    Extensions = [] # Extensions registered by Artemisa
-    
-    SIP_Message = "" # Stores the SIP message to classify (usually the INVITE)
-    
-    bACKReceived = False
-    bMediaReceived = False
-    
-    Behaviour = ""
-    Behaviour_actions = []
-    
-    Classification = [] # Stores the classification of the message
-    
-    # Information:
-    ToolName = "" # Flag to store the attack tool detected
-
-    Results_file = ""
-    
-    Running = True # State of the analysis
-
-    def __init__(self):
-        self.Running = True
+		self.CallInformation = CallData() # Creates an instance of CallData
+		
         self.Classification = []
-        CallData.__init__(self)
         
-        
-    # def Start
-    #
-    # This function starts the process. 
-    
-    def Start(self):
-
-        self.GetCallData() # Retrieves all the necessary data from the message for further analysis
-
-        # Defines a file name to store the output. The idea is to make a txt file with the same output
-        # of the screen and then use it to build the HTML report.
+	def GetFilename(self):
+        """
+		Defines a file name to store the output. The idea is to make a txt file with the same output
+		of the screen and then use it to build the HTML report.
+		"""
         
         strFilename = ""
         try:
@@ -129,46 +111,18 @@ class Classifier(PrintClass, log, CallData):
                     break
         except:
             pass
-        
-        self.Results_file = strFilename
-        
-        self.Print("")
-        #self.Print("===================================================================",True,self.Results_file)
-        #self.Print("| Information about the call                                      |",True,self.Results_file)
-        #self.Print("===================================================================",True,self.Results_file)
-
-        self.Print("******************************* Information about the call *******************************",True,self.Results_file)
-        self.Print("",True,self.Results_file)
-        
-        self.Print("From: " + self.From_Extension + " in " + self.From_IP + ":" + self.From_Port + "/" + self.From_Transport,True,self.Results_file)
-        self.Print("To: "  + self.To_Extension + " in " + self.To_IP,True,self.Results_file)
-        self.Print("Contact: "  + self.Contact_Extension + " in " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport,True,self.Results_file)
-        self.Print("Connection: " + self.Connection,True,self.Results_file)
-        self.Print("Owner: " + self.Owner,True,self.Results_file)
-        
-        for i in range(len(self.Via)):
-            self.Print("Via " + str(i) + ": " + self.Via[i][0] + ":" + self.Via[i][1] + "/" + self.Via[i][2],True,self.Results_file)
-            
-        self.Print(self.UserAgent,True,self.Results_file)
-
-        self.Print("",True,self.Results_file)
-
-        #self.Print("===================================================================",True,self.Results_file)
-        #self.Print("| Classification                                                  |",True,self.Results_file)
-        #self.Print("===================================================================",True,self.Results_file)
-        
-        self.Print("************************************* Classification *************************************",True,self.Results_file)
-        self.Print("",True,self.Results_file)
-                
-        # ---------------------------------------------------------------------------------
-        # Check fingerprint
-        # ---------------------------------------------------------------------------------
-        
+		
+		return strFilename
+			
+	def Tests_CheckFingerprint(self):
+		"""
+		This method carries out the fingerprint test
+		"""
         self.Print("+ Checking fingerprint...",True,self.Results_file)
         self.Print("|",True,self.Results_file)
-        self.Print("| " + self.UserAgent,True,self.Results_file)
+        self.Print("| " + self.CallInformation.UserAgent,True,self.Results_file)
         
-        self.ToolName = CheckFingerprint(self.UserAgent)
+        self.ToolName = CheckFingerprint(self.CallInformation.UserAgent)
         if self.ToolName < 0:
             self.Print("|",True,self.Results_file)
             self.Print("| Fingerprint check failed.",True,self.Results_file)
@@ -183,26 +137,24 @@ class Classifier(PrintClass, log, CallData):
             self.AddCategory("Attack tool")
         
         self.Print("",True,self.Results_file)
-        
-        # ---------------------------------------------------------------------------------
-        # Check DNS
-        # ---------------------------------------------------------------------------------
-        
-        self.Print("+ Checking DNS...",True,self.Results_file)
+		
+	def Tests_CheckDNS(self):
+		"""
+		This method carries out the DNS test
+		"""
+		self.Print("+ Checking DNS...",True,self.Results_file)
         
         ip_to_analyze = [] # IPs that will be analyzed
                 
-        ip_to_analyze.append(self.From_IP)
-        if ip_to_analyze.count(self.Contact_IP) == 0: ip_to_analyze.append(self.Contact_IP) # This is to avoid having repeated IPs
-        if ip_to_analyze.count(self.Connection) == 0: ip_to_analyze.append(self.Connection)
-        if ip_to_analyze.count(self.Owner) == 0: ip_to_analyze.append(self.Owner)
+        ip_to_analyze.append(self.CallInformation.From_IP)
+        if ip_to_analyze.count(self.CallInformation.Contact_IP) == 0: ip_to_analyze.append(self.CallInformation.Contact_IP) # This is to avoid having repeated IPs
+        if ip_to_analyze.count(self.CallInformation.Connection) == 0: ip_to_analyze.append(self.CallInformation.Connection)
+        if ip_to_analyze.count(self.CallInformation.Owner) == 0: ip_to_analyze.append(self.CallInformation.Owner)
         
-        for i in range(len(self.Via)):
-                if ip_to_analyze.count(self.Via[i][0]) == 0: ip_to_analyze.append(self.Via[i][0])
+        for i in range(len(self.CallInformation.Via)):
+                if ip_to_analyze.count(self.CallInformation.Via[i][0]) == 0: ip_to_analyze.append(self.CallInformation.Via[i][0])
        
-        
         # Analyze each IP address 
-       
         for i in range(len(ip_to_analyze)):
             self.Print("|",True,self.Results_file)
             self.Print("| + Checking " + ip_to_analyze[i] + "...",True,self.Results_file)
@@ -232,18 +184,18 @@ class Classifier(PrintClass, log, CallData):
                     self.AddCategory("Interactive attack")
     
         self.Print("",True,self.Results_file)
-
-        # ---------------------------------------------------------------------------------
-        # Check if SIP ports are opened
-        # ---------------------------------------------------------------------------------
-
+		
+	def Tests_CheckSIPPorts(self):
+		"""
+		This method carries out the SIP ports test
+		"""
         self.Print("+ Checking if SIP port is opened...",True,self.Results_file)
 
         self.Print("|",True,self.Results_file)
-        self.Print("| + Checking " + self.Contact_IP + ":" + self.Contact_Port + "/" + self.Contact_Transport + "...",True,self.Results_file)
+        self.Print("| + Checking " + self.CallInformation.Contact_IP + ":" + self.CallInformation.Contact_Port + "/" + self.CallInformation.Contact_Transport + "...",True,self.Results_file)
         self.Print("| |",True,self.Results_file)   
             
-        strResult = CheckPort(self.Contact_IP, self.Contact_Port, self.Contact_Transport, self.verbose)
+        strResult = CheckPort(self.CallInformation.Contact_IP, self.CallInformation.Contact_Port, self.CallInformation.Contact_Transport, self.verbose)
             
         if strResult == 0 or strResult < 0:
             self.Print("| | Error while scanning the port.",True,self.Results_file)
@@ -268,11 +220,11 @@ class Classifier(PrintClass, log, CallData):
                 self.AddCategory("Interactive attack")
                 
         self.Print("",True,self.Results_file)
-
-        # ---------------------------------------------------------------------------------
-        # Check if media ports are opened
-        # ---------------------------------------------------------------------------------
-
+		
+	def Tests_CheckMediaPorts(self):
+		"""
+		This method carries out the media ports test
+		"""
         self.Print("+ Checking if media port is opened...",True,self.Results_file)
 
         # FIXME: this parsing could be improved
@@ -288,10 +240,10 @@ class Classifier(PrintClass, log, CallData):
             strRTPPort = strRTPPort.split(" ")[1]
 
             self.Print("|",True,self.Results_file)
-            self.Print("| + Checking " + self.Contact_IP + ":" + strRTPPort + "/" + "udp" + "...",True,self.Results_file)
+            self.Print("| + Checking " + self.CallInformation.Contact_IP + ":" + strRTPPort + "/" + "udp" + "...",True,self.Results_file)
             self.Print("| |",True,self.Results_file)   
                 
-            strResult = CheckPort(self.Contact_IP, strRTPPort, "udp", self.verbose)
+            strResult = CheckPort(self.CallInformation.Contact_IP, strRTPPort, "udp", self.verbose)
                 
             if strResult == 0 or strResult < 0:
                 self.Print("| | Error while scanning the port.",True,self.Results_file)
@@ -316,23 +268,23 @@ class Classifier(PrintClass, log, CallData):
                     self.AddCategory("Interactive attack")
                 
         self.Print("",True,self.Results_file)
-
-        # ---------------------------------------------------------------------------------
-        # Check request URI
-        # ---------------------------------------------------------------------------------
-
+		
+	def Tests_CheckURI(self):
+		"""
+		This method carries out the URI comprobation test
+		"""
         bRequestURI = False # Flag to know if this test gives a positive or negative result
 
         self.Print("+ Checking request URI...",True,self.Results_file)
         self.Print("|",True,self.Results_file)
-        self.Print("| Extension in field To: " + self.To_Extension,True,self.Results_file)
+        self.Print("| Extension in field To: " + self.CallInformation.To_Extension,True,self.Results_file)
         self.Print("|",True,self.Results_file)
         
         # Now it checks if the extension contained in the "To" field is one of the honeypot's registered
         # extesions.
         bFound = False
         for i in range(len(self.Extensions)):
-            if str(self.Extensions[i].Extension) == self.To_Extension:
+            if str(self.Extensions[i].Extension) == self.CallInformation.To_Extension:
                 # The extension contained in the "To" field is an extension of the honeypot.
                 bFound = True
                 self.Print("| Request addressed to the honeypot? Yes",True,self.Results_file)
@@ -344,11 +296,11 @@ class Classifier(PrintClass, log, CallData):
             bRequestURI = False
 
         self.Print("",True,self.Results_file)
-
-        # ---------------------------------------------------------------------------------
-        # Check if proxy in Via
-        # ---------------------------------------------------------------------------------
-
+		
+	def Tests_CheckVia(self):
+		"""
+		This method carries out the Via test
+		"""
         # This entire tests depends on the result of the previous
         if bRequestURI == False:
 
@@ -356,11 +308,11 @@ class Classifier(PrintClass, log, CallData):
             
             self.Print("+ Checking if proxy in Via...",True,self.Results_file)
             self.Print("|",True,self.Results_file)
-            self.Print("| + Checking " + self.Via[0][0] + ":" + self.Via[0][1] + "/" + self.Via[0][2] + "...",True,self.Results_file)
+            self.Print("| + Checking " + self.CallInformation.Via[0][0] + ":" + self.CallInformation.Via[0][1] + "/" + self.CallInformation.Via[0][2] + "...",True,self.Results_file)
             self.Print("| |",True,self.Results_file)   
     
             # We determine the existence of the proxy by checking the port with nmap
-            strResult = CheckPort(self.Via[0][0], self.Via[0][1], self.Via[0][2], self.verbose)
+            strResult = CheckPort(self.CallInformation.Via[0][0], self.CallInformation.Via[0][1], self.CallInformation.Via[0][2], self.verbose)
                 
             if strResult == 0 or strResult < 0:
                 self.Print("| | Error while scanning.",True,self.Results_file)
@@ -379,11 +331,11 @@ class Classifier(PrintClass, log, CallData):
                     self.AddCategory("Direct attack")
         
             self.Print("",True,self.Results_file)
-
-        # ---------------------------------------------------------------------------------
-        # Check for ACK
-        # ---------------------------------------------------------------------------------
-        
+			
+	def Tests_CheckACK(self):
+		"""
+		This method carries out the ACK test
+		"""
         self.Print("+ Checking for ACK...",True,self.Results_file)
         self.Print("|",True,self.Results_file)
         
@@ -396,11 +348,11 @@ class Classifier(PrintClass, log, CallData):
             self.AddCategory("Scanning")
 
         self.Print("",True,self.Results_file)
-
-        # ---------------------------------------------------------------------------------
-        # Check received media
-        # ---------------------------------------------------------------------------------
-
+		
+	def Tests_CheckMedia(self):
+		"""
+		This method carries out the received media test
+		"""
         self.Print("+ Checking for received media...",True,self.Results_file)
         self.Print("|",True,self.Results_file)
         
@@ -416,80 +368,136 @@ class Classifier(PrintClass, log, CallData):
             self.AddCategory("Ringing")       
 
         self.Print("",True,self.Results_file)
+		
+    def Start(self):
+		"""
+		This function starts the process. 
+		"""
+		
+        self.GetCallData() # Retrieves all the necessary data from the message for further analysis
+
+        self.Results_file = self.GetFilename()
+        
+        self.Print("")
+        self.Print("******************************* Information about the call *******************************",True,self.Results_file)
+        self.Print("",True,self.Results_file)
+        
+        self.Print("From: " + self.CallInformation.From_Extension + " in " + self.CallInformation.From_IP + ":" + self.CallInformation.From_Port + "/" + self.CallInformation.From_Transport,True,self.Results_file)
+        self.Print("To: "  + self.CallInformation.To_Extension + " in " + self.To_IP,True,self.Results_file)
+        self.Print("Contact: "  + self.CallInformation.Contact_Extension + " in " + self.CallInformation.Contact_IP + ":" + self.CallInformation.Contact_Port + "/" + self.CallInformation.Contact_Transport,True,self.Results_file)
+        self.Print("Connection: " + self.CallInformation.Connection,True,self.Results_file)
+        self.Print("Owner: " + self.CallInformation.Owner,True,self.Results_file)
+        
+        for i in range(len(self.CallInformation.Via)):
+            self.Print("Via " + str(i) + ": " + self.CallInformation.Via[i][0] + ":" + self.CallInformation.Via[i][1] + "/" + self.CallInformation.Via[i][2],True,self.Results_file)
+            
+        self.Print(self.CallInformation.UserAgent,True,self.Results_file)
+
+        self.Print("",True,self.Results_file)
+        self.Print("************************************* Classification *************************************",True,self.Results_file)
+        self.Print("",True,self.Results_file)
+                
+        # ---------------------------------------------------------------------------------
+        # Check fingerprint
+        # ---------------------------------------------------------------------------------
+		self.Tests_CheckFingerprint()
+        
+        # ---------------------------------------------------------------------------------
+        # Check DNS
+        # ---------------------------------------------------------------------------------
+        self.Tests_CheckDNS()
+
+        # ---------------------------------------------------------------------------------
+        # Check if SIP ports are opened
+        # ---------------------------------------------------------------------------------
+		self.Tests_CheckSIPPorts()
+
+        # ---------------------------------------------------------------------------------
+        # Check if media ports are opened
+        # ---------------------------------------------------------------------------------
+		self.Tests_CheckMediaPorts()
+
+        # ---------------------------------------------------------------------------------
+        # Check request URI
+        # ---------------------------------------------------------------------------------
+		self.Tests_CheckURI()
+
+        # ---------------------------------------------------------------------------------
+        # Check if proxy in Via
+        # ---------------------------------------------------------------------------------
+		self.Tests_CheckVia()
+
+        # ---------------------------------------------------------------------------------
+        # Check for ACK
+        # ---------------------------------------------------------------------------------
+		self.Tests_CheckACK()
+
+        # ---------------------------------------------------------------------------------
+        # Check received media
+        # ---------------------------------------------------------------------------------
+		self.Tests_CheckMedia()
 
         self.Running = False
-        
-        return
 
 
-    # def GetCallData
-    #
-    # This function extracts information from the SIP message.
-    
     def GetCallData(self):
-        
-        self.INVITE_IP = GetIPfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
-        self.INVITE_Port = GetPortfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
-        if self.INVITE_Port == "": self.INVITE_Port = "5060" # By default
-        self.INVITE_Extension = GetExtensionfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
-        if GetSIPHeader("INVITE",self.SIP_Message).find("udp") != -1 or GetSIPHeader("INVITE",self.SIP_Message).find("UDP") != -1: 
-            self.INVITE_Transport = "udp"
-        elif GetSIPHeader("INVITE",self.SIP_Message).find("tcp") != -1 or GetSIPHeader("INVITE",self.SIP_Message).find("TCP") != -1:
-            self.INVITE_Transport = "tcp"
-        else:
-            self.INVITE_Transport = "udp" # By default
+		"""
+		This method extracts information from the SIP message.
+		"""
+		
+		# First line of the SIP message (We call it INVITE)
+        self.CallInformation.INVITE_IP = GetIPfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
+        self.CallInformation.INVITE_Port = GetPortfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
+        if self.CallInformation.INVITE_Port == "": self.CallInformation.INVITE_Port = "5060" # By default
+        self.CallInformation.INVITE_Extension = GetExtensionfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
+		
+		self.CallInformation.INVITE_Transport = GetTransportfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
             
-        self.To_IP = GetIPfromSIP(GetSIPHeader("To",self.SIP_Message))
-        self.To_Extension = GetExtensionfromSIP(GetSIPHeader("To",self.SIP_Message))
+		# Field To
+        self.CallInformation.To_IP = GetIPfromSIP(GetSIPHeader("To",self.SIP_Message))
+        self.CallInformation.To_Extension = GetExtensionfromSIP(GetSIPHeader("To",self.SIP_Message))
         
-        self.From_IP = GetIPfromSIP(GetSIPHeader("From",self.SIP_Message))
-        self.From_Port = GetPortfromSIP(GetSIPHeader("From",self.SIP_Message))
-        if self.From_Port == "": self.From_Port = "5060" # By default
-        self.From_Extension = GetExtensionfromSIP(GetSIPHeader("From",self.SIP_Message))
-        if GetSIPHeader("From",self.SIP_Message).find("udp") != -1 or GetSIPHeader("From",self.SIP_Message).find("UDP") != -1: 
-            self.From_Transport = "udp"
-        elif GetSIPHeader("From",self.SIP_Message).find("tcp") != -1 or GetSIPHeader("From",self.SIP_Message).find("TCP") != -1:
-            self.From_Transport = "tcp"
-        else:
-            self.From_Transport = "udp" # By default
-        
-        self.Contact_IP = GetIPfromSIP(GetSIPHeader("Contact",self.SIP_Message))
-        self.Contact_Port = GetPortfromSIP(GetSIPHeader("Contact",self.SIP_Message))
-        if self.Contact_Port == "": self.Contact_Port = "5060" # By default
+		# Field From
+        self.CallInformation.From_IP = GetIPfromSIP(GetSIPHeader("From",self.SIP_Message))
+        self.CallInformation.From_Port = GetPortfromSIP(GetSIPHeader("From",self.SIP_Message))
+        if self.CallInformation.From_Port == "": self.CallInformation.From_Port = "5060" # By default
+        self.CallInformation.From_Extension = GetExtensionfromSIP(GetSIPHeader("From",self.SIP_Message))
+		
+		self.CallInformation.From_Transport = GetTransportfromSIP(GetSIPHeader("From",self.SIP_Message))
+		
+		# Field Contact
+        self.CallInformation.Contact_IP = GetIPfromSIP(GetSIPHeader("Contact",self.SIP_Message))
+        self.CallInformation.Contact_Port = GetPortfromSIP(GetSIPHeader("Contact",self.SIP_Message))
+        if self.CallInformation.Contact_Port == "": self.CallInformation.Contact_Port = "5060" # By default
         self.Contact_Extension = GetExtensionfromSIP(GetSIPHeader("Contact",self.SIP_Message))
-        if GetSIPHeader("Contact",self.SIP_Message).find("udp") != -1 or GetSIPHeader("Contact",self.SIP_Message).find("UDP") != -1: 
-            self.Contact_Transport = "udp"
-        elif GetSIPHeader("Contact",self.SIP_Message).find("tcp") != -1 or GetSIPHeader("Contact",self.SIP_Message).find("TCP") != -1:
-            self.Contact_Transport = "tcp"
-        else:
-            self.Contact_Transport = "udp" # By default
+		
+		self.CallInformation.Contact_Transport = GetTransportfromSIP(GetSIPHeader("Contact",self.SIP_Message))
             
-        self.Connection = GetIPfromSIP(GetSIPHeader("c=",self.SIP_Message))
+		# Field Connection
+        self.CallInformation.Connection = GetIPfromSIP(GetSIPHeader("c=",self.SIP_Message))
         
-        self.Owner = GetIPfromSIP(GetSIPHeader("o=",self.SIP_Message))
+		# Field Owner
+        self.CallInformation.Owner = GetIPfromSIP(GetSIPHeader("o=",self.SIP_Message))
             
-        self.UserAgent = GetSIPHeader("User-Agent",self.SIP_Message)
+		# Field UserAgent
+        self.CallInformation.UserAgent = GetSIPHeader("User-Agent",self.SIP_Message)
     
-        #self.Record_Route = GetSIPHeader("Record-Route",self.SIP_Message)
+		# Field RecordRoute
+        #self.CallInformation.Record_Route = GetSIPHeader("Record-Route",self.SIP_Message)
         
+		# Field Via
         strTemp = self.SIP_Message.splitlines()
-    
         for line in strTemp:
             if line[0:4] == "Via:":
-                if line.find("UDP") != -1 or line.find("udp") != -1:
-                    strTransport = "udp"
-                elif line.find("TCP") != -1 or line.find("tcp") != -1:
-                    strTransport = "tcp"
-                else:
-                    strTransport = "other" #FIXME: this should be changed
-                                    
-                self.Via.append([GetIPfromSIP(line.strip()), GetPortfromSIP(line.strip()), strTransport])
+                self.CallInformation.Via.append([GetIPfromSIP(line.strip()), GetPortfromSIP(line.strip()), GetTransportfromSIP(GetSIPHeader(line.strip(),self.SIP_Message))])
         
         
-    # def AddCategory
-    
     def AddCategory(self, strCategory):
-        
+        """
+		Keyword Arguments:
+		strCategory -- category to add
+		
+		"""
         bFound = False
         
         for i in range(len(self.Classification)):
