@@ -20,8 +20,6 @@ from commons import PrintClass
 from subprocess import Popen, PIPE
 from libs.IPy.IPy import *       # Module to deal with IPs
 
-# def CheckDNS
-
 def CheckDNS(strIP, verbose):
 
     if strIP == "": return 0

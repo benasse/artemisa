@@ -15,28 +15,29 @@
 # You should have received a copy of the GNU General Public License
 # along with Artemisa. If not, see <http://www.gnu.org/licenses/>.
 
-
 from time import strftime
 from logs import log                # Import class log from logs.py
 import ConfigParser                 # Read configuration files
 from libs.IPy.IPy import *       # Module to deal with IPs
 from subprocess import Popen, PIPE
 
-# class GetTimeClass
-#
-# Returns the time in a specific format.
-
 class GetTimeClass:
+	"""
+	This class has a method that returns the time in a specific format.
+	"""
 	def GetTime(self):
 		return "[" + str(strftime("%Y-%m-%d %H:%M:%S")) + "]"
 
-# def Search
-#
-# Search a value in a bunch of data and return its content. The values to search have the
-# structure "label=value"
-
 def Search(strLabel, strData):
-
+	"""
+	Keyword Arguments:
+	strLabel -- label to find
+	strData -- string containg the bunch of data
+	
+	Search a value in a bunch of data and return its content. The values to search have the
+	structure "label=value"
+	"""
+	
 	strTemp = strData.splitlines()
 	
 	for line in strTemp:
@@ -45,13 +46,14 @@ def Search(strLabel, strData):
 
 	return ""
 
-
-# def GetSIPHeader
-#
-# Search a line of the SIP header and returns it.
-
 def GetSIPHeader(strKeyword, strData):
-
+	"""
+	Keyword Arguments:
+	strKeyword -- pattern to identify the line
+	strData -- typically the SIP message to where the function looks for the header
+	
+	This function searches a line of the SIP header and returns it.
+	"""
 	strTemp = strData.splitlines()
 
 	for line in strTemp:
@@ -60,13 +62,13 @@ def GetSIPHeader(strKeyword, strData):
 
 	return ""
 
-
-# def GetIPfromSIP
-#
-# This function gets and returns the IP address from a SIP header field.
-
 def GetIPfromSIP(strHeaderLine):
-
+	"""
+	Keyword Arguments:
+	strHeaderLine -- a string containing a specific SIP header
+	
+	This function gets and returns the IP address from a SIP header field.
+	"""
 	if strHeaderLine == "": return ""
 
 	if strHeaderLine.find("sip:") != -1:
@@ -89,14 +91,13 @@ def GetIPfromSIP(strHeaderLine):
 	
 	return strIP.strip()
 	
-
-
-# def GetPortfromSIP
-#
-# This function gets and returns the port number from a SIP header field.
-
 def GetPortfromSIP(strHeaderLine):
-
+	"""
+	Keyword Arguments:
+	strHeaderLine -- a string containing a specific SIP header
+	
+	This function gets and returns the port number from a SIP header field.
+	"""
 	if strHeaderLine == "": return ""
 
 	if strHeaderLine.find("sip:") != -1:
@@ -128,14 +129,13 @@ def GetPortfromSIP(strHeaderLine):
 	
 	return strPort.strip()
 	
-	
-
-# def GetExtensionfromSIP
-#
-# This function gets and returns the extension value from a SIP header field.
-
 def GetExtensionfromSIP(strHeaderLine):
-
+	"""
+	Keyword Arguments:
+	strHeaderLine -- a string containing a specific SIP header
+	
+	This function gets and returns the extension value from a SIP header field.
+	"""
 	if strHeaderLine == "": return ""
 
 	if strHeaderLine.find("@") == -1:
@@ -149,16 +149,34 @@ def GetExtensionfromSIP(strHeaderLine):
 	
 	return strExtension.strip()
 	
+def GetTransportfromSIP(strHeaderLine):
+	"""
+	Keyword Arguments:
+	strHeaderLine -- a string containing a specific SIP header
 	
-	
-# class PrintClass
-#
-# This simple class prints strData in console (unless bPrint is False) and log it.
+	This function gets and returns the transport protocol value from a SIP header field.
+	"""
+	if strHeaderLine.lower().find("udp") != -1: 
+		return "udp"
+	elif strHeaderLine.lower().find("tcp") != -1: 
+		return "tcp"
+	else:
+		return "udp" # By default	
 
 class PrintClass(log, GetTimeClass):
+	"""
+	This simple class prints strData in console (unless bPrint is False) and log it.
+	"""
 	
 	def Print(self, strData, bPrint=True, strFilename=""):
+		"""
+		Keyword Arguments:
+		strData -- string to print
+		bPrint -- boolean to know whether the string shoud (True) or not (False) be printed on screen
+		strFilename -- file name and path to where the string is printed
 
+		"""
+		
 		strTemp = strData.splitlines()
 		
 		if bPrint == True:
@@ -182,15 +200,16 @@ class PrintClass(log, GetTimeClass):
 			
 			
 		self.Log(strData)
-		
-		
-# def GetConfigSection
-#
-# This function reads a file and returns the content of a section. This was made in order to
-# read the sections related with the behaviour mode in the configuration file artemisa.conf.
-
-def GetConfigSection(strFilename, strSection):
 	
+def GetConfigSection(strFilename, strSection):
+	"""
+	Keyword Arguments:
+	strFilename -- configuration file to read
+	strSection -- section searched
+	
+	This function reads a file and returns the content of a section. This was made in order to
+	read the sections related with the behaviour mode in the configuration file artemisa.conf.
+	"""
 	SectionData = []
 	
 	File = open(strFilename, "r")
@@ -215,45 +234,43 @@ def GetConfigSection(strFilename, strSection):
 	
 	return SectionData
 
-
-# def ResolveDNS
-#
-# Get the IP from a DNS name.
-
-def ResolveDNS(strIP):
+def ResolveDNS(strDNS):
+	"""
+	Keyword Arguments:
+	strDNS -- DNS to resolve
 	
-	# Check if strIP is an IP or a domain name
+	Get the IP from a DNS name.
+	"""
+	
+	# Check if strDNS is an IP or a domain name
 	bDNS = False
 	try:
-		temp = IP(strIP)
+		temp = IP(strDNS)
 	except:
 		bDNS = True
             
 	if bDNS == True: # Get the IP from the domain name
 		try:        
-			Process = Popen("dig " + strIP + " A +noall +answer +short", shell=True, stdout=PIPE)
+			Process = Popen("dig " + strDNS + " A +noall +answer +short", shell=True, stdout=PIPE)
 			Process.wait()
 			strData = Process.communicate()[0].strip().split("\n")
-			strIP = strData[len(strData)-1]
+			strDNS = strData[len(strData)-1]
                 
 		except OSError:
 			return -1
 
 	try:
-		temp = IP(strIP)
+		temp = IP(strDNS)
 	except:
 		# The address could't be resolved.
 		return ""
     
-	return IP(strIP).strNormal()
+	return IP(strDNS).strNormal()
 	
-	
-# def RemoveComments
-#
-# Removes the comments (# comments) of a line.
-
 def RemoveComments(strLine):
-	
+	"""
+	Removes the comments (# comments) of a line.
+	"""
 	if len(strLine) == 0: return strLine
 	
 	while 1:

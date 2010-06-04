@@ -123,23 +123,19 @@ bACKReceived = False                # We must know if an ACK was received
 bMediaReceived = False              # Flag to know whether media has been received
 bFlood = False                      # Flag to know whether flood was detected
 
-# class Extensions
-#
-# Object created in order to keep the user data which an unique extension.
-
 class Extension():
-
+	"""
+	Keeps the user data which an unique extension.
+	"""
     Extension = ""
     Username = ""
     Password = ""
    
-      
-# class Server
-#
-# Manage registration information.
-
 class Server():
-    
+    """
+	Manage registration information.
+	"""
+	
     Name = ""
     Registrar_IP = ""               # Registrar server IP (Asterisk, SER, etc.)
     Registrar_port = ""             # Registrar server port
@@ -160,13 +156,11 @@ class Server():
         self.acc_cfg = None
         self.acc_cb = None
         
-    # def Register
-    #
-    # This function registers the honeypot at the SIP server, and keep it alive sending REGISTRAR
-    # messages within the time specified in the configuration file.
-    
     def Register(self):
-
+		"""
+		This function registers the honeypot at the SIP server, and keep it alive sending REGISTRAR
+		messages within the time specified in the configuration file.
+		"""
         global lib 
         
         if len(self.Extensions) == 0:
@@ -205,15 +199,12 @@ class Server():
     #    self.acc.delete()
     #    self.acc = None
 
-
-# def lob_cb
-#
-# This function saves the data returned by PJSUA module. This shows also the SIP packet, so it's possible
-# to analyse it directly from here, and there is no need to use some capturing packet function.
-# This function is very important.
-
 def log_cb(level, str, len):
-    
+    """
+	This function saves the data returned by PJSUA module. This shows also the SIP packet, so it's possible
+	to analyse it directly from here, and there is no need to use some capturing packet function.
+	This function is very important.
+	"""
     global thrAnalyzeCall
     global LastINVITEreceived
     global intNumCalls
@@ -305,13 +296,10 @@ def log_cb(level, str, len):
     
     thrAnalyzeCall.start()
 
-
-# class MyAccountCallback
-#
-# Callback to receive events from account.
-
 class MyAccountCallback(pj.AccountCallback):
-
+	"""
+	Callback to receive events from account.
+	"""
     global Unregister
 
     def __init__(self, account=None):
@@ -380,14 +368,11 @@ class MyAccountCallback(pj.AccountCallback):
                     current_call.answer(200)
                             
         #current_call.hangup()
-        
-
-# class MyCallCallback
-#         
-# Callback to receive events from Call
 
 class MyCallCallback(pj.CallCallback):
-
+	"""
+	Callback to receive events from Call
+	"""
     rec_id = None
     rec_slot = None
 
@@ -475,13 +460,10 @@ class MyCallCallback(pj.CallCallback):
             
             Output.Print("NOTICE Audio is inactive. Check the configuration file.") 
             
-
-# def LoadExtensions
-#
-# Load configurations from file extensions.conf
-
 def LoadExtensions():
-    
+	"""
+	Load configurations from file extensions.conf
+	"""
     global Extensions
 
     config = ConfigParser.ConfigParser()
@@ -507,15 +489,11 @@ def LoadExtensions():
             sys.exit(1)
 
     del config
-    
-    
-
-# def LoadServers
-#
-# Load configurations from file servers.conf
-
+	
 def LoadServers(): 
-    
+    """
+	Load configurations from file servers.conf
+	"""
     global Servers
     global Extentions
     
@@ -557,13 +535,10 @@ def LoadServers():
 
     del config
     
-    
-# def LoadConfiguration
-#
-# Load configurations from file artemisa.conf
-
 def LoadConfiguration():
-    
+    """
+	Load configurations from file artemisa.conf
+	"""
     global strLocal_IP
     global strLocal_port
     global strSIPdomain
@@ -665,18 +640,43 @@ def LoadConfiguration():
 
     del config            
 
-# def AnalyzeCall
-#
-# Core of the program. Here is where the honeypot concludes if the packet received is trusted or not.
-
-def AnalyzeCall(strData):    
-
-    global verbose
-    global Extensions
-    global behaviour_mode
+def WaitForPackets(seconds):
+	"""
+	Keyword Arguments:
+	seconds -- number of seconds to wait
+	
+	This function stops the program some seconds in order to let the system collect more traces
+	"""
+    for i in range(seconds):
+        Output.Print("Waiting for SIP dialogs (" + str(seconds-i) + ")...")
+        sleep(1)
+		
+def GetBehaviourActions(behaviour_mode):
+	"""
+	Keyword Arguments:
+	behaviour_mode
+	
+	This function returns the actions of the given behaviour mode
+	"""
     global Active_mode
     global Passive_mode
     global Aggressive_mode
+	
+    if behaviour_mode == "active":
+        return Active_mode
+    elif behaviour_mode == "passive":
+        return Passive_mode
+    elif behaviour_mode == "aggressive":
+        return Aggressive_mode
+		
+def AnalyzeCall(strData):    
+	"""
+	Core of the program. Here is where the honeypot concludes if the packet received is trusted or not.
+	"""
+    global verbose
+    global Extensions
+    global behaviour_mode
+
     global strLocal_IP
     global strLocal_port
     global VERSION
@@ -690,40 +690,12 @@ def AnalyzeCall(strData):
     global On_scanning_parameters
     
     # Wait 5 seconds for an ACK and media events. 
-    # TODO: This could be better handled.
+    WaitForPackets(5)
     
-    for i in range(5):
-        Output.Print("Waiting for SIP dialogs (" + str(5-i) + ")...")
-        sleep(1)
-    
-    
-    #self.email = Email() # Creates an Email object.
+	# Create an instance of the Classifier
+    classifier_instance = Classifier(VERSION, verbose, strLocal_IP, strLocal_port, behaviour_mode, GetBehaviourActions(behaviour_mode), strData, Extensions, bACKReceived, bMediaReceived)
 
-    #if self.Behaviour_actions.count("investigate") == 0:
-    #    self.send_results(True)
-    #    self.Running = False
-    #    return
-        
-        
-    classifier_instance = Classifier()
-    classifier_instance.VERSION = VERSION
-    classifier_instance.strLocal_IP = strLocal_IP
-    classifier_instance.strLocal_port = strLocal_port
-
-    classifier_instance.Behaviour = behaviour_mode
-    
-    if behaviour_mode == "active":
-        classifier_instance.Behaviour_actions = Active_mode
-    elif behaviour_mode == "passive":
-        classifier_instance.Behaviour_actions = Passive_mode
-    elif behaviour_mode == "aggressive":
-        classifier_instance.Behaviour_actions = Aggressive_mode
-    
-    classifier_instance.SIP_Message = strData
-    classifier_instance.verbose = verbose
-    classifier_instance.Extensions = Extensions
-    classifier_instance.bACKReceived = bACKReceived
-    classifier_instance.bMediaReceived = bMediaReceived
+	# Start the classification
     classifier_instance.Start()
 
     while classifier_instance.Running:
@@ -750,7 +722,7 @@ def AnalyzeCall(strData):
     # Save the results in a HTML file
     File = open(classifier_instance.Results_file + ".html", "w")
         
-    File.write(get_results_html(classifier_instance.Results_file, False, classifier_instance.SIP_Message, classifier_instance.From_Extension, classifier_instance.From_IP, classifier_instance.To_Extension, classifier_instance.To_IP, classifier_instance.Contact_Extension, classifier_instance.Contact_IP, classifier_instance.Connection, classifier_instance.Owner, classifier_instance.Via, classifier_instance.UserAgent, VERSION, strLocal_IP, strLocal_port))
+    File.write(get_results_html(classifier_instance.Results_file, False, classifier_instance.SIP_Message, classifier_instance.CallInformation.From_Extension, classifier_instance.CallInformation.From_IP, classifier_instance.CallInformation.To_Extension, classifier_instance.CallInformation.To_IP, classifier_instance.CallInformation.Contact_Extension, classifier_instance.CallInformation.Contact_IP, classifier_instance.CallInformation.Connection, classifier_instance.CallInformation.Owner, classifier_instance.CallInformation.Via, classifier_instance.CallInformation.UserAgent, VERSION, strLocal_IP, strLocal_port))
             
     File.close()
     
@@ -760,14 +732,14 @@ def AnalyzeCall(strData):
     # If a flooding has been detected then run the script
     if bFlood == True:
         
-        On_flood_parameters = On_flood_parameters.replace("$From_IP$", classifier_instance.From_IP)
-        On_flood_parameters = On_flood_parameters.replace("$From_Port$", classifier_instance.From_Port)
-        On_flood_parameters = On_flood_parameters.replace("$From_Transport$", classifier_instance.From_Transport)
-        On_flood_parameters = On_flood_parameters.replace("$Contact_IP$", classifier_instance.Contact_IP)
-        On_flood_parameters = On_flood_parameters.replace("$Contact_Port$", classifier_instance.Contact_Port)
-        On_flood_parameters = On_flood_parameters.replace("$Contact_Transport$", classifier_instance.Contact_Transport)
-        On_flood_parameters = On_flood_parameters.replace("$Connection_IP$", classifier_instance.Connection)
-        On_flood_parameters = On_flood_parameters.replace("$Owner_IP$", classifier_instance.Owner)
+        On_flood_parameters = On_flood_parameters.replace("$From_IP$", classifier_instance.CallInformation.From_IP)
+        On_flood_parameters = On_flood_parameters.replace("$From_Port$", classifier_instance.CallInformation.From_Port)
+        On_flood_parameters = On_flood_parameters.replace("$From_Transport$", classifier_instance.CallInformation.From_Transport)
+        On_flood_parameters = On_flood_parameters.replace("$Contact_IP$", classifier_instance.CallInformation.Contact_IP)
+        On_flood_parameters = On_flood_parameters.replace("$Contact_Port$", classifier_instance.CallInformation.Contact_Port)
+        On_flood_parameters = On_flood_parameters.replace("$Contact_Transport$", classifier_instance.CallInformation.Contact_Transport)
+        On_flood_parameters = On_flood_parameters.replace("$Connection_IP$", classifier_instance.CallInformation.Connection)
+        On_flood_parameters = On_flood_parameters.replace("$Owner_IP$", classifier_instance.CallInformation.Owner)
         
         strCommand = "bash ./scripts/on_flood.sh " + On_flood_parameters
         Output.Print("Executing " + strCommand + " ...")
@@ -777,14 +749,14 @@ def AnalyzeCall(strData):
     # If SPIT has been detected then run the script
     if IfCategory("SPIT",classifier_instance.Classification) == True:
         
-        On_SPIT_parameters = On_SPIT_parameters.replace("$From_IP$", classifier_instance.From_IP)
-        On_SPIT_parameters = On_SPIT_parameters.replace("$From_Port$", classifier_instance.From_Port)
-        On_SPIT_parameters = On_SPIT_parameters.replace("$From_Transport$", classifier_instance.From_Transport)
-        On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_IP$", classifier_instance.Contact_IP)
-        On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Port$", classifier_instance.Contact_Port)
-        On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Transport$", classifier_instance.Contact_Transport)
-        On_SPIT_parameters = On_SPIT_parameters.replace("$Connection_IP$", classifier_instance.Connection)
-        On_SPIT_parameters = On_SPIT_parameters.replace("$Owner_IP$", classifier_instance.Owner)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$From_IP$", classifier_instance.CallInformation.From_IP)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$From_Port$", classifier_instance.CallInformation.From_Port)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$From_Transport$", classifier_instance.CallInformation.From_Transport)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_IP$", classifier_instance.CallInformation.Contact_IP)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Port$", classifier_instance.CCallInformation.ontact_Port)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Transport$", classifier_instance.CallInformation.Contact_Transport)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Connection_IP$", classifier_instance.CallInformation.Connection)
+        On_SPIT_parameters = On_SPIT_parameters.replace("$Owner_IP$", classifier_instance.CallInformation.Owner)
         
         strCommand = "bash ./scripts/on_spit.sh " + On_SPIT_parameters
         Output.Print("Executing " + strCommand + " ...")
@@ -794,14 +766,14 @@ def AnalyzeCall(strData):
     # If a scanning has been detected then run the script
     if IfCategory("Scanning",classifier_instance.Classification) == True:
         
-        On_scanning_parameters = On_scanning_parameters.replace("$From_IP$", classifier_instance.From_IP)
-        On_scanning_parameters = On_scanning_parameters.replace("$From_Port$", classifier_instance.From_Port)
-        On_scanning_parameters = On_scanning_parameters.replace("$From_Transport$", classifier_instance.From_Transport)
-        On_scanning_parameters = On_scanning_parameters.replace("$Contact_IP$", classifier_instance.Contact_IP)
-        On_scanning_parameters = On_scanning_parameters.replace("$Contact_Port$", classifier_instance.Contact_Port)
-        On_scanning_parameters = On_scanning_parameters.replace("$Contact_Transport$", classifier_instance.Contact_Transport)
-        On_scanning_parameters = On_scanning_parameters.replace("$Connection_IP$", classifier_instance.Connection)
-        On_scanning_parameters = On_scanning_parameters.replace("$Owner_IP$", classifier_instance.Owner)
+        On_scanning_parameters = On_scanning_parameters.replace("$From_IP$", classifier_instance.CallInformation.From_IP)
+        On_scanning_parameters = On_scanning_parameters.replace("$From_Port$", classifier_instance.CallInformation.From_Port)
+        On_scanning_parameters = On_scanning_parameters.replace("$From_Transport$", classifier_instance.CallInformation.From_Transport)
+        On_scanning_parameters = On_scanning_parameters.replace("$Contact_IP$", classifier_instance.CallInformation.Contact_IP)
+        On_scanning_parameters = On_scanning_parameters.replace("$Contact_Port$", classifier_instance.CallInformation.Contact_Port)
+        On_scanning_parameters = On_scanning_parameters.replace("$Contact_Transport$", classifier_instance.CallInformation.Contact_Transport)
+        On_scanning_parameters = On_scanning_parameters.replace("$Connection_IP$", classifier_instance.CallInformation.Connection)
+        On_scanning_parameters = On_scanning_parameters.replace("$Owner_IP$", classifier_instance.CallInformation.Owner)
         
         strCommand = "bash ./scripts/on_scanning.sh " + On_scanning_parameters
         Output.Print("Executing " + strCommand + " ...")
@@ -815,7 +787,7 @@ def AnalyzeCall(strData):
         Output.Print("NOTICE E-mail notification is disabled.")
     else:
     
-        strData = get_results_html(classifier_instance.Results_file, True, classifier_instance.SIP_Message, classifier_instance.From_Extension, classifier_instance.From_IP, classifier_instance.To_Extension, classifier_instance.To_IP, classifier_instance.Contact_Extension, classifier_instance.Contact_IP, classifier_instance.Connection, classifier_instance.Owner, classifier_instance.Via, classifier_instance.UserAgent, VERSION, strLocal_IP, strLocal_port)
+        strData = get_results_html(classifier_instance.Results_file, True, classifier_instance.SIP_Message, classifier_instance.CallInformation.From_Extension, classifier_instance.CallInformation.From_IP, classifier_instance.CallInformation.To_Extension, classifier_instance.CallInformation.To_IP, classifier_instance.CallInformation.Contact_Extension, classifier_instance.CallInformation.Contact_IP, classifier_instance.CallInformation.Connection, classifier_instance.CallInformation.Owner, classifier_instance.CallInformation.Via, classifier_instance.CallInformation.UserAgent, VERSION, strLocal_IP, strLocal_port)
                     
         Output.Print("NOTICE Sending this report by e-mail...")
         Output.Print(email.sendemail(strData))
@@ -833,13 +805,10 @@ def AnalyzeCall(strData):
     
     intNumCalls -= 1
 
-
-# def EndConnection
-#
-# Finalizes PJSUA.
-
 def EndConnection():
-
+	"""
+	Finalizes PJSUA.
+	"""
     global lib
     global Servers
     global Unregister
@@ -852,14 +821,13 @@ def EndConnection():
     lib.destroy()
     lib = None
     
-    
-# def ShowHelp
-#
-# Shows the help.
-# Arguments: 
-#     bCommands: when True the commands list is shown. 
-
 def ShowHelp(bCommands = True):
+	"""
+	Keyword Arguments:
+	bCommands -- when True the commands list is shown. 
+	
+	Shows the help
+	"""
     print "Usage: artemisa [Options]"
     print "  -v, --verbose             Verbose mode (it shows more information)."
     print "  -g, --get_sound_devices   Show the available sound devices."
@@ -892,159 +860,20 @@ def ShowHelp(bCommands = True):
     print "show license             Show the program license."
     print ""
     print "s, q, quit, exit         Exit"
-    
-    
-# def main
-#
-# Here starts Artemisa.
-    
-def main():
-
-    global verbose
-    global lib
-    global strLocal_IP
-    global strLocal_port
-    global strUserAgent
-    global intMaxCalls
-    global behaviour_mode
-    global Unregister
-    
-    global Servers
-    
-    global Sound_enabled
-    global Sound_device
-    global Sound_rate
-
+ 
+def ReadKeyboard(): 
+	"""
+	This function handles the keyboard process
+	"""
     # Stats' variables
     global intN_INVITE
     global intN_OPTIONS
     global strFLOOD
-    
-    Show_sound_devices = False
-    
-    # Check if some arguments has been passed
-    if len(sys.argv) > 1:
-        for i in range(1, len(sys.argv)):
-            if sys.argv[i] == "-h" or sys.argv[i] == "--help":
-                ShowHelp(False)
-                sys.exit(0)
-            elif sys.argv[i] == "-v" or sys.argv[i] == "--verbose":
-                verbose = True
-            elif sys.argv[i] == "-g" or sys.argv[i] == "--get_sound_devices":
-                Show_sound_devices = True
-            else:
-                print "Invalid argument: " + sys.argv[i]
-                    
-    print "Artemisa v" + VERSION + " Copyright (C) 2009-2010 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
-    print ""
-    print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
-    print "This is free software, and you are welcome to redistribute it under certain"
-    print "conditions; type 'show license' for details."
-    print ""
-    print ""
-    print "Type 'help' for help."
-    print ""
-        
-    # Read the configuration file artemisa.conf
-    LoadConfiguration()
-
-    # Read the extensions configuration in extensions.conf
-    LoadExtensions()
-
-    # Read the registrar servers configuration in servers.conf
-    LoadServers()
-                
-    # Initialize the PJSUA library
-    lib = pj.Lib() # Starts PJSUA library
-    ua_cfg = pj.UAConfig()
-    ua_cfg.user_agent = strUserAgent
-    ua_cfg.max_calls = intMaxCalls
-            
-    media_cfg = pj.MediaConfig()
-    media_cfg.clock_rate = Sound_rate
-    media_cfg.no_vad = True
-            
-    log_cfg = pj.LogConfig()
-    log_cfg.level = 5
-    log_cfg.callback = log_cb
-    log_cfg.console_level = 5 # The value console_level MUST be 5 since it's used to analyze the messages
-            
-    lib.init(ua_cfg, log_cfg, media_cfg)
-    
-    try:
-        lib.create_transport(pj.TransportType.UDP, pj.TransportConfig(int(strLocal_port)))
-    except:
-        print ""
-        print "Critical error:"
-        print "Port " + strLocal_port + " is already in use by another process. Please close that process or change the port number in the configuration file."
-        print ""
-        lib.destroy()
-        lib = None
-        sys.exit(1)
-    
-            
-    lib.start()
-    
-    if Show_sound_devices == True:
-        a = 0
-        print ""
-        print ""
-        print "List of available sound devices:"
-        print ""
-	if len(lib.enum_snd_dev()) == 0:
-	    print "No sound device detected."
-	else:
-            for item in lib.enum_snd_dev():
-                print "Index=" + str(a) + " Name=" + item.name
-                a += 1
-        print ""
-        print ""
-        
-        EndConnection()
-        sys.exit(0)
-
-    
-    Output.Print("-------------------------------------------------------------------------------------------------", False)
-    Output.Print("Artemisa started.", False)
-            
-    if Sound_enabled == True:
-        # Configure the audio device 
-        try:
-            if len(lib.enum_snd_dev()) > 0:
-                lib.set_snd_dev(Sound_device,Sound_device)
-            else:
-                Output.Print("WARNING Audio device not found. Calls will not be recorded.")
-                Sound_enabled = False
-        except:
-            Output.Print("WARNING Audio device not found. Calls will not be recorded.")
-            Sound_enabled = False
-
-                
-    Unregister = False
-
-    Output.Print("User Agent listening on: " + strLocal_IP + ":" + strLocal_port)
-    
-    Output.Print("Behaviour mode: " + behaviour_mode)
-
-    if len(Servers) == 0:
-        Output.Print("No extensions have been configured.")
-    else:
-        Output.Print("Starting extensions registration process...")
-        
-        # Register each account
-        for i in range(len(Servers)):
-            Servers[i].Register()
-   
-    writer = csv.writer(sys.stdout, delimiter="\t", quotechar='|', quoting=csv.QUOTE_MINIMAL) # For printing CPT matrices
-   
-    if os.getenv('HOSTNAME') == None:
-        # Well, Ubuntu doesn't export the environmental variable HOSTNAME...
-        strCLIprompt = str(os.getenv('USER')) + "> "
-    else:
-        strCLIprompt = str(os.getenv('HOSTNAME')) + "> "
-   
-    # The keyboard is read:
-    while True:
+	
+	global verbose
+	global behaviour_mode
+	
+	while True:
         
         s = raw_input(strCLIprompt).strip()
         
@@ -1172,15 +1001,163 @@ def main():
 
         else:
             print "Command not found. Type \"help\" for a list of commands."
+			
+def main():
+	"""
+	Here starts Artemisa
+	"""
+	
+    global verbose
+    global lib
+    global strLocal_IP
+    global strLocal_port
+    global strUserAgent
+    global intMaxCalls
+    global behaviour_mode
+    global Unregister
+    
+    global Servers
+    
+    global Sound_enabled
+    global Sound_device
+    global Sound_rate
+    
+    Show_sound_devices = False
+    
+    # Check if some arguments has been passed
+    if len(sys.argv) > 1:
+        for i in range(1, len(sys.argv)):
+            if sys.argv[i] == "-h" or sys.argv[i] == "--help":
+                ShowHelp(False)
+                sys.exit(0)
+            elif sys.argv[i] == "-v" or sys.argv[i] == "--verbose":
+                verbose = True
+            elif sys.argv[i] == "-g" or sys.argv[i] == "--get_sound_devices":
+                Show_sound_devices = True
+            else:
+                print "Invalid argument: " + sys.argv[i]
+                    
+    print "Artemisa v" + VERSION + " Copyright (C) 2009-2010 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
+    print ""
+    print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
+    print "This is free software, and you are welcome to redistribute it under certain"
+    print "conditions; type 'show license' for details."
+    print ""
+    print ""
+    print "Type 'help' for help."
+    print ""
+        
+    # Read the configuration file artemisa.conf
+    LoadConfiguration()
+
+    # Read the extensions configuration in extensions.conf
+    LoadExtensions()
+
+    # Read the registrar servers configuration in servers.conf
+    LoadServers()
+                
+    # Initialize the PJSUA library
+    lib = pj.Lib() # Starts PJSUA library
+    ua_cfg = pj.UAConfig()
+    ua_cfg.user_agent = strUserAgent
+    ua_cfg.max_calls = intMaxCalls
+            
+    media_cfg = pj.MediaConfig()
+    media_cfg.clock_rate = Sound_rate
+    media_cfg.no_vad = True
+            
+    log_cfg = pj.LogConfig()
+    log_cfg.level = 5
+    log_cfg.callback = log_cb
+    log_cfg.console_level = 5 # The value console_level MUST be 5 since it's used to analyze the messages
+            
+    lib.init(ua_cfg, log_cfg, media_cfg)
+    
+    try:
+        lib.create_transport(pj.TransportType.UDP, pj.TransportConfig(int(strLocal_port)))
+    except:
+        print ""
+        print "Critical error:"
+        print "Port " + strLocal_port + " is already in use by another process. Please close that process or change the port number in the configuration file."
+        print ""
+        lib.destroy()
+        lib = None
+        sys.exit(1)
+    
+            
+    lib.start()
+    
+    if Show_sound_devices == True:
+        a = 0
+        print ""
+        print ""
+        print "List of available sound devices:"
+        print ""
+	if len(lib.enum_snd_dev()) == 0:
+	    print "No sound device detected."
+	else:
+            for item in lib.enum_snd_dev():
+                print "Index=" + str(a) + " Name=" + item.name
+                a += 1
+        print ""
+        print ""
+        
+        EndConnection()
+        sys.exit(0)
+
+    
+    Output.Print("-------------------------------------------------------------------------------------------------", False)
+    Output.Print("Artemisa started.", False)
+            
+    if Sound_enabled == True:
+        # Configure the audio device 
+        try:
+            if len(lib.enum_snd_dev()) > 0:
+                lib.set_snd_dev(Sound_device,Sound_device)
+            else:
+                Output.Print("WARNING Audio device not found. Calls will not be recorded.")
+                Sound_enabled = False
+        except:
+            Output.Print("WARNING Audio device not found. Calls will not be recorded.")
+            Sound_enabled = False
+
+                
+    Unregister = False
+
+    Output.Print("User Agent listening on: " + strLocal_IP + ":" + strLocal_port)
+    
+    Output.Print("Behaviour mode: " + behaviour_mode)
+
+    if len(Servers) == 0:
+        Output.Print("No extensions have been configured.")
+    else:
+        Output.Print("Starting extensions registration process...")
+        
+        # Register each account
+        for i in range(len(Servers)):
+            Servers[i].Register()
+   
+    writer = csv.writer(sys.stdout, delimiter="\t", quotechar='|', quoting=csv.QUOTE_MINIMAL) # For printing CPT matrices
+   
+    if os.getenv('HOSTNAME') == None:
+        # Well... some distributions don't export the environmental variable HOSTNAME...
+        strCLIprompt = str(os.getenv('USER')) + "> "
+    else:
+        strCLIprompt = str(os.getenv('HOSTNAME')) + "> "
+   
+    # The keyboard is read:
+    ReadKeyboard()
 
     EndConnection()
+	
     print ""
     print "Good bye!"
     print ""
+	
     Output.Print("Artemisa ended.", False)
     sys.exit(0)
     
-    
+
 if __name__ == "__main__":
     try:
         main()

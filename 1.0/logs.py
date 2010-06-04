@@ -23,12 +23,10 @@ from time import strftime
     
 class log:
     
-    # def Log
-    #
-    # Save logs in a log file.
-    
     def Log(self,strData):
-        
+        """
+		Save logs in a log file.
+		"""
         strLines = strData.splitlines()
             
         try:
@@ -47,13 +45,10 @@ class log:
         except:
             pass
     
-    
-    # def PJSUA_Log
-    #
-    # Save PJSUA output in a log file.
-    
     def PJSUA_Log(self,strData):
-        
+		"""
+		Save PJSUA output in a log file.
+		"""
         strLines = strData.strip().splitlines()
             
         try:
@@ -72,13 +67,10 @@ class log:
         except:
             pass
         
-       
-    # def InviteLog
-    #
-    # Save INVITE messages received in a log file.
-    
     def InviteLog(self,strData):
-        
+		"""
+		Save INVITE messages received in a log file.
+		"""
         try:
             strFilename = "./logs/invite_msgs/" + strftime("%Y-%m-%d") + ".log"     
             

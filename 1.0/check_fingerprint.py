@@ -19,8 +19,6 @@ import sys
 
 from commons import PrintClass, RemoveComments
 
-# def CheckFingerprint
-
 def CheckFingerprint(UserAgent):
 
     # Now the program should read the fingerprint.txt in order to get the strings to search and compare.

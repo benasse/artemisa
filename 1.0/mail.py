@@ -22,12 +22,10 @@ from email.mime.multipart import MIMEMultipart
 
 import ConfigParser                 # Read configuration files.
 
-# class Email
-#
-# This class is used to handle the email part.
-
 class Email():
-    
+    """
+	This class is used to handle the email part.
+	"""
     Enabled = True
           
     SMTP_IP = ""

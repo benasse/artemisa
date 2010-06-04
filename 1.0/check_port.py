@@ -20,12 +20,10 @@ from commons import PrintClass
 from subprocess import Popen, PIPE
 from libs.IPy.IPy import *       # Module to deal with IPs
 
-# def CheckPort
-#
-# This function checks a given IP:port and it's used for both SIP and media ports analysis
-
 def CheckPort(strIP, strPort, strTransport, verbose):
-
+	"""
+	This function checks a given IP:port and it's used for both SIP and media ports analysis
+	"""
     if strIP == "" or strPort == "": return -1
     
     strDataToSend = ""
