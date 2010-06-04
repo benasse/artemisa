@@ -84,6 +84,8 @@ class Classifier(PrintClass, log):
 		self.Behaviour = behaviour_mode
 		self.Behaviour_actions = behaviour_actions
 		
+		self.bRequestURI = False
+		
 		self.ToolName = "" # Flag to store the attack tool detected
 		self.Results_file = ""
         self.Running = True # State of the analysis
@@ -273,7 +275,7 @@ class Classifier(PrintClass, log):
 		"""
 		This method carries out the URI comprobation test
 		"""
-        bRequestURI = False # Flag to know if this test gives a positive or negative result
+        self.bRequestURI = False # Flag to know if this test gives a positive or negative result
 
         self.Print("+ Checking request URI...",True,self.Results_file)
         self.Print("|",True,self.Results_file)
@@ -288,12 +290,12 @@ class Classifier(PrintClass, log):
                 # The extension contained in the "To" field is an extension of the honeypot.
                 bFound = True
                 self.Print("| Request addressed to the honeypot? Yes",True,self.Results_file)
-                bRequestURI = True
+                self.bRequestURI = True
                 break
                 
         if bFound == False:
             self.Print("| Request addressed to the honeypot? No",True,self.Results_file)
-            bRequestURI = False
+            self.bRequestURI = False
 
         self.Print("",True,self.Results_file)
 		
@@ -302,7 +304,7 @@ class Classifier(PrintClass, log):
 		This method carries out the Via test
 		"""
         # This entire tests depends on the result of the previous
-        if bRequestURI == False:
+        if self.bRequestURI == False:
 
             # Via[0] is the first Via field, so that it has the IP of the last proxy.
             
@@ -486,8 +488,7 @@ class Classifier(PrintClass, log):
         #self.CallInformation.Record_Route = GetSIPHeader("Record-Route",self.SIP_Message)
         
 		# Field Via
-        strTemp = self.SIP_Message.splitlines()
-        for line in strTemp:
+        for line in self.SIP_Message.splitlines():
             if line[0:4] == "Via:":
                 self.CallInformation.Via.append([GetIPfromSIP(line.strip()), GetPortfromSIP(line.strip()), GetTransportfromSIP(GetSIPHeader(line.strip(),self.SIP_Message))])
         
