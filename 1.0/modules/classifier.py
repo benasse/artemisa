@@ -396,6 +396,13 @@ class Classifier(PrintClass, log):
 		# ---------------------------------------------------------------------------------
 		self.Tests_CheckMedia()
 
+		# Print the categories
+		self.Print("+ The message is classified as:",True)
+		for i in range(len( self.CallInformation.Classification)):
+			self.Print("| " +  self.CallInformation.Classification[i],True)
+	
+		self.Print("",True)
+
 		self.Running = False
 
 
