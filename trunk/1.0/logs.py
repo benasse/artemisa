@@ -20,69 +20,69 @@ from time import strftime
 
 # TODO: the log system could be better. In fact, the logging module which comes
 # with Python could be a good choice. 
-    
+	
 class log:
-    
-    def Log(self,strData):
-        """
+	
+	def Log(self,strData):
+		"""
 		Save logs in a log file.
 		"""
-        strLines = strData.splitlines()
-            
-        try:
-            strFilename = strftime("%Y-%m-%d") + ".log"
-            
-            if os.path.isfile("./logs/" + strFilename) == True:
-                File = open("./logs/" + strFilename, "a")
-            else:
-                File = open("./logs/" + strFilename, "w")
-                
-            for line in strLines:
-                File.write("[" + str(strftime("%Y-%m-%d %H:%M:%S")) + "]" + " " + line.strip() + "\n")
-        
-            File.close()
-            
-        except:
-            pass
-    
-    def PJSUA_Log(self,strData):
+		strLines = strData.splitlines()
+			
+		try:
+			strFilename = strftime("%Y-%m-%d") + ".log"
+			
+			if os.path.isfile("./logs/" + strFilename) == True:
+				File = open("./logs/" + strFilename, "a")
+			else:
+				File = open("./logs/" + strFilename, "w")
+				
+			for line in strLines:
+				File.write("[" + str(strftime("%Y-%m-%d %H:%M:%S")) + "]" + " " + line.strip() + "\n")
+		
+			File.close()
+			
+		except:
+			pass
+	
+	def PJSUA_Log(self,strData):
 		"""
 		Save PJSUA output in a log file.
 		"""
-        strLines = strData.strip().splitlines()
-            
-        try:
-            strFilename = strftime("%Y-%m-%d") + "_PJSUA.log"
-            
-            if os.path.isfile("./logs/" + strFilename) == True:
-                File = open("./logs/" + strFilename, "a")
-            else:
-                File = open("./logs/" + strFilename, "w")
-                
-            for i in range(len(strLines)):
-                File.write(strftime("%Y-%m-%d") + " " + strLines[i] + "\n")
-        
-            File.close()
-            
-        except:
-            pass
-        
-    def InviteLog(self,strData):
+		strLines = strData.strip().splitlines()
+
+		try:
+			strFilename = strftime("%Y-%m-%d") + "_PJSUA.log"
+			
+			if os.path.isfile("./logs/" + strFilename) == True:
+				File = open("./logs/" + strFilename, "a")
+			else:
+				File = open("./logs/" + strFilename, "w")
+				
+			for i in range(len(strLines)):
+				File.write(strftime("%Y-%m-%d") + " " + strLines[i] + "\n")
+		
+			File.close()
+			
+		except:
+			pass
+		
+	def InviteLog(self,strData):
 		"""
 		Save INVITE messages received in a log file.
 		"""
-        try:
-            strFilename = "./logs/invite_msgs/" + strftime("%Y-%m-%d") + ".log"     
-            
-            if os.path.isfile(strFilename) == True:
-                File = open(strFilename, "a")
-            else:
-                File = open(strFilename, "w")
-                
-            File.write("========================================================================================\n")
-            File.write("INVITE message received on " + str(strftime("%Y-%m-%d %H:%M:%S")) + ":" + "\n" + "\n" + strData + "\n")
-        
-            File.close()
-            
-        except:
-            pass
+		try:
+			strFilename = "./logs/invite_msgs/" + strftime("%Y-%m-%d") + ".log"	 
+			
+			if os.path.isfile(strFilename) == True:
+				File = open(strFilename, "a")
+			else:
+				File = open(strFilename, "w")
+				
+			File.write("========================================================================================\n")
+			File.write("INVITE message received on " + str(strftime("%Y-%m-%d %H:%M:%S")) + ":" + "\n" + "\n" + strData + "\n")
+		
+			File.close()
+			
+		except:
+			pass

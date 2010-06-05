@@ -16,9 +16,9 @@
 # along with Artemisa. If not, see <http://www.gnu.org/licenses/>.
 
 from time import strftime
-from logs import log                # Import class log from logs.py
-import ConfigParser                 # Read configuration files
-from libs.IPy.IPy import *       # Module to deal with IPs
+from logs import log				# Import class log from logs.py
+import ConfigParser				 # Read configuration files
+from libs.IPy.IPy import *	   # Module to deal with IPs
 from subprocess import Popen, PIPE
 
 class GetTimeClass:
@@ -195,7 +195,7 @@ class PrintClass(log, GetTimeClass):
 			else:
 				for line in strTemp:
 					File.write(line.replace("\n","").replace("\r","" + "\n") + "\n")
-					            
+								
 			File.close()
 			
 			
@@ -248,14 +248,14 @@ def ResolveDNS(strDNS):
 		temp = IP(strDNS)
 	except:
 		bDNS = True
-            
+			
 	if bDNS == True: # Get the IP from the domain name
-		try:        
+		try:		
 			Process = Popen("dig " + strDNS + " A +noall +answer +short", shell=True, stdout=PIPE)
 			Process.wait()
 			strData = Process.communicate()[0].strip().split("\n")
 			strDNS = strData[len(strData)-1]
-                
+				
 		except OSError:
 			return -1
 
@@ -264,7 +264,7 @@ def ResolveDNS(strDNS):
 	except:
 		# The address could't be resolved.
 		return ""
-    
+	
 	return IP(strDNS).strNormal()
 	
 def RemoveComments(strLine):
