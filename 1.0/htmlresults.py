@@ -75,7 +75,7 @@ def get_results_html(strFilename, ForEmail, Message, From_Extension, From_IP, To
 #	strPage = strPage + "Owner: " + Owner + "<br>" + "\n"
 	
 #	for i in range(len(Via)):
-#         strPage = strPage + "Via " + str(i) + ": " + Via[i] + "<br>" + "\n"
+#		 strPage = strPage + "Via " + str(i) + ": " + Via[i] + "<br>" + "\n"
 	
 #	strPage = strPage + UserAgent + "<br><br>" + "\n"
 

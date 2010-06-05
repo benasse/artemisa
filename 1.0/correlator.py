@@ -64,11 +64,11 @@ def Correlator(Classification, bFlood, Results_file, ToolName):
         
         
 def IfCategory(strCategory, Classification):
-	"""
-	Returns whether a category is found or not.
-	"""
+    """
+    Returns whether a category is found or not.
+    """
     bFound = False
-        
+       
     for i in range(len(Classification)):
         if Classification[i] == strCategory:
             bFound = True

@@ -21,38 +21,38 @@ from commons import PrintClass, RemoveComments
 
 def CheckFingerprint(UserAgent):
 
-    # Now the program should read the fingerprint.txt in order to get the strings to search and compare.
+	# Now the program should read the fingerprint.txt in order to get the strings to search and compare.
 
-    try:
-        File = open("./fingerprint/fingerprint.txt", "r")
-        
-    except:
-        print "WARNING Can't read /fingerprint/fingerprint.txt."
-        return -1
-        
-    bFound = False
-        
-    for line in File:
-        line = line.strip()
-        line = RemoveComments(line)
-        if line == "": continue
-        ToolName = line.split("=")[0]
-        Fingerprint = line.split("=")[1]
-        if UserAgent.find(Fingerprint) != -1:
-            bFound = True
-            break
-            
-    File.close()
-        
-    if bFound == True:
-        return ToolName
-    else:
-        return 0
-    
+	try:
+		File = open("./fingerprint/fingerprint.txt", "r")
+		
+	except:
+		print "WARNING Can't read /fingerprint/fingerprint.txt."
+		return -1
+		
+	bFound = False
+		
+	for line in File:
+		line = line.strip()
+		line = RemoveComments(line)
+		if line == "": continue
+		ToolName = line.split("=")[0]
+		Fingerprint = line.split("=")[1]
+		if UserAgent.find(Fingerprint) != -1:
+			bFound = True
+			break
+			
+	File.close()
+		
+	if bFound == True:
+		return ToolName
+	else:
+		return 0
+	
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-         print CheckFingerprint(sys.argv[1])
-    else:
-        print "Arguments are required!"
-        sys.exit(1)
+	if len(sys.argv) > 1:
+		 print CheckFingerprint(sys.argv[1])
+	else:
+		print "Arguments are required!"
+		sys.exit(1)
