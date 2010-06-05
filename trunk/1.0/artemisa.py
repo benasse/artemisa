@@ -19,9 +19,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-VERSION = "1.0.78"
+VERSION = "1.0."
 
 import sys
+
+# Set a path to the modules
+sys.path.append("./modules/")
+
 import os
 	
 import ConfigParser				# Read configuration files
@@ -36,7 +40,8 @@ from correlator import IfCategory
 import threading				# Use of threads
 
 from mail import Email
-from htmlresults import get_results_html
+from results_format_html import get_results_html
+from results_format_txt import get_results_txt
 
 from subprocess import Popen, PIPE
 
@@ -123,7 +128,7 @@ bFlood = False					# Flag to know whether flood was detected
 
 class Extension():
 	"""
-	Keeps the user data which an unique extension.
+	Keeps the user data with an unique extension.
 	"""
 	Extension = ""
 	Username = ""
@@ -133,23 +138,17 @@ class Server():
 	"""
 	Manage registration information.
 	"""
-	
-	Name = ""
-	Registrar_IP = ""			# Registrar server IP (Asterisk, SER, etc.)
-	Registrar_port = ""			# Registrar server port
-	Registrar_time = 10			# Time in minutes between REGISTRAR messeges sent to the server.
-	RegSchedule = ""			# Time between registrations
-	NAT_ka_inverval = 0			# Time between NAT keep alive messages
-	behaviour_mode = ""			# Artemisa behaviour mode
 
-	Extensions = []				# Store the extensions registered to the SIP server
-
-	acc = None
-	acc_cfg = None
-	acc_cb = None
-	
 	def __init__(self):
-		self.Extensions = []
+		self.Name = ""
+		self.Registrar_IP = ""		# Registrar server IP (Asterisk, SER, etc.)
+		self.Registrar_port = ""	# Registrar server port
+		self.Registrar_time = 10	# Time in minutes between REGISTRAR messeges sent to the server.
+		self.RegSchedule = ""		# Time between registrations
+		self.NAT_ka_inverval = 0	# Time between NAT keep alive messages
+		self.behaviour_mode = ""	# Artemisa behaviour mode
+
+		self.Extensions = []		# Store the extensions registered to the SIP server
 		self.acc = None
 		self.acc_cfg = None
 		self.acc_cb = None
@@ -244,7 +243,7 @@ def log_cb(level, str, len):
 				if strINVITETag == line.split("tag=")[1]:
 					bACKReceived = True
 					break
-	return
+		return
 			
 	if bFound == False: return # If False means that the received message was not an INVITE one
 
@@ -667,6 +666,152 @@ def GetBehaviourActions(behaviour_mode):
 	elif behaviour_mode == "aggressive":
 		return Aggressive_mode
 		
+def CheckIfFlood(Results):
+	"""
+	Keyword Arguments:
+	Results -- A CallData instance that contains call information.
+	
+	This functions runs a script if flood was detected.
+	"""
+	global bFlood
+	global On_flood_parameters
+
+	if bFlood == True:
+		
+		On_flood_parameters = On_flood_parameters.replace("$From_IP$", Results.From_IP)
+		On_flood_parameters = On_flood_parameters.replace("$From_Port$", Results.From_Port)
+		On_flood_parameters = On_flood_parameters.replace("$From_Transport$", Results.From_Transport)
+		On_flood_parameters = On_flood_parameters.replace("$Contact_IP$", Results.Contact_IP)
+		On_flood_parameters = On_flood_parameters.replace("$Contact_Port$", Results.Contact_Port)
+		On_flood_parameters = On_flood_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
+		On_flood_parameters = On_flood_parameters.replace("$Connection_IP$", Results.Connection)
+		On_flood_parameters = On_flood_parameters.replace("$Owner_IP$", Results.Owner)
+		
+		strCommand = "bash ./scripts/on_flood.sh " + On_flood_parameters
+		Output.Print("Executing " + strCommand + " ...")
+		# Execute a script
+		Process = Popen(strCommand, shell=True, stdout=PIPE)
+
+def CheckCategory(Results):
+	"""
+	Keyword Arguments:
+	Results -- A CallData instance that contains call information.
+
+	This functions runs a script if certain data was found on the call.
+	"""
+	global On_SPIT_parameters
+
+	if IfCategory("SPIT",Results.Classification) == True:
+		
+		On_SPIT_parameters = On_SPIT_parameters.replace("$From_IP$", Results.From_IP)
+		On_SPIT_parameters = On_SPIT_parameters.replace("$From_Port$", Results.From_Port)
+		On_SPIT_parameters = On_SPIT_parameters.replace("$From_Transport$", Results.From_Transport)
+		On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_IP$", Results.Contact_IP)
+		On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Port$", Results.Contact_Port)
+		On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
+		On_SPIT_parameters = On_SPIT_parameters.replace("$Connection_IP$", Results.Connection)
+		On_SPIT_parameters = On_SPIT_parameters.replace("$Owner_IP$", Results.Owner)
+		
+		strCommand = "bash ./scripts/on_spit.sh " + On_SPIT_parameters
+		Output.Print("Executing " + strCommand + " ...")
+		# Execute a script
+		Process = Popen(strCommand, shell=True, stdout=PIPE)
+
+def CheckIfScanning(Results):
+	"""
+	Keyword Arguments:
+	Results -- A CallData instance that contains call information.
+
+	This functions runs a script if certain data was found on the call.
+	"""
+	global On_scanning_parameters
+
+	if IfCategory("Scanning",Results.Classification) == True:
+		
+		On_scanning_parameters = On_scanning_parameters.replace("$From_IP$", Results.From_IP)
+		On_scanning_parameters = On_scanning_parameters.replace("$From_Port$", Results.From_Port)
+		On_scanning_parameters = On_scanning_parameters.replace("$From_Transport$", Results.From_Transport)
+		On_scanning_parameters = On_scanning_parameters.replace("$Contact_IP$", Results.Contact_IP)
+		On_scanning_parameters = On_scanning_parameters.replace("$Contact_Port$", Results.Contact_Port)
+		On_scanning_parameters = On_scanning_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
+		On_scanning_parameters = On_scanning_parameters.replace("$Connection_IP$", Results.Connection)
+		On_scanning_parameters = On_scanning_parameters.replace("$Owner_IP$", Results.Owner)
+		
+		strCommand = "bash ./scripts/on_scanning.sh " + On_scanning_parameters
+		Output.Print("Executing " + strCommand + " ...")
+		# Execute a script
+		Process = Popen(strCommand, shell=True, stdout=PIPE)
+
+def SaveResultsToTextFile(strResults, strFilename):
+	"""
+	Keyword Arguments:
+	Results -- A CallData instance that contains call information.
+
+	This functions creates a plain text file for the results.
+	"""
+	global strLocal_IP
+	global strLocal_port
+	global VERSION
+
+	File = open(strFilename, "w")
+	File.write(strResults)
+	File.close()
+	Output.Print("NOTICE This report has been saved on file " + strFilename)
+
+def SaveResultsToHTML(strResults, strFilename):
+	"""
+	Keyword Arguments:
+	Results -- A CallData instance that contains call information.
+
+	This functions creates a HTML file for the results.
+	"""
+	global strLocal_IP
+	global strLocal_port
+	global VERSION
+
+	File = open(strFilename, "w")
+	File.write(strResults)
+	File.close()
+	Output.Print("NOTICE This report has been saved on file " + strFilename)
+
+	return strFilename
+
+def SendResultsByEmail(strHTMLData):
+	email = Email() # Creates an Email object
+
+	if email.Enabled == False: 
+		Output.Print("NOTICE E-mail notificatabadezaion is disabled.")
+	else:
+
+		Output.Print("NOTICE Sending this report by e-mail...")
+		Output.Print(email.sendemail(strHTMLData))
+	
+		del email
+
+def GetFilename(strExt):
+	"""
+	Defines a file name to store the output.
+	"""
+
+	strFilename = ""
+	try:
+		a = 0
+		while 1:
+						
+			strFilename = "./results/" + strftime("%Y-%m-%d") + "_" + str(a) + "." + strExt
+						
+			if os.path.isfile(strFilename) == True:
+				a += 1
+			else:
+				break
+	except:
+		Exception("Can't create the results file " + strFilename)
+
+	return strFilename
+
+def DeleteFile(strFilename):
+	Process = Popen("rm -f " + strFilename, shell=True, stdout=PIPE)
+	
 def AnalyzeCall(strData):	
 	"""
 	Core of the program. Here is where the honeypot concludes if the packet received is trusted or not.
@@ -683,10 +828,6 @@ def AnalyzeCall(strData):
 	global bMediaReceived
 	global bFlood
 	
-	global On_flood_parameters
-	global On_SPIT_parameters
-	global On_scanning_parameters
-	
 	# Wait 5 seconds for an ACK and media events. 
 	WaitForPackets(5)
 	
@@ -699,104 +840,42 @@ def AnalyzeCall(strData):
 	while classifier_instance.Running:
 		pass
 	
+	Results = classifier_instance.CallInformation	
+
+	del classifier_instance
+
+	Output.Print("+ The message is classified as:",True)
+	for i in range(len(Results.Classification)):
+		Output.Print("| " + Results.Classification[i],True)
 	
-	Output.Print("+ The message is classified as:",True,classifier_instance.Results_file)
-	for i in range(len(classifier_instance.Classification)):
-		Output.Print("| " + classifier_instance.Classification[i],True,classifier_instance.Results_file)
-	
-	Output.Print("",True,classifier_instance.Results_file)
-	
+	Output.Print("",True)
 	
 	# Call the correlator
-	Correlator(classifier_instance.Classification, bFlood, classifier_instance.Results_file, classifier_instance.ToolName)
+	Correlator(Results.Classification, bFlood, Results.Results_file, Results.ToolName)
 	
+	CheckIfFlood(Results)
+		
+	CheckCategory(Results)
+		
+	CheckIfScanning(Results)
+
 	# Save the raw SIP message in the report file
-	Output.Print("************************************** SIP message ***************************************",False,classifier_instance.Results_file)
-	Output.Print("",False,classifier_instance.Results_file)
-	Output.Print(classifier_instance.SIP_Message,False,classifier_instance.Results_file)
-	
-	Output.Print("NOTICE This report has been saved on file " + classifier_instance.Results_file + ".txt")
+	strTXTFilenme = GetFilename("txt")
+	strTXTData = get_results_txt(strTXTFilenme, Results.Results_file, Results.SIP_Message, VERSION, strLocal_IP, strLocal_port)
+	SaveResultsToTextFile(strTXTData, strTXTFilenme)
 
 	# Save the results in a HTML file
-	File = open(classifier_instance.Results_file + ".html", "w")
-		
-	File.write(get_results_html(classifier_instance.Results_file, False, classifier_instance.SIP_Message, classifier_instance.CallInformation.From_Extension, classifier_instance.CallInformation.From_IP, classifier_instance.CallInformation.To_Extension, classifier_instance.CallInformation.To_IP, classifier_instance.CallInformation.Contact_Extension, classifier_instance.CallInformation.Contact_IP, classifier_instance.CallInformation.Connection, classifier_instance.CallInformation.Owner, classifier_instance.CallInformation.Via, classifier_instance.CallInformation.UserAgent, VERSION, strLocal_IP, strLocal_port))
-			
-	File.close()
-	
-	Output.Print("NOTICE This report has been saved on file " + classifier_instance.Results_file + ".html")
+	strHTMLFilenme = GetFilename("html")	
+	strHTMLData = get_results_html(strHTMLFilenme, Results.Results_file, False, Results.SIP_Message, VERSION, strLocal_IP, strLocal_port)
+	SaveResultsToHTML(strHTMLData, strHTMLFilenme)
 
-
-	# If a flooding has been detected then run the script
-	if bFlood == True:
-		
-		On_flood_parameters = On_flood_parameters.replace("$From_IP$", classifier_instance.CallInformation.From_IP)
-		On_flood_parameters = On_flood_parameters.replace("$From_Port$", classifier_instance.CallInformation.From_Port)
-		On_flood_parameters = On_flood_parameters.replace("$From_Transport$", classifier_instance.CallInformation.From_Transport)
-		On_flood_parameters = On_flood_parameters.replace("$Contact_IP$", classifier_instance.CallInformation.Contact_IP)
-		On_flood_parameters = On_flood_parameters.replace("$Contact_Port$", classifier_instance.CallInformation.Contact_Port)
-		On_flood_parameters = On_flood_parameters.replace("$Contact_Transport$", classifier_instance.CallInformation.Contact_Transport)
-		On_flood_parameters = On_flood_parameters.replace("$Connection_IP$", classifier_instance.CallInformation.Connection)
-		On_flood_parameters = On_flood_parameters.replace("$Owner_IP$", classifier_instance.CallInformation.Owner)
-		
-		strCommand = "bash ./scripts/on_flood.sh " + On_flood_parameters
-		Output.Print("Executing " + strCommand + " ...")
-		# Execute a script
-		Process = Popen(strCommand, shell=True, stdout=PIPE)
-		
-	# If SPIT has been detected then run the script
-	if IfCategory("SPIT",classifier_instance.Classification) == True:
-		
-		On_SPIT_parameters = On_SPIT_parameters.replace("$From_IP$", classifier_instance.CallInformation.From_IP)
-		On_SPIT_parameters = On_SPIT_parameters.replace("$From_Port$", classifier_instance.CallInformation.From_Port)
-		On_SPIT_parameters = On_SPIT_parameters.replace("$From_Transport$", classifier_instance.CallInformation.From_Transport)
-		On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_IP$", classifier_instance.CallInformation.Contact_IP)
-		On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Port$", classifier_instance.CCallInformation.ontact_Port)
-		On_SPIT_parameters = On_SPIT_parameters.replace("$Contact_Transport$", classifier_instance.CallInformation.Contact_Transport)
-		On_SPIT_parameters = On_SPIT_parameters.replace("$Connection_IP$", classifier_instance.CallInformation.Connection)
-		On_SPIT_parameters = On_SPIT_parameters.replace("$Owner_IP$", classifier_instance.CallInformation.Owner)
-		
-		strCommand = "bash ./scripts/on_spit.sh " + On_SPIT_parameters
-		Output.Print("Executing " + strCommand + " ...")
-		# Execute a script
-		Process = Popen(strCommand, shell=True, stdout=PIPE)
-		
-	# If a scanning has been detected then run the script
-	if IfCategory("Scanning",classifier_instance.Classification) == True:
-		
-		On_scanning_parameters = On_scanning_parameters.replace("$From_IP$", classifier_instance.CallInformation.From_IP)
-		On_scanning_parameters = On_scanning_parameters.replace("$From_Port$", classifier_instance.CallInformation.From_Port)
-		On_scanning_parameters = On_scanning_parameters.replace("$From_Transport$", classifier_instance.CallInformation.From_Transport)
-		On_scanning_parameters = On_scanning_parameters.replace("$Contact_IP$", classifier_instance.CallInformation.Contact_IP)
-		On_scanning_parameters = On_scanning_parameters.replace("$Contact_Port$", classifier_instance.CallInformation.Contact_Port)
-		On_scanning_parameters = On_scanning_parameters.replace("$Contact_Transport$", classifier_instance.CallInformation.Contact_Transport)
-		On_scanning_parameters = On_scanning_parameters.replace("$Connection_IP$", classifier_instance.CallInformation.Connection)
-		On_scanning_parameters = On_scanning_parameters.replace("$Owner_IP$", classifier_instance.CallInformation.Owner)
-		
-		strCommand = "bash ./scripts/on_scanning.sh " + On_scanning_parameters
-		Output.Print("Executing " + strCommand + " ...")
-		# Execute a script
-		Process = Popen(strCommand, shell=True, stdout=PIPE)
-				
 	# Send the results by e-mail
-	email = Email() # Creates an Email object
-
-	if email.Enabled == False: 
-		Output.Print("NOTICE E-mail notification is disabled.")
-	else:
+	# The function get_results_html is called again and it return an email-adapted format
+	strHTMLMailData = get_results_html(strHTMLFilenme, Results.Results_file, True, Results.SIP_Message, VERSION, strLocal_IP, strLocal_port)
+	SendResultsByEmail(strHTMLMailData)
 	
-		strData = get_results_html(classifier_instance.Results_file, True, classifier_instance.SIP_Message, classifier_instance.CallInformation.From_Extension, classifier_instance.CallInformation.From_IP, classifier_instance.CallInformation.To_Extension, classifier_instance.CallInformation.To_IP, classifier_instance.CallInformation.Contact_Extension, classifier_instance.CallInformation.Contact_IP, classifier_instance.CallInformation.Connection, classifier_instance.CallInformation.Owner, classifier_instance.CallInformation.Via, classifier_instance.CallInformation.UserAgent, VERSION, strLocal_IP, strLocal_port)
-					
-		Output.Print("NOTICE Sending this report by e-mail...")
-		Output.Print(email.sendemail(strData))
-	
-		del email
-
-	
-	# End of the analysis
-	
-	del classifier_instance
-	
+	DeleteFile(Results.Results_file)
+				
 	bACKReceived = False
 	bMediaReceived = False
 	bFlood = False
@@ -808,7 +887,6 @@ def EndConnection():
 	Finalizes PJSUA.
 	"""
 	global lib
-	global Servers
 	global Unregister
 	global current_call
 
@@ -827,7 +905,7 @@ def ShowHelp(bCommands = True):
 	Shows the help
 	"""
 	print "Usage: artemisa [Options]"
-	print "  -v, --verbose			 Verbose mode (it shows more information)."
+	print "  -v, --verbose			Verbose mode (it shows more information)."
 	print "  -g, --get_sound_devices   Show the available sound devices."
 	
 	if bCommands == False: return
@@ -835,29 +913,28 @@ def ShowHelp(bCommands = True):
 	print ""	
 	print "Commands list:"
 	print ""
-	print "mode active			  Change behaviour mode to active."
-	print "mode passive			 Change behaviour mode to passive."
-	print "mode aggressive		  Change behaviour mode to aggressive."
+	print "mode active			Change behaviour mode to active."
+	print "mode passive			Change behaviour mode to passive."
+	print "mode aggressive			Change behaviour mode to aggressive."
 	print ""
-	print "verbose on			   Turn verbose mode on (it shows more information)."
-	print "verbose off			  Turn verbose mode off."
+	print "verbose on			Turn verbose mode on (it shows more information)."
+	print "verbose off			Turn verbose mode off."
 	print ""
-	print "show statistics, stats   Show the statistics of the current instance."
+	print "show statistics, stats		Show the statistics of the current instance."
 	print ""
-	#print "clean historical		 Remove the historical database."
-	print "clean logs			   Remove all log files."
+	print "clean logs			Remove all log files."
 	print "clean results			Remove all results files."
-	print "clean alarms			 Remove all alarm files."
-	print "clean calls			  Remove all the recorded calls."
-	print "clean all				Remove all files."
-	print "						 (Use these commands carefully)"
+	print "clean alarms			Remove all alarm files."
+	print "clean calls			Remove all the recorded calls."
+	print "clean all			Remove all files."
+	print "				(Use these commands carefully)"
 	print ""
-	print "hangup all			   Hang up all calls."
+	print "hangup all			Hang up all calls."
 	print ""
 	print "show warranty			Show the program warrany."
-	print "show license			 Show the program license."
+	print "show license			Show the program license."
 	print ""
-	print "s, q, quit, exit		 Exit"
+	print "s, q, quit, exit		Exit"
  
 def ReadKeyboard(): 
 	"""
@@ -925,8 +1002,6 @@ def ReadKeyboard():
 			print "Cleaned"
 						
 		elif s == "clean all":
-			#Process = Popen("rm -f ./historical/*", shell=True, stdout=PIPE)
-			#Process.wait()
 			Process = Popen("rm -f ./logs/*.log", shell=True, stdout=PIPE)
 			Process.wait()
 			Process = Popen("rm -f ./logs/invite_msgs/*.log", shell=True, stdout=PIPE)
@@ -1005,6 +1080,14 @@ def ReadKeyboard():
 
 		else:
 			print "Command not found. Type \"help\" for a list of commands."
+
+def CloseArtemisa():
+	EndConnection()
+	print ""
+	print "Good bye!"
+	print ""
+	Output.Print("Artemisa ended.", False)
+	sys.exit(0)
 			
 def main():
 	"""
@@ -1110,7 +1193,7 @@ def main():
 		EndConnection()
 		sys.exit(0)
 
-	
+	# Put some lines into the log file
 	Output.Print("-------------------------------------------------------------------------------------------------", False)
 	Output.Print("Artemisa started.", False)
 			
@@ -1145,25 +1228,13 @@ def main():
 	# The keyboard is read:
 	ReadKeyboard()
 
-	EndConnection()
+	# Here finalizes the program when the ReadKeyboard() function is returned.
+	CloseArtemisa()
 	
-	print ""
-	print "Good bye!"
-	print ""
-	
-	Output.Print("Artemisa ended.", False)
-	sys.exit(0)
-	
-
 if __name__ == "__main__":
 	try:
 		main()
 	except KeyboardInterrupt:
-		EndConnection()
-		print ""
-		print "Good bye!"
-		print ""
-		Output.Print("Artemisa ended.", False)
-		sys.exit(0)
+		CloseArtemisa()
 	
 	

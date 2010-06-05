@@ -15,11 +15,56 @@
 # You should have received a copy of the GNU General Public License
 # along with Artemisa. If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+
+# Set a path to the main root
+sys.path.append("../")
+
 from time import strftime
 from logs import log				# Import class log from logs.py
-import ConfigParser				 # Read configuration files
-from libs.IPy.IPy import *	   # Module to deal with IPs
+import ConfigParser				# Read configuration files
+from libs.IPy.IPy import *			# Module to deal with IPs
 from subprocess import Popen, PIPE
+
+class CallData():
+	"""
+	Class employed to store some data about the received call and the analysis
+	"""
+
+	def __init__(self):
+		self.SIP_Message = ""
+
+		self.INVITE_IP = "" # Corresponds to the first line of a INVITE message
+		self.INVITE_Port = ""
+		self.INVITE_Transport = ""
+		self.INVITE_Extension = ""
+		
+		self.To_IP = ""
+		self.To_Extension = ""
+		
+		self.From_IP = ""
+		self.From_Port = ""
+		self.From_Transport = ""
+		self.From_Extension = ""
+		
+		self.Contact_IP = ""
+		self.Contact_Port = ""
+		self.Contact_Transport = ""
+		self.Contact_Extension = ""
+		
+		self.Via = []
+		
+		self.Record_Route = ""
+		
+		self.Connection = ""
+		self.Owner = ""
+
+		self.UserAgent = ""
+
+		# The following variables are set for results
+		self.Classification = []
+		self.ToolName = "" # Flag to store the attack tool detected
+		self.Results_file = ""
 
 class GetTimeClass:
 	"""
@@ -164,17 +209,17 @@ def GetTransportfromSIP(strHeaderLine):
 		return "udp" # By default	
 
 class PrintClass(log, GetTimeClass):
-	"""
-	This simple class prints strData in console (unless bPrint is False) and log it.
-	"""
-	
-	def Print(self, strData, bPrint=True, strFilename=""):
+
+	def __init__(self):
+		self.PrintFile = ""
+
+	def Print(self, strData, bPrint=True):
 		"""
 		Keyword Arguments:
 		strData -- string to print
 		bPrint -- boolean to know whether the string shoud (True) or not (False) be printed on screen
-		strFilename -- file name and path to where the string is printed
-
+		
+		This method prints strData in console (unless bPrint is False) and log it.
 		"""
 		
 		strTemp = strData.splitlines()
@@ -186,9 +231,9 @@ class PrintClass(log, GetTimeClass):
 				for line in strTemp:
 					print self.GetTime() + " " + line.replace("\n","").replace("\r","")
 		   	
-		# if strFilename has a string value, it stores the results in a file   
-		if strFilename != "":
-			File = open(strFilename + ".txt", "a")
+		# if self.PrintFile has a string value, it prints the string into a file   
+		if self.PrintFile != "":
+			File = open(self.PrintFile, "a")
 			
 			if strData == "":
 				File.write("\n")
