@@ -844,12 +844,6 @@ def AnalyzeCall(strData):
 
 	del classifier_instance
 
-	Output.Print("+ The message is classified as:",True)
-	for i in range(len(Results.Classification)):
-		Output.Print("| " + Results.Classification[i],True)
-	
-	Output.Print("",True)
-	
 	# Call the correlator
 	Correlator(Results.Classification, bFlood, Results.Results_file, Results.ToolName)
 	
