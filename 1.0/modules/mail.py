@@ -46,7 +46,8 @@ class Email():
 		strTemp = config.read("./conf/artemisa.conf")
 		
 		if strTemp == []:
-			return "WARNING The configuration file artemisa.conf cannot be read."
+			raise Exception("WARNING The configuration file artemisa.conf cannot be read.")
+			return
 		else:
 			try:
 
@@ -70,7 +71,8 @@ class Email():
 					self.TSLSSL = False
 	 
 			except:
-				return "WARNING E-mail account configuration cannot be correctly read. E-mail reports cannot be sent."
+				raise Exception("WARNING E-mail account configuration cannot be correctly read. E-mail reports cannot be sent.")
+				return
 	
 		del config
 

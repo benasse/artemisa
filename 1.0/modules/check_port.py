@@ -16,6 +16,10 @@
 # along with Artemisa. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+
+# Set a path to the main root
+sys.path.append("../")
+
 from commons import PrintClass
 from subprocess import Popen, PIPE
 from libs.IPy.IPy import *	   # Module to deal with IPs
