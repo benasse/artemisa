@@ -83,11 +83,15 @@ def Search(strLabel, strData):
 	structure "label=value"
 	"""
 	
-	strTemp = strData.splitlines()
+	strTemp = strData.strip().splitlines(True)
 	
 	for line in strTemp:
-	   if line.search(strLabel + "=") != -1:
-	   	   return strData.split("=")[1]
+		if line.find(strLabel + "=") != -1:
+			try:
+				return strData.split("=")[1]
+			except:
+				raise Exception("Error in function commons.Search. Cannot return value=string.")
+				break
 
 	return ""
 

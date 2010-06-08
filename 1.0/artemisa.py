@@ -225,9 +225,7 @@ def log_cb(level, str, len):
 	global bOPTIONSReceived 
 	global strINVITETag
 	global bFlood
-	
-	strTemp = str.strip().splitlines(True)
-	
+
 	logging.PJSUA_Log(str)
 	
 	if IsMessage(str, "ACK") == True:
@@ -243,22 +241,23 @@ def log_cb(level, str, len):
 
 	if IsMessage(str, "INVITE") == False:
 		# If False means that the received message was not an INVITE one
-		return 
-			
+		return
+
 	intN_INVITE += 1
 
 	# Store the tag of the INVITE to be used later to identify the ACK
 	strINVITETag = Search("tag", str)
-
+	
 	strINVITEMessage = ""
-			
+
+	strTemp = str.strip().splitlines(True)			
 	i = -1
 	for line in strTemp:
 		line = line.strip()
 		i += 1
 		if i > 0 and line.find("--end msg--") == -1:
 			if strINVITEMessage != "":
-				strINVITEMessage = strINVITEMessage + "\n" + line
+				strINVITEMessage += "\n" + line
 			else:
 				strINVITEMessage = line
 	
