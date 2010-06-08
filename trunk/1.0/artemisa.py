@@ -21,6 +21,8 @@
 
 VERSION = "1.0."
 
+SIP_VERSION = "2.0"
+
 import sys
 
 # Set a path to the modules
@@ -196,8 +198,18 @@ class Server():
 	#	self.acc.delete()
 	#	self.acc = None
 
+def IsMessage(strMessage, strType):
+	strTemp = strMessage.strip().splitlines(True)
+
+	for line in strTemp:
+		if line.find(strType) != -1 and line.find("SIP/" + SIP_VERSION) != -1:
+			return True
+
+	return False
+
 def log_cb(level, str, len):
 	"""
+	This is quite dirty but I wasn't able to find another way to capture the raw messages.
 	This function saves the data returned by PJSUA module. This shows also the SIP packet, so it's possible
 	to analyse it directly from here, and there is no need to use some capturing packet function.
 	This function is very important.
@@ -218,36 +230,25 @@ def log_cb(level, str, len):
 	
 	logging.PJSUA_Log(str)
 	
-	bFound = False
-	bAckFound = False
-	
-	for line in strTemp:
-		if line.find("INVITE") != -1 and line.find("SIP/2.0") != -1:
-			bFound = True
-			break
-		elif line.find("ACK") != -1 and line.find("SIP/2.0") != -1:
-			bAckFound = True
-			break
-		elif line.find("OPTIONS") != -1 and line.find("SIP/2.0") != -1:
-			bOPTIONSReceived = True
-			break
-
-	if bOPTIONSReceived == True:
-		intN_OPTIONS += 1
-
-	# Here we check if the ACK received is for the received INVITE.		
-	if bAckFound == True:
-		for line in strTemp:
-			line = line.strip()
-			if line.find("tag=") != -1:
-				if strINVITETag == line.split("tag=")[1]:
-					bACKReceived = True
-					break
+	if IsMessage(str, "ACK") == True:
+		# Here we check if the ACK received is for the received INVITE.		
+		if Search("tag", str) == strINVITETag:
+			bACKReceived = True
 		return
-			
-	if bFound == False: return # If False means that the received message was not an INVITE one
 
+	if IsMessage(str, "OPTIONS") == True:
+		bOPTIONSReceived = True
+		intN_OPTIONS += 1
+		return
+
+	if IsMessage(str, "INVITE") == False:
+		# If False means that the received message was not an INVITE one
+		return 
+			
 	intN_INVITE += 1
+
+	# Store the tag of the INVITE to be used later to identify the ACK
+	strINVITETag = Search("tag", str)
 
 	strINVITEMessage = ""
 			
@@ -260,12 +261,6 @@ def log_cb(level, str, len):
 				strINVITEMessage = strINVITEMessage + "\n" + line
 			else:
 				strINVITEMessage = line
-				
-	for line in strTemp:
-		line = line.strip()				
-		if line.find("tag=") != -1:
-			strINVITETag = line.split("tag=")[1] # Store the tag of the INVITE to be used later to identify the ACK
-			break
 	
 	if LastINVITEreceived == strINVITEMessage:
 		#Output.Print("Duplicated INVITE arrived. Seq: " + str(nSeq))
@@ -306,7 +301,8 @@ class MyAccountCallback(pj.AccountCallback):
 		if Unregister == False:
 			if self.account.info().reg_status >= 200 and self.account.info().reg_status < 300:
 				Output.Print("NOTICE Extension " + str(self.account.info().uri) + " registered, status=" + str(self.account.info().reg_status) + " (" + str(self.account.info().reg_reason) + ")")	
-			elif (self.account.info().reg_status >= 400 and self.account.info().reg_status < 500) or self.account.info().reg_status > 700:
+			#elif (self.account.info().reg_status >= 400 and self.account.info().reg_status < 500) or self.account.info().reg_status > 700:
+			elif self.account.info().reg_status >= 300 and self.account.info().reg_status < 700:
 				Output.Print("NOTICE Extension " + str(self.account.info().uri) + " registration failed, status=" + str(self.account.info().reg_status) + " (" + str(self.account.info().reg_reason) + ")")
 				# This part is important since it's necessary to try the registration again if it fails.
 				Output.Print("NOTICE Trying to register again.")
@@ -319,7 +315,8 @@ class MyAccountCallback(pj.AccountCallback):
 			# "expire" time. So, there is no other way to determine if it's a registration or an unregistration.  
 			if self.account.info().reg_status >= 200 and self.account.info().reg_status < 300:
 				Output.Print("NOTICE Extension " + str(self.account.info().uri) + " unregistered, status=" + str(self.account.info().reg_status) + " (" + str(self.account.info().reg_reason) + ")")	
-			elif (self.account.info().reg_status >= 400 and self.account.info().reg_status < 500) or self.account.info().reg_status > 700:
+			#elif (self.account.info().reg_status >= 400 and self.account.info().reg_status < 500) or self.account.info().reg_status > 700:
+			elif self.account.info().reg_status >= 300 and self.account.info().reg_status < 700:
 				Output.Print("NOTICE Extension " + str(self.account.info().uri) + " unregistration failed, status=" + str(self.account.info().reg_status) + " (" + str(self.account.info().reg_reason) + ")")
 			# No problem if the unregistration process fails.
 			else:
@@ -362,7 +359,7 @@ class MyAccountCallback(pj.AccountCallback):
 				if item == "send_180":
 					current_call.answer(180)
 				if item == "send_200":
-					  current_call.answer(200)
+					current_call.answer(200)
 							
 		#current_call.hangup()
 
