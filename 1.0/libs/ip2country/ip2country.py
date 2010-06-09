@@ -370,6 +370,7 @@ class IP2Country:
             #print "line: %s" % repr(line)
             ip, country = line.split(":")
             specificIPs[ip] = country
+            
         
         self.log("Created apnic lookup tables")
     
@@ -382,7 +383,7 @@ class IP2Country:
     
         # consult cached IPs
         if self.specificIPs.has_key(ipaddr):
-            cc = self.specificIPs[ipaddr]
+            cc = self.cs[ipaddr]
             return cc, self.countryCodes.get(cc, '???')
     
         # screen Class C addresses
@@ -443,7 +444,7 @@ class IP2Country:
     
         for line in lines:
             if line.lower().startswith("country:"):
-                cc = line[8:].strip()
+                cc = line[8:].strip().upper()
     
         if cc:
             # got it - add to memory and file cache
