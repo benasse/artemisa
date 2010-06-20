@@ -28,25 +28,6 @@ import sys
 # Set a path to the modules
 sys.path.append("./modules/")
 
-import os
-	
-import ConfigParser				# Read configuration files
-
-from time import strftime, sleep, time
-import sched
-from logs import log				# Import class log from logs.py
-from commons import *				# Import functions from commons.py
-from classifier import Classifier		# Message classifier 
-from correlator import Correlator		# Correlator
-from correlator import IfCategory
-import threading				# Use of threads
-
-from mail import Email
-from results_format_html import get_results_html
-from results_format_txt import get_results_txt
-
-from subprocess import Popen, PIPE
-
 try:
 	import pjsua as pj
 except ImportError:
@@ -70,6 +51,24 @@ except ImportError:
 	print ""
 	sys.exit(1)
 
+import os
+	
+import ConfigParser				# Read configuration files
+
+from time import strftime, sleep, time
+import sched
+from logs import log				# Import class log from logs.py
+from commons import *				# Import functions from commons.py
+from classifier import Classifier		# Message classifier 
+from correlator import Correlator		# Correlator
+from correlator import IfCategory
+import threading				# Use of threads
+
+from mail import Email
+from results_format_html import get_results_html
+from results_format_txt import get_results_txt
+
+from subprocess import Popen, PIPE
 
 # Environment configuration
 strLocal_IP = ""				# Local IP
@@ -78,6 +77,7 @@ strSIPdomain = ""				# Local SIP domain
 strUserAgent = ""				# User-Agent name used by Artemisa 
 intMaxCalls = 0					# Max number of calls to handle
 intNumCalls = 0					# Number of calls being analysed
+strPlayfile = ""				# Name of the file to be played
 
 # Sound configuration
 Sound_enabled = True
@@ -128,15 +128,16 @@ bACKReceived = False				# We must know if an ACK was received
 bMediaReceived = False				# Flag to know whether media has been received
 bFlood = False					# Flag to know whether flood was detected
 
-class Extension():
+class Extension(object):
 	"""
 	Keeps the user data with an unique extension.
 	"""
-	Extension = ""
-	Username = ""
-	Password = ""
+	def __init__(self):
+		self.Extension = ""
+		self.Username = ""
+		self.Password = ""
    
-class Server():
+class Server(object):
 	"""
 	Manage registration information.
 	"""
@@ -366,13 +367,12 @@ class MyCallCallback(pj.CallCallback):
 	"""
 	Callback to receive events from Call
 	"""
-	rec_id = None
-	rec_slot = None
-
  	def __init__(self, call=None):
 		pj.CallCallback.__init__(self, call)
 		self.rec_slot = None
 		self.rec_id = None
+		self.player_slot = None
+		self.player_id = None
 
 	# Notification when call state has changed
 	def on_state(self):
@@ -393,6 +393,11 @@ class MyCallCallback(pj.CallCallback):
 					lib.conf_disconnect(call_slot, self.rec_slot)
 					
 					lib.recorder_destroy(self.rec_id)
+
+					# Disconnect the call from the player
+					lib.conf_disconnect(self.player_slot, call_slot)
+					
+					lib.player_destroy(self.player_id)
 					
 				except Exception, e:
 					Output.Print("WARNING Error: " + str(e))
@@ -406,7 +411,8 @@ class MyCallCallback(pj.CallCallback):
 		global lib
 		global Sound_enabled
 		global bMediaReceived
-		
+		global strPlayfile
+
 		if Sound_enabled == False: return
 		
 		if self.call.info().media_state == pj.MediaState.ACTIVE: 
@@ -426,6 +432,7 @@ class MyCallCallback(pj.CallCallback):
 						else:
 							break
 					
+					# Set the recorder
 					self.rec_id = lib.create_recorder(strFilename)
 					self.rec_slot = lib.recorder_get_slot(self.rec_id)
 				
@@ -438,6 +445,26 @@ class MyCallCallback(pj.CallCallback):
 				
 			except Exception, e:
 				Output.Print("WARNING Error while trying to record the call. Error: " + str(e))
+
+			try:
+				if self.player_id < 0:
+
+					# And now set the file player
+					if strPlayfile != "":
+						call_slot = self.call.info().conf_slot 
+
+						strWAVPlayFilename = "./audiofiles/" + strPlayfile
+
+						self.player_id = lib.create_player(strWAVPlayFilename)
+						self.player_slot = lib.player_get_slot(self.player_id)
+
+						# Connect the call with the WAV player
+						lib.conf_connect(self.player_slot, call_slot)
+					
+						Output.Print("The following audio file is now being played: " + strPlayfile)
+	
+			except Exception, e:
+				Output.Print("WARNING Error while trying to play the WAV file. Error: " + str(e))
   
 
 		else:
@@ -447,6 +474,9 @@ class MyCallCallback(pj.CallCallback):
 				
 				# Disconnect the call with the WAV recorder
 				pj.Lib.instance().conf_disconnect(call_slot, lib.recorder_get_slot(self.rec_id))
+
+				# Disconnect the call from the player
+				pj.Lib.instance().conf_disconnect(lib.player_get_slot(self.player_id), call_slot)
 
 			except Exception, e:
 				Output.Print("WARNING Error: " + str(e))
@@ -538,6 +568,7 @@ def LoadConfiguration():
 	global strUserAgent
 	global intMaxCalls
 	global behaviour_mode
+	global strPlayfile
 
 	global Sound_enabled
 	global Sound_device
@@ -598,7 +629,8 @@ def LoadConfiguration():
 			strUserAgent = config.get("environment", "user_agent")
 			behaviour_mode = config.get("environment", "behaviour_mode")
 			intMaxCalls  = int(config.get("environment", "max_calls"))
-			
+			strPlayfile = config.get("environment", "playfile")
+
 			Sound_enabled = config.get("sound", "enabled")
 			Sound_device = int(config.get("sound", "device"))
 			Sound_rate = int(config.get("sound", "rate"))			
@@ -641,7 +673,7 @@ def WaitForPackets(seconds):
 	This function stops the program some seconds in order to let the system collect more traces
 	"""
 	for i in range(seconds):
-		Output.Print("Waiting for SIP dialogs (" + str(seconds-i) + ")...")
+		Output.Print("Waiting for SIP messages (" + str(seconds-i) + ")...")
 		sleep(1)
 		
 def GetBehaviourActions(behaviour_mode):
@@ -673,7 +705,8 @@ def CheckIfFlood(Results):
 	global On_flood_parameters
 
 	if bFlood == True:
-		
+
+		On_flood_parameters = On_flood_parameters.replace("$From_Extension$", Results.From_Extension)
 		On_flood_parameters = On_flood_parameters.replace("$From_IP$", Results.From_IP)
 		On_flood_parameters = On_flood_parameters.replace("$From_Port$", Results.From_Port)
 		On_flood_parameters = On_flood_parameters.replace("$From_Transport$", Results.From_Transport)
@@ -699,6 +732,7 @@ def CheckCategory(Results):
 
 	if IfCategory("SPIT",Results.Classification) == True:
 		
+		On_SPIT_parameters = On_SPIT_parameters.replace("$From_Extension$", Results.From_Extension)
 		On_SPIT_parameters = On_SPIT_parameters.replace("$From_IP$", Results.From_IP)
 		On_SPIT_parameters = On_SPIT_parameters.replace("$From_Port$", Results.From_Port)
 		On_SPIT_parameters = On_SPIT_parameters.replace("$From_Transport$", Results.From_Transport)
@@ -724,6 +758,7 @@ def CheckIfScanning(Results):
 
 	if IfCategory("Scanning",Results.Classification) == True:
 		
+		On_scanning_parameters = On_scanning_parameters.replace("$From_Extension$", Results.From_Extension)
 		On_scanning_parameters = On_scanning_parameters.replace("$From_IP$", Results.From_IP)
 		On_scanning_parameters = On_scanning_parameters.replace("$From_Port$", Results.From_Port)
 		On_scanning_parameters = On_scanning_parameters.replace("$From_Transport$", Results.From_Transport)
