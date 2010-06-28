@@ -39,7 +39,7 @@ def Correlator(Results, Flood):
 	####################################################################################
     
 	if IfCategory("Attack tool", Results.Classification) == True:
-		prtString = "* The attack was created employing the tool " + ToolName + "."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "* The attack was created employing the tool " + Results.ToolName + "."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
 	if Flood == True:
 		prtString = "* A flooding attack."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)

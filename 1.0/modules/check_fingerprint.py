@@ -15,7 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Artemisa. If not, see <http://www.gnu.org/licenses/>.
 
+FINGERPRINT_PATH = "./fingerprint/fingerprint.txt"
+
 import sys
+
+# Set a path to the main root
+sys.path.append("../")
 
 from commons import RemoveComments
 
@@ -26,13 +31,13 @@ def CheckFingerprint(UserAgent):
 	# Now the program should read the fingerprint.txt in order to get the strings to search and compare.
 
 	try:
-		File = open("./fingerprint/fingerprint.txt", "r")
+		File = open(FINGERPRINT_PATH, "r")
 		
 	except:
-		logger.warning("Can't read /fingerprint/fingerprint.txt.")
+		logger.warning("Can't read " + FINGERPRINT_PATH)
 		return -1
 		
-	bFound = False
+	Found = False
 		
 	for line in File:
 		line = line.strip()
@@ -41,12 +46,12 @@ def CheckFingerprint(UserAgent):
 		ToolName = line.split("=")[0]
 		Fingerprint = line.split("=")[1]
 		if UserAgent.find(Fingerprint) != -1:
-			bFound = True
+			Found = True
 			break
 			
 	File.close()
 		
-	if bFound == True:
+	if Found == True:
 		return ToolName
 	else:
 		return 0

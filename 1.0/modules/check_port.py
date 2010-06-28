@@ -25,49 +25,49 @@ from libs.IPy.IPy import *	   # Module to deal with IPs
 
 from modules.logger import logger
 
-def CheckPort(strIP, strPort, strTransport, verbose):
+def CheckPort(strIP, Port, Transport, verbose):
 	"""
 	This function checks a given IP:port and it's used for both SIP and media ports analysis	
 	"""	
-	if strIP == "" or strPort == "": return -1
+	if strIP == "" or Port == "": return -1
 	
-	strDataToSend = ""
+	DataToSend = ""
 	
 	try:		
-		if strTransport == "udp":
-			strCommand = "nmap -sU " + strIP + " -p " + strPort
-			Process = Popen(strCommand, shell=True, stdout=PIPE)
+		if Transport == "udp":
+			Command = "nmap -sU " + strIP + " -p " + Port
+			Process = Popen(Command, shell=True, stdout=PIPE)
 
-		elif strTransport == "tcp":
-			strCommand = "nmap -sS " + strIP + " -p " + strPort
-			Process = Popen(strCommand, shell=True, stdout=PIPE)
+		elif Transport == "tcp":
+			Command = "nmap -sS " + strIP + " -p " + Port
+			Process = Popen(Command, shell=True, stdout=PIPE)
 			
 		if verbose == True:
-			strDataToSend = "+ Verbose" + "\n"
-			strDataToSend = strDataToSend + "| Tool employed: " + strCommand + "\n"
-			strDataToSend = strDataToSend + "|" + "\n"
+			DataToSend = "+ Verbose" + "\n"
+			DataToSend = DataToSend + "| Tool employed: " + Command + "\n"
+			DataToSend = DataToSend + "|" + "\n"
 						
 		Process.wait()
 		
 		strData = Process.communicate()[0].strip().split("\n")
 		
 		if verbose == True:
-			strDataToSend = strDataToSend + "| Tool output:" + "\n"
+			DataToSend = DataToSend + "| Tool output:" + "\n"
 			for line in strData:
-				strDataToSend = strDataToSend + "| " + line + "\n"
-			strDataToSend = strDataToSend + "\n"
+				DataToSend = DataToSend + "| " + line + "\n"
+			DataToSend = DataToSend + "\n"
 				
 		strState = ""
 		
 		# FIXME: The following lines parse the output returned by nmap. This part can be modified
 		# in order to do a better parsing such as parsing the XML file. This will be for the future.
 		for line in strData:
-			if line.find(strPort + "/" + strTransport) != -1:
+			if line.find(Port + "/" + Transport) != -1:
 				strState = line.split(" ")[1]
 				break
 				
 		if strState != "":
-			return strDataToSend + "Port state: " + strState
+			return DataToSend + "Port state: " + strState
 		else:
 			return -1
 			
