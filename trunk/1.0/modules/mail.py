@@ -22,6 +22,8 @@ from email.mime.multipart import MIMEMultipart
 
 import ConfigParser				 # Read configuration files.
 
+from modules.logger import logger
+
 class Email():
 	"""
 	This class is used to handle the email part.
@@ -43,10 +45,13 @@ class Email():
 	def __init__(self):
 		
 		config = ConfigParser.ConfigParser()
-		strTemp = config.read("./conf/artemisa.conf")
+		try:
+			strTemp = config.read("./conf/artemisa.conf")
+		except:
+			logger.error("The configuration file artemisa.conf cannot be read.")
 		
 		if strTemp == []:
-			raise Exception("WARNING The configuration file artemisa.conf cannot be read.")
+			logger.error("The configuration file artemisa.conf cannot be read.")
 			return
 		else:
 			try:
@@ -71,17 +76,17 @@ class Email():
 					self.TSLSSL = False
 	 
 			except:
-				raise Exception("WARNING E-mail account configuration cannot be correctly read. E-mail reports cannot be sent.")
+				logger.error("E-mail account configuration cannot be correctly read. E-mail reports cannot be sent.")
 				return
 	
 		del config
 
 	def sendemail(self, strData):
 		
-		if self.Enabled == False: return "NOTICE E-mail notification is disabled."
-		if self.SMTP_IP == "": return "NOTICE No SMTP server address configured."
-		if self.SMTP_PORT == "": return "NOTICE SMTP server port is not configured."
-		if self.Recipients == "": return "NOTICE No recipient address is configured."
+		if self.Enabled == False: return "E-mail notification is disabled."
+		if self.SMTP_IP == "": return "No SMTP server address configured."
+		if self.SMTP_PORT == "": return "SMTP server port is not configured."
+		if self.Recipients == "": return "No recipient address is configured."
 		
 		msg = MIMEMultipart()
 		msg['To'] = self.To_header
@@ -118,7 +123,8 @@ class Email():
 			return "NOTICE E-mail notification sent."
 		
 		except SMTPAuthenticationError:
-			return "WARNING E-mail account username and/or password refused by SMTP server."
+			return "E-mail account username and/or password refused by SMTP server."
 		except Exception, e:
-			return "WARNING E-mail notification wasn't able to be sent. Error: " + str(e)
+			logger.error("E-mail notification wasn't able to be sent. Error: " + str(e))
+			return
 		

@@ -17,7 +17,9 @@
 
 import sys
 
-from commons import PrintClass, RemoveComments
+from commons import RemoveComments
+
+from modules.logger import logger
 
 def CheckFingerprint(UserAgent):
 
@@ -27,7 +29,7 @@ def CheckFingerprint(UserAgent):
 		File = open("./fingerprint/fingerprint.txt", "r")
 		
 	except:
-		print "WARNING Can't read /fingerprint/fingerprint.txt."
+		logger.warning("Can't read /fingerprint/fingerprint.txt.")
 		return -1
 		
 	bFound = False

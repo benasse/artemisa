@@ -19,21 +19,22 @@
 import os
 from time import strftime
 
-from commons import PrintClass, GetSIPHeader, Search, GetTimeClass, GetIPfromSIP, GetPortfromSIP, GetExtensionfromSIP, GetTransportfromSIP, RemoveComments, ResolveDNS, CallData
+from commons import GetSIPHeader, Search, GetTimeClass, GetIPfromSIP, GetPortfromSIP, GetExtensionfromSIP, GetTransportfromSIP, RemoveComments, ResolveDNS, CallData
 
 from mail import Email
-from logs import log				# Import class log from logs.py
 
 from check_fingerprint import CheckFingerprint
 from check_dns import CheckDNS
 from check_port import CheckPort
 
-class Classifier(PrintClass, log):
+from modules.logger import logger
+
+class Classifier():
 	"""
 	This class performs the classification of the received SIP message.
 	"""
 	
-	def __init__(self, VERSION, verbose, strLocal_IP, strLocal_port, behaviour_mode, behaviour_actions, strData, Extensions, bACKReceived, bMediaReceived):
+	def __init__(self, VERSION, verbose, strLocal_IP, strLocal_port, behaviour_mode, behaviour_actions, SIP_Message, Extensions, bACKReceived, bMediaReceived):
 		self.VERSION = VERSION # Artemisa's version
 		self.strLocal_IP = strLocal_IP
 		self.strLocal_port = strLocal_port
@@ -46,8 +47,7 @@ class Classifier(PrintClass, log):
 		self.bRequestURI = False
 		self.Running = True # State of the analysis
 		self.CallInformation = CallData() # Creates an instance of CallData
-		self.CallInformation.SIP_Message = strData # Stores the SIP message to classify (usually the INVITE)
-		self.PrintFile = ""
+		self.CallInformation.SIP_Message = SIP_Message # Stores the SIP message to classify (usually the INVITE)
 
 	def GetFilename(self):
 		"""
@@ -75,31 +75,31 @@ class Classifier(PrintClass, log):
 		"""
 		This method carries out the fingerprint test
 		"""
-		self.Print("+ Checking fingerprint...",True)
-		self.Print("|",True)
-		self.Print("| " + self.CallInformation.UserAgent,True)
+		prtString = "+ Checking fingerprint..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "| " + self.CallInformation.UserAgent; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 		self.ToolName = CheckFingerprint(self.CallInformation.UserAgent)
 		if self.ToolName < 0:
-			self.Print("|",True)
-			self.Print("| Fingerprint check failed.",True)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| Fingerprint check failed."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		elif self.ToolName == 0:
-			self.Print("|",True)
-			self.Print("| No fingerprint found.",True)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| No fingerprint found."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		else:
-			self.Print("|",True)
-			self.Print("| Fingerprint found. The following attack tool was employed: " + self.ToolName,True)
-			self.Print("|",True)			
-			self.Print("| Category: Attack tool",True)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| Fingerprint found. The following attack tool was employed: " + self.ToolName; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| Category: Attack tool"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			self.AddCategory("Attack tool")
 		
-		self.Print("",True)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 	def Tests_CheckDNS(self):
 		"""
 		This method carries out the DNS test
 		"""
-		self.Print("+ Checking DNS...",True)
+		prtString = "+ Checking DNS..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 		ip_to_analyze = [] # IPs that will be analyzed
 				
@@ -113,118 +113,114 @@ class Classifier(PrintClass, log):
 	   
 		# Analyze each IP address 
 		for i in range(len(ip_to_analyze)):
-			self.Print("|",True)
-			self.Print("| + Checking " + ip_to_analyze[i] + "...",True)
-			self.Print("| |",True)   
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| + Checking " + ip_to_analyze[i] + "..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)			
 			DNS_Result = CheckDNS(ip_to_analyze[i], self.verbose)
 			if DNS_Result <= 0:
-				self.Print("| | IP cannot be resolved.",True)
-				self.Print("| |",True)
-				self.Print("| | Category: Spoofed message",True)
+				prtString = "| | IP cannot be resolved."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| | Category: Spoofed message"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 				self.AddCategory("Spoofed message")
 			else:
 				if (DNS_Result.find("WHOIS data not found") != -1 or DNS_Result.find("none") != -1) and DNS_Result.find("not DNS") == -1:
 					DNS_Result = DNS_Result.splitlines()
 					for line in DNS_Result:
-						self.Print("| | " + line,True) 
-					self.Print("| |",True)
-					self.Print("| | Category: Spoofed message",True)
+						prtString = "| | " + line; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| |Category: Spoofed message"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 					self.AddCategory("Spoofed message")
 				elif DNS_Result.find("not DNS") != -1:
-					self.Print("| | This is already an IP address. Nothing done.",True)
+					prtString = "| | This is already an IP address. Nothing done."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 				else:
 					DNS_Result = DNS_Result.splitlines()
 					for line in DNS_Result:
-						self.Print("| | " + line,True) 
-					self.Print("| |",True)
-					self.Print("| | Category: Interactive attack",True)
+						prtString = "| | " + line; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| | Category: Interactive attack"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 					self.AddCategory("Interactive attack")
 	
-		self.Print("",True)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 	def Tests_CheckSIPPorts(self):
 		"""
 		This method carries out the SIP ports test
 		"""
-		self.Print("+ Checking if SIP port is opened...",True)
+		prtString = "+ Checking if SIP port is opened..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
-		self.Print("|",True)
-		self.Print("| + Checking " + self.CallInformation.Contact_IP + ":" + self.CallInformation.Contact_Port + "/" + self.CallInformation.Contact_Transport + "...",True)
-		self.Print("| |",True)   
+		prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "| + Checking " + self.CallInformation.Contact_IP + ":" + self.CallInformation.Contact_Port + "/" + self.CallInformation.Contact_Transport + "..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			
 		strResult = CheckPort(self.CallInformation.Contact_IP, self.CallInformation.Contact_Port, self.CallInformation.Contact_Transport, self.verbose)
 			
 		if strResult == 0 or strResult < 0:
-			self.Print("| | Error while scanning the port.",True)
-			self.Print("| |",True)
-			self.Print("| | Category: -",True)
+			prtString = "| |  Error while scanning the port."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| |  Category: -"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		else:
 			if strResult.find("closed") != -1:
 				strResult = strResult.splitlines()
 				for line in strResult:
-					self.Print("| | " + line,True)  
-				#self.Print("| | Result: Port closed",True) 
-				self.Print("| |",True)
-				self.Print("| | Category: Spoofed message",True)
+					prtString = "| | " + line; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| | Category: Spoofed message"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 				self.AddCategory("Spoofed message")
 			else:
 				strResult = strResult.splitlines()
 				for line in strResult:
-					self.Print("| | " + line,True)
-				#self.Print("| | Result: Port opened",True) 
-				self.Print("| |",True)
-				self.Print("| | Category: Interactive attack",True)
+					prtString = "| | " + line; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| | Category: Interactive attack"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 				self.AddCategory("Interactive attack")
 				
-		self.Print("",True)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 	def Tests_CheckMediaPorts(self):
 		"""
 		This method carries out the media ports test
 		"""
-		self.Print("+ Checking if media port is opened...",True)
+		prtString = "+ Checking if media port is opened..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
 		# FIXME: this parsing could be improved
 		strRTPPort = GetSIPHeader("m=audio", self.CallInformation.SIP_Message)
 		
 		if strRTPPort == "": # Could happen that no RTP was delivered
-			self.Print("|",True) 
-			self.Print("| No RTP info delivered.",True)
-			self.Print("|",True)
-			self.Print("| Category: Spoofed message",True)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| No RTP info delivered."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| Category: Spoofed message"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			self.AddCategory("Spoofed message")
 		else:
 			strRTPPort = strRTPPort.split(" ")[1]
 
-			self.Print("|",True)
-			self.Print("| + Checking " + self.CallInformation.Contact_IP + ":" + strRTPPort + "/" + "udp" + "...",True)
-			self.Print("| |",True)   
-				
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| + Checking " + self.CallInformation.Contact_IP + ":" + strRTPPort + "/" + "udp" + "..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+
 			strResult = CheckPort(self.CallInformation.Contact_IP, strRTPPort, "udp", self.verbose)
 				
 			if strResult == 0 or strResult < 0:
-				self.Print("| | Error while scanning the port.",True)
-				self.Print("| |",True)
-				self.Print("| | Category: -",True)
+				prtString = "| | Error while scanning the port."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| | Category: -"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			else:
 				if strResult.find("closed") != -1:
 					strResult = strResult.splitlines()
 					for line in strResult:
-						self.Print("| | " + line,True)   
-					#self.Print("| | Result: Port closed",True) 
-					self.Print("| |",True)
-					self.Print("| | Category: Spoofed message",True)
+						prtString = "| | " + line; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)   
+					prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| | Category: Spoofed message"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 					self.AddCategory("Spoofed message")
 				else:
 					strResult = strResult.splitlines()
 					for line in strResult:
-						self.Print("| | " + line,True)  
-					#self.Print("| | Result: Port opened",True) 
-					self.Print("| |",True)
-					self.Print("| | Category: Interactive attack",True)
+						prtString = "| | " + line; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)   
+					prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| | Category: Interactive attack"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString) 
 					self.AddCategory("Interactive attack")
 				
-		self.Print("",True)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 	def Tests_CheckURI(self):
 		"""
@@ -232,11 +228,11 @@ class Classifier(PrintClass, log):
 		"""
 		self.bRequestURI = False # Flag to know if this test gives a positive or negative result
 
-		self.Print("+ Checking request URI...",True)
-		self.Print("|",True)
-		self.Print("| Extension in field To: " + self.CallInformation.To_Extension,True)
-		self.Print("|",True)
-		
+		prtString = "+ Checking request URI..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "| Extension in field To: " + self.CallInformation.To_Extension; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+
 		# Now it checks if the extension contained in the "To" field is one of the honeypot's registered
 		# extesions.
 		bFound = False
@@ -244,15 +240,15 @@ class Classifier(PrintClass, log):
 			if str(self.Extensions[i].Extension) == self.CallInformation.To_Extension:
 				# The extension contained in the "To" field is an extension of the honeypot.
 				bFound = True
-				self.Print("| Request addressed to the honeypot? Yes",True)
+				prtString = "| Request addressed to the honeypot? Yes"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 				self.bRequestURI = True
 				break
 				
 		if bFound == False:
-			self.Print("| Request addressed to the honeypot? No",True)
+			prtString = "| Request addressed to the honeypot? No"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			self.bRequestURI = False
 
-		self.Print("",True)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 	def Tests_CheckVia(self):
 		"""
@@ -263,68 +259,68 @@ class Classifier(PrintClass, log):
 
 			# Via[0] is the first Via field, so that it has the IP of the last proxy.
 			
-			self.Print("+ Checking if proxy in Via...",True)
-			self.Print("|",True)
-			self.Print("| + Checking " + self.CallInformation.Via[0][0] + ":" + self.CallInformation.Via[0][1] + "/" + self.CallInformation.Via[0][2] + "...",True)
-			self.Print("| |",True)   
-	
+			prtString = "+ Checking if proxy in Via..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| + Checking " + self.CallInformation.Via[0][0] + ":" + self.CallInformation.Via[0][1] + "/" + self.CallInformation.Via[0][2] + "..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+
 			# We determine the existence of the proxy by checking the port with nmap
 			strResult = CheckPort(self.CallInformation.Via[0][0], self.CallInformation.Via[0][1], self.CallInformation.Via[0][2], self.verbose)
 				
 			if strResult == 0 or strResult < 0:
-				self.Print("| | Error while scanning.",True)
-				self.Print("| |",True)
-				self.Print("| | Category: -",True)
+				prtString = "| | Error while scanning."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+				prtString = "| | Category: -"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			else:
 				if strResult.find("closed") != -1: 
-					self.Print("| | Result: There is no SIP proxy",True) 
-					self.Print("| |",True)
-					self.Print("| | Category: DialPlan fault",True)
-					self.AddCategory("DialPlan fault")
+					prtString = "| | Result: There is no SIP proxy"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| | Category: Dial plan fault"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					self.AddCategory("Dial plan fault")
 				else:
-					self.Print("| | Result: There is a SIP proxy",True) 
-					self.Print("| |",True)
-					self.Print("| | Category: Direct attack",True)
+					prtString = "| | Result: There is a SIP proxy"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+					prtString = "| | Category: Direct attack"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 					self.AddCategory("Direct attack")
 		
-			self.Print("",True)
+			prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			
 	def Tests_CheckACK(self):
 		"""
 		This method carries out the ACK test
 		"""
-		self.Print("+ Checking for ACK...",True)
-		self.Print("|",True)
-		
+		prtString = "+ Checking for ACK..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+
 		if self.bACKReceived == True:
-			self.Print("| ACK received: Yes",True)
+			prtString = "| ACK received: Yes"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		else:
-			self.Print("| ACK received: No",True)
-			self.Print("|",True)
-			self.Print("| Category: Scanning",True)
+			prtString = "| ACK received: No"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| Category: Scanning"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			self.AddCategory("Scanning")
 
-		self.Print("",True)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 	def Tests_CheckMedia(self):
 		"""
 		This method carries out the received media test
 		"""
-		self.Print("+ Checking for received media...",True)
-		self.Print("|",True)
+		prtString = "+ Checking for received media..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 		if self.bMediaReceived == True:
-			self.Print("| Media received: Yes",True)
-			self.Print("|",True)
-			self.Print("| Category: SPIT",True)
+			prtString = "| Media received: Yes"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| Category: SPIT"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			self.AddCategory("SPIT")
 		else:
-			self.Print("| Media received: No",True)
-			self.Print("|",True)
-			self.Print("| Category: Ringing",True)
+			prtString = "| Media received: No"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| Category: Ringing"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			self.AddCategory("Ringing")	   
 
-		self.Print("",True)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 	def Start(self):
 		"""
@@ -332,30 +328,26 @@ class Classifier(PrintClass, log):
 		"""
 
 		self.GetCallData() # Retrieves all the necessary data from the message for further analysis
-
-		self.CallInformation.Results_file = self.GetFilename()
 		
-		self.PrintFile = self.CallInformation.Results_file
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "******************************* Information about the call *******************************"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
-		self.Print("")
-		self.Print("******************************* Information about the call *******************************",True)
-		self.Print("",True)
-		
-		self.Print("From: " + self.CallInformation.From_Extension + " in " + self.CallInformation.From_IP + ":" + self.CallInformation.From_Port + "/" + self.CallInformation.From_Transport,True)
-		self.Print("To: "  + self.CallInformation.To_Extension + " in " + self.CallInformation.To_IP,True)
-		self.Print("Contact: "  + self.CallInformation.Contact_Extension + " in " + self.CallInformation.Contact_IP + ":" + self.CallInformation.Contact_Port + "/" + self.CallInformation.Contact_Transport,True)
-		self.Print("Connection: " + self.CallInformation.Connection,True)
-		self.Print("Owner: " + self.CallInformation.Owner,True)
+		prtString = "From: " + self.CallInformation.From_Extension + " in " + self.CallInformation.From_IP + ":" + self.CallInformation.From_Port + "/" + self.CallInformation.From_Transport; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "To: "  + self.CallInformation.To_Extension + " in " + self.CallInformation.To_IP; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "Contact: "  + self.CallInformation.Contact_Extension + " in " + self.CallInformation.Contact_IP + ":" + self.CallInformation.Contact_Port + "/" + self.CallInformation.Contact_Transport; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "Connection: " + self.CallInformation.Connection; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "Owner: " + self.CallInformation.Owner; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
 		for i in range(len(self.CallInformation.Via)):
-			self.Print("Via " + str(i) + ": " + self.CallInformation.Via[i][0] + ":" + self.CallInformation.Via[i][1] + "/" + self.CallInformation.Via[i][2],True)
+			prtString = "Via " + str(i) + ": " + self.CallInformation.Via[i][0] + ":" + self.CallInformation.Via[i][1] + "/" + self.CallInformation.Via[i][2]; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			
-		self.Print(self.CallInformation.UserAgent,True)
+		prtString = self.CallInformation.UserAgent; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
-		self.Print("",True)
-		self.Print("************************************* Classification *************************************",True)
-		self.Print("",True)
-				
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = "************************************* Classification *************************************"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+
 		# ---------------------------------------------------------------------------------
 		# Check fingerprint
 		# ---------------------------------------------------------------------------------
@@ -397,11 +389,11 @@ class Classifier(PrintClass, log):
 		self.Tests_CheckMedia()
 
 		# Print the categories
-		self.Print("+ The message is classified as:",True)
+		prtString = "+ The message is classified as:"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		for i in range(len( self.CallInformation.Classification)):
-			self.Print("| " +  self.CallInformation.Classification[i],True)
+			prtString = "| " +  self.CallInformation.Classification[i]; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 	
-		self.Print("",True)
+		prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
 		self.Running = False
 

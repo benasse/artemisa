@@ -21,7 +21,6 @@ import sys
 sys.path.append("../")
 
 from time import strftime
-from logs import log				# Import class log from logs.py
 import ConfigParser				# Read configuration files
 from libs.IPy.IPy import *			# Module to deal with IPs
 from subprocess import Popen, PIPE
@@ -64,7 +63,7 @@ class CallData():
 		# The following variables are set for results
 		self.Classification = []
 		self.ToolName = "" # Flag to store the attack tool detected
-		self.Results_file = ""
+		self.Results_File_Buffer = "" # Stores the results printed on screen
 
 class GetTimeClass:
 	"""
@@ -212,43 +211,43 @@ def GetTransportfromSIP(strHeaderLine):
 	else:
 		return "udp" # By default	
 
-class PrintClass(log, GetTimeClass):
-
-	def __init__(self):
-		self.PrintFile = ""
-
-	def Print(self, strData, bPrint=True):
-		"""
-		Keyword Arguments:
-		strData -- string to print
-		bPrint -- boolean to know whether the string shoud (True) or not (False) be printed on screen
-		
-		This method prints strData in console (unless bPrint is False) and log it.
-		"""
-		
-		strTemp = strData.splitlines()
-		
-		if bPrint == True:
-			if strData == "":
-				print self.GetTime()
-			else:
-				for line in strTemp:
-					print self.GetTime() + " " + line.replace("\n","").replace("\r","")
-		   	
-		# if self.PrintFile has a string value, it prints the string into a file   
-		if self.PrintFile != "":
-			File = open(self.PrintFile, "a")
-			
-			if strData == "":
-				File.write("\n")
-			else:
-				for line in strTemp:
-					File.write(line.replace("\n","").replace("\r","" + "\n") + "\n")
-								
-			File.close()
-			
-			
-		self.Log(strData)
+#class PrintClass(log, GetTimeClass):
+#
+#	def __init__(self):
+#		self.PrintFile = ""
+#
+#	def Print(self, strData, bPrint=True):
+#		"""
+#		Keyword Arguments:
+#		strData -- string to print
+#		bPrint -- boolean to know whether the string shoud (True) or not (False) be printed on screen
+#		
+#		This method prints strData in console (unless bPrint is False) and log it.
+#		"""
+#		
+#		strTemp = strData.splitlines()
+#		
+#		if bPrint == True:
+#			if strData == "":
+#				print self.GetTime()
+#			else:
+#				for line in strTemp:
+#					print self.GetTime() + " " + line.replace("\n","").replace("\r","")
+#		   	
+#		# if self.PrintFile has a string value, it prints the string into a file   
+#		if self.PrintFile != "":
+#			File = open(self.PrintFile, "a")
+#			
+#			if strData == "":
+#				File.write("\n")
+#			else:
+#				for line in strTemp:
+#					File.write(line.replace("\n","").replace("\r","" + "\n") + "\n")
+#								
+#			File.close()
+#			
+#			
+#		self.Log(strData)
 	
 def GetConfigSection(strFilename, strSection):
 	"""

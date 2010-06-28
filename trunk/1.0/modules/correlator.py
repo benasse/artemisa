@@ -15,17 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Artemisa. If not, see <http://www.gnu.org/licenses/>.
 
-from commons import PrintClass
+from modules.logger import logger
 
-def Correlator(Classification, bFlood, Results_file, ToolName):
-    
-	Output = PrintClass()
-	Output.PrintFile = Results_file
-	Output.Print("************************************** Correlation ***************************************",True)
-	Output.Print("",True)
-	Output.Print("Artemisa concludes that the arrived message is likely to be:",True)
-	Output.Print("",True)
-    
+def Correlator(Results, Flood):
+	"""
+	Keyword Arguments:
+	Results -- an instance of commons.CallData
+	Flood -- flag from core.py
+
+	"""
+	
+	prtString = "************************************** Correlation ***************************************"; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+	prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+	prtString = "Artemisa concludes that the arrived message is likely to be:"; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+	prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+
 	####################################################################################
 	####################################################################################
 	##                                                                                ##
@@ -34,40 +38,41 @@ def Correlator(Classification, bFlood, Results_file, ToolName):
 	####################################################################################
 	####################################################################################
     
-	if IfCategory("Attack tool", Classification) == True:
-		Output.Print("* The attack was created employing the tool " + ToolName + ".",True)
+	if IfCategory("Attack tool", Results.Classification) == True:
+		prtString = "* The attack was created employing the tool " + ToolName + "."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
-	if bFlood == True:
-		Output.Print("* A flooding attack.",True)
-		Output.Print("",True)
+	if Flood == True:
+		prtString = "* A flooding attack."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		return
      
-	if IfCategory("SPIT", Classification) == True:
-		Output.Print("* A SPIT call.",True)
-		Output.Print("",True)
+	if IfCategory("SPIT", Results.Classification) == True:
+		prtString = "* A SPIT call."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		return
 
-	if IfCategory("Scanning", Classification) == True:
-		Output.Print("* A scanning attempt.",True)
+	if IfCategory("Scanning", Results.Classification) == True:
+		prtString = "* A scanning attempt."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+		prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
-	if IfCategory("Ringing", Classification) == True:
-		Output.Print("* The message belongs to a ringing attack.",True)
+	if IfCategory("Ringing", Results.Classification) == True:
+		prtString = "* The message belongs to a ringing attack."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
-	Output.Print("",True)
+	prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
         
-def IfCategory(strCategory, Classification):
+def IfCategory(Category, Classification):
 	"""
 	Returns whether a category is found or not.
 	"""
-	bFound = False
+	Found = False
        
 	for i in range(len(Classification)):
-		if Classification[i] == strCategory:
-			bFound = True
+		if Classification[i] == Category:
+			Found = True
 			break
 
-	if bFound == True: 
+	if Found == True: 
 		return True
 	else:
 		return False
