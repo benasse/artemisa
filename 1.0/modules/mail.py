@@ -51,7 +51,7 @@ class Email():
 		else:
 			try:
 
-				if config.get("email", "enabled") == "true":
+				if config.get("email", "enabled").lower() == "true":
 					self.Enabled = True
 				else:
 					self.Enabled = False
@@ -65,7 +65,7 @@ class Email():
 				self.To_header = config.get("email", "to_header")
 				self.Subject = config.get("email", "subject")
 				
-				if config.get("email", "smtp_server_use_tsl_ssl") == "true":
+				if config.get("email", "smtp_server_use_tsl_ssl").lower() == "true":
 					self.TSLSSL = True
 				else:
 					self.TSLSSL = False
