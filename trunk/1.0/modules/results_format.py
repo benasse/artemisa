@@ -17,10 +17,11 @@
 
 from time import strftime
 
-def get_results_txt(Filename, Results, LocalIP, LocalPort):
+def get_results_txt(Filename, VERSION, Results, LocalIP, LocalPort):
 	"""
 	Keyword Arguments:
 	Filename -- results file
+	VERSION -- version of Artemisa
 	Results -- an instance of commons.CallData
 	LocalIP -- local address where Artemisa is listening	
 	LocalPort -- local port where Artemisa is listening
@@ -47,10 +48,11 @@ def get_results_txt(Filename, Results, LocalIP, LocalPort):
 
 	return Page
 
-def get_results_html(Filename, Results, ForEmail, LocalIP, LocalPort):
+def get_results_html(Filename, VERSION, Results, ForEmail, LocalIP, LocalPort):
 	"""
 	Keyword Arguments:
 	Filename -- results file
+	VERSION -- version of Artemisa
 	Results -- an instance of commons.CallData
 	ForEmail -- flag to know if the html is for e-mail sending
 	LocalIP -- local address where Artemisa is listening	
