@@ -122,6 +122,14 @@ class Server(object):
 		self.MediaReceived = MediaReceived
 		self.Playfile = Playfile
 
+	def __del__(self):
+		# This close the connections
+		try:
+			self.acc.delete()
+			self.acc = None
+		except:
+			pass
+			
 	def Register(self):
 		"""
 		This method registers the honeypot at the SIP server, and keeps it alive by sending REGISTRAR
@@ -214,31 +222,35 @@ class MyAccountCallback(pj.AccountCallback):
 
 		logger.info("Incoming call from " + str(call.info().remote_uri))
 
-		self.current_call = call
+		try:
+			self.current_call = call
 
-		self.call_cb = MyCallCallback(self.lib, self.current_call, self.Sound_enabled, self.MediaReceived, self.Playfile)
-		self.current_call.set_callback(self.call_cb)
+			self.call_cb = MyCallCallback(self.lib, self.current_call, self.Sound_enabled, self.MediaReceived, self.Playfile)
+			self.current_call.set_callback(self.call_cb)
 
-		if self.behaviour_mode == "active":
-			for item in self.Active_mode:
-				if item == "send_180":
-					self.current_call.answer(180)
-				if item == "send_200":
-					self.current_call.answer(200)
+			if self.behaviour_mode == "active":
+				for item in self.Active_mode:
+					if item == "send_180":
+						self.current_call.answer(180)
+					if item == "send_200":
+						self.current_call.answer(200)
 
-		elif self.behaviour_mode == "passive":
-			for item in self.Passive_mode:
-				if item == "send_180":
-					self.current_call.answer(180)
-				if item == "send_200":
-					self.current_call.answer(200)
+			elif self.behaviour_mode == "passive":
+				for item in self.Passive_mode:
+					if item == "send_180":
+						self.current_call.answer(180)
+					if item == "send_200":
+						self.current_call.answer(200)
 
-		elif self.behaviour_mode == "aggressive":
-			for item in self.Aggressive_mode:
-				if item == "send_180":
-					self.current_call.answer(180)
-				if item == "send_200":
-					self.current_call.answer(200)
+			elif self.behaviour_mode == "aggressive":
+				for item in self.Aggressive_mode:
+					if item == "send_180":
+						self.current_call.answer(180)
+					if item == "send_200":
+						self.current_call.answer(200)
+		
+		except:
+			logger.error("Error in method on_incoming_call().")
 							
 		#self.current_call.hangup()
 
@@ -281,8 +293,8 @@ class MyCallCallback(pj.CallCallback):
 					
 					self.lib.player_destroy(self.player_id)
 					
-				except Exception, e:
-					logger.warning("Error: " + str(e))
+				except:
+					logger.warning("Error while closing the conferences in method on_state().")
 					
 				self.current_call = None
 				logger.info("Current call is " + str(current_call))
@@ -319,8 +331,8 @@ class MyCallCallback(pj.CallCallback):
 					
 					self.MediaReceived = True
 				
-			except Exception, e:
-				logger.error("Error while trying to record the call. Details: " + str(e))
+			except:
+				logger.error("Error while trying to record the call.")
 
 			try:
 				if self.player_id < 0:
@@ -339,8 +351,8 @@ class MyCallCallback(pj.CallCallback):
 					
 						logger.info("The following audio file is now being played: " + self.Playfile)
 	
-			except Exception, e:
-				logger.error("Error while trying to play the WAV file. Details: " + str(e))
+			except:
+				logger.error("Error while trying to play the WAV file.")
   
 		else:
 
@@ -353,8 +365,8 @@ class MyCallCallback(pj.CallCallback):
 				# Disconnect the call from the player
 				pj.Lib.instance().conf_disconnect(self.lib.player_get_slot(self.player_id), self.call_slot)
 
-			except Exception, e:
-				logger.warning("Error: " + str(e))
+			except:
+				logger.warning("Error while closing the conferences in method on_media_state()")
 			
 			logger.info("Audio is inactive. Check the configuration file.") 
 
@@ -426,8 +438,13 @@ class Artemisa(object):
 
 		Unregister = True
 
-		#del self.current_call
-
+		# Delete the Server instances which will close the connections
+		try:
+			for i in range(len(self.Servers)):
+				del self.Servers[i]
+		except:
+			pass
+			
 		try:
 			self.lib.destroy()
 			self.lib = None
@@ -499,16 +516,14 @@ class Artemisa(object):
 	
 		try:
 			self.lib.create_transport(pj.TransportType.UDP, pj.TransportConfig(int(self.Local_port)))
-		except Exception, e:
-			logger.error("Error. More info: " + str(e))
-			self.lib.destroy()
-			self.lib = None
+		except:
+			logger.error("Error while opening port. The port number " + self.Local_port + " is already in use by another process.")
 			sys.exit(1)
 	
 		try:
 			self.lib.start()
-		except Exception, e:
-			logger.error(str(e))
+		except:
+			logger.error("Error while starting pj.Lib.")
 			sys.exit(0)
 	
 		if Show_sound_devices == True:
@@ -565,6 +580,7 @@ class Artemisa(object):
 		self.ReadKeyboard()
 
 		# Here finalizes the program when the ReadKeyboard() function is returned.
+		self.__del__()
 		sys.exit(0)
 	
 	def ShowHelp(self, Commands = True):
