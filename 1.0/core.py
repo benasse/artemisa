@@ -123,12 +123,7 @@ class Server(object):
 		self.Playfile = Playfile
 
 	def __del__(self):
-		# This close the connections
-		try:
-			self.acc.delete()
-			self.acc = None
-		except:
-			pass
+		self.Unregister()
 			
 	def Register(self):
 		"""
@@ -170,9 +165,14 @@ class Server(object):
 		"""
 		self.acc.set_registration(True)
 
-	#def Unregister(self):
-	#	self.acc.delete()
-	#	self.acc = None
+	def Unregister(self):
+		"""
+		This method close the connections.
+		"""
+		try:
+			del self.acc_cb
+		except:
+			pass
 
 
 
@@ -381,13 +381,13 @@ class Artemisa(object):
 		self.SIP_VERSION = "2.0"
 
 		# Environment configuration
-		self.Local_IP = ""				# Local IP
-		self.Local_port = ""				# Local port
-		self.SIPdomain = ""				# Local SIP domain
-		self.UserAgent = ""				# User-Agent name used by Artemisa 
-		self.MaxCalls = 0				# Max number of calls to handle
-		self.NumCalls = 0				# Number of calls being analysed
-		self.Playfile = ""				# Name of the file to be played
+		self.Local_IP = ""						# Local IP
+		self.Local_port = ""					# Local port
+		self.SIPdomain = ""						# Local SIP domain
+		self.UserAgent = ""						# User-Agent name used by Artemisa 
+		self.MaxCalls = 0						# Max number of calls to handle
+		self.NumCalls = 0						# Number of calls being analysed
+		self.Playfile = ""						# Name of the file to be played
 
 		# Sound configuration
 		self.Sound_enabled = True
@@ -404,14 +404,14 @@ class Artemisa(object):
 		self.On_SPIT_parameters = ""			# Parameters to send when calling on_spit.sh
 		self.On_scanning_parameters = ""		# Parameters to send when calling on_scanning.sh
 
-		self.verbose = False				# verbose mode
+		self.verbose = False					# verbose mode
 
-		self.Servers = []				# SIP REGISTRAR servers
-		self.Extensions = []				# Extensions
+		self.Servers = []						# SIP REGISTRAR servers
+		self.Extensions = []					# Extensions
 
 		self.LastINVITEreceived = ""			# Store the last INVITE message received in order to avoid analysing repeated messages
 
-		#self.nSeq = 0					# Number of received messages
+		#self.nSeq = 0							# Number of received messages
 
 		# Statistics
 		self.N_INVITE = 0
@@ -424,12 +424,12 @@ class Artemisa(object):
 		#self.OPTIONS_Flood_timer0 = 0			# Flag to set a timer to detect OPTIONS flood
 		#self.OPTIONS_Flood_timer1 = 0			# Flag to set a timer to detect OPTIONS flood
 
-		self.INVITETag = ""				# Tag of the received INVITE
-		self.ACKReceived = False			# We must know if an ACK was received
-		self.MediaReceived = False			# Flag to know whether media has been received
-		self.Flood = False				# Flag to know whether flood was detected
+		self.INVITETag = ""						# Tag of the received INVITE
+		self.ACKReceived = False				# We must know if an ACK was received
+		self.MediaReceived = False				# Flag to know whether media has been received
+		self.Flood = False						# Flag to know whether flood was detected
 	
-		self.main(args) # Here invokes the method that starts Artemisa
+		self.main(args) 						# Here invokes the method that starts Artemisa
 
 	def __del__(self):
 		"""
@@ -654,6 +654,7 @@ class Artemisa(object):
 			elif s == "clean logs":
 				Process = Popen("rm -f " + LOGS_DIR + "*.log", shell=True, stdout=PIPE)
 				Process.wait()
+				# FIXME: Here is a bug! If the logs are deleted the logger cannot continue logging.
 				print "Cleaned"
 			
 			elif s == "clean results":
@@ -971,7 +972,8 @@ class Artemisa(object):
 			try:
 				cmd_out=os.popen(Command)
 				for line in cmd_out.readlines():
-					logger.info(line)
+					if line.strip() != "":
+						logger.info(line.strip())
 			except Exception, e:
 				logger.error("Cannot execute script. Details: " + str(e))
 
@@ -1000,7 +1002,8 @@ class Artemisa(object):
 			try:
 				cmd_out=os.popen(Command)
 				for line in cmd_out.readlines():
-					logger.info(line)
+					if line.strip() != "":
+						logger.info(line.strip())
 			except Exception, e:
 				logger.error("Cannot execute script. Details: " + str(e))
 
@@ -1029,7 +1032,8 @@ class Artemisa(object):
 			try:
 				cmd_out=os.popen(Command)
 				for line in cmd_out.readlines():
-					logger.info(line)
+					if line.strip() != "":
+						logger.info(line.strip())
 			except Exception, e:
 				logger.error("Cannot execute script. Details: " + str(e))
 
