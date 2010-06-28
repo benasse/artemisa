@@ -20,9 +20,10 @@ import sys
 # Set a path to the main root
 sys.path.append("../")
 
-from commons import PrintClass
 from subprocess import Popen, PIPE
 from libs.IPy.IPy import *	   # Module to deal with IPs
+
+from modules.logger import logger
 
 def CheckDNS(strIP, verbose):
 
@@ -91,7 +92,7 @@ def CheckDNS(strIP, verbose):
 				strDataToSend = strDataToSend + "\n"
 							
 		except OSError:
-			print "WARNING dig command is not installed."
+			logger.warning("dig command is not installed.")
 			return -1
 
 		# Try to use the whois command. If it fails, perhaps the command is not installed.
@@ -116,7 +117,7 @@ def CheckDNS(strIP, verbose):
 				bWhoisDataFound = True
 				
 		except OSError:
-			self.Print("WARNING whois is not installed.")
+			logger.warning("whois is not installed.")
 			return -1   
 	
 		if strIPResolved == "": 
@@ -129,7 +130,7 @@ def CheckDNS(strIP, verbose):
 	
 if __name__ == '__main__':
 	if len(sys.argv) > 2:
-		 print CheckDNS(sys.argv[1], sys.argv[2])
+		print CheckDNS(sys.argv[1], sys.argv[2])
 	else:
 		print "Arguments are required!"
 		sys.exit(1)

@@ -6,7 +6,6 @@
 
 find -name "*.pyc" -print0 | xargs -0 rm -rf
 find -name "*.log" -print0 | xargs -0 rm -rf
-rm -f ./logs/invite_msgs/*
 rm -f ./recorded_calls/*
 rm -f ./results/*
 rm -f ./test.py

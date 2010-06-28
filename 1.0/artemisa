@@ -24,9 +24,11 @@ try:
 except:
     pass
 
-import core
+import sys
+from core import Artemisa
 
 try:
-	core.main()
+	# Creates an instance of object artemisa
+	proc = Artemisa(sys.argv)
 except KeyboardInterrupt:
-	core.CloseArtemisa()
+	del proc
