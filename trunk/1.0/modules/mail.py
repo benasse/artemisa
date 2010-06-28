@@ -78,7 +78,7 @@ class Email():
 
 	def sendemail(self, strData):
 		
-		if self.Enabled == False: 
+		if not self.Enabled: 
 			logger.info("E-mail notification is disabled.")
 			return
 		if self.SMTP_IP == "":
@@ -113,7 +113,7 @@ class Email():
 		msg.attach(msgImage)
 		
 		try:
-			if self.TSLSSL == True:
+			if self.TSLSSL:
 				server = SMTP(self.SMTP_IP, int(self.SMTP_PORT))
 				server.ehlo()
 				server.starttls()

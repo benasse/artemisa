@@ -69,7 +69,7 @@ import sys, os
 import ConfigParser							# Read configuration files
 
 from time import strftime, sleep, time
-import sched
+
 from modules.commons import *				# Import functions from commons.py
 from modules.classifier import Classifier	# Message classifier 
 from modules.correlator import Correlator	# Correlator
@@ -195,7 +195,7 @@ class MyAccountCallback(pj.AccountCallback):
 		self.Playfile = Playfile
 
 	def on_reg_state(self):
-		if Unregister == False:
+		if not Unregister:
 			if self.account.info().reg_status >= 200 and self.account.info().reg_status < 300:
 				logger.info("Extension " + str(self.account.info().uri) + " registered, status=" + str(self.account.info().reg_status) + " (" + str(self.account.info().reg_reason) + ")")	
 			#elif (self.account.info().reg_status >= 400 and self.account.info().reg_status < 500) or self.account.info().reg_status > 700:
@@ -280,7 +280,7 @@ class MyCallCallback(pj.CallCallback):
 		
 		if self.call.info().state == pj.CallState.DISCONNECTED:
 			
-			if self.Sound_enabled == True:
+			if self.Sound_enabled:
 				try:
 					
 					self.call_slot = self.call.info().conf_slot
@@ -299,12 +299,12 @@ class MyCallCallback(pj.CallCallback):
 					logger.warning("Error while closing the conferences in method on_state().")
 					
 				self.current_call = None
-				logger.info("Current call is " + str(current_call))
+				logger.info("Current call is " + str(self.current_call))
 		
 	# Notification when call's media state has changed.
 	def on_media_state(self):
 		
-		if self.Sound_enabled == False: return
+		if not self.Sound_enabled: return
 		
 		if self.call.info().media_state == pj.MediaState.ACTIVE: 
 			try:
@@ -317,7 +317,7 @@ class MyCallCallback(pj.CallCallback):
 					while 1:
 						Filename = RECORDED_CALLS_DIR + strftime("%Y-%m-%d") + "_call_from_" + str(self.call.info().remote_uri).split("@")[0].split(":")[1] + "_" + str(a) + ".wav"
 						
-						if os.path.isfile(Filename) == True:
+						if os.path.isfile(Filename):
 							a += 1
 						else:
 							break
@@ -438,6 +438,8 @@ class Artemisa(object):
 		Destructor. It closes the active connections.
 		"""
 
+		global Unregister
+		
 		Unregister = True
 
 		# Delete the Server instances which will close the connections
@@ -459,6 +461,8 @@ class Artemisa(object):
 		"""
 		Artemisa starts here.
 		"""
+		global Unregister
+		
 		Show_sound_devices = False
 	
 		# Check if some arguments has been passed
@@ -528,7 +532,7 @@ class Artemisa(object):
 			logger.critical("Error while starting pj.Lib.")
 			sys.exit(0)
 	
-		if Show_sound_devices == True:
+		if Show_sound_devices:
 			a = 0
 			print ""
 			print ""
@@ -550,7 +554,7 @@ class Artemisa(object):
 		logger.debug("-------------------------------------------------------------------------------------------------")
 		logger.debug("Artemisa started.")
 			
-		if self.Sound_enabled == True:
+		if self.Sound_enabled:
 			# Configure the audio device 
 			try:
 				if len(self.lib.enum_snd_dev()) > 0:
@@ -596,7 +600,7 @@ class Artemisa(object):
 		print "  -v, --verbose			Verbose mode (it shows more information)."
 		print "  -g, --get_sound_devices   Show the available sound devices."
 	
-		if Commands == False: return
+		if not Commands: return
 	
 		print ""	
 		print "Commands list:"
@@ -864,7 +868,7 @@ class Artemisa(object):
 				self.Local_port = config.get("environment", "local_port")
 
 				try:
-					temp = int(self.Local_port)
+					int(self.Local_port)
 				except:
 					logger.error("local_port in configuration file must be an integer. Set to 5060")
 					self.Local_port = "5060"
@@ -964,7 +968,7 @@ class Artemisa(object):
 		This functions runs a script if flood was detected.
 		"""
 
-		if self.Flood == True:
+		if self.Flood:
 
 			self.On_flood_parameters = self.On_flood_parameters.replace("$From_Extension$", Results.From_Extension)
 			self.On_flood_parameters = self.On_flood_parameters.replace("$From_IP$", Results.From_IP)
@@ -994,7 +998,7 @@ class Artemisa(object):
 
 		This functions runs a script if certain data was found on the call.
 		"""
-		if IfCategory("SPIT",Results.Classification) == True:
+		if IfCategory("SPIT",Results.Classification):
 		
 			self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$From_Extension$", Results.From_Extension)
 			self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$From_IP$", Results.From_IP)
@@ -1024,7 +1028,7 @@ class Artemisa(object):
 
 		This functions runs a script if certain data was found on the call.
 		"""
-		if IfCategory("Scanning",Results.Classification) == True:
+		if IfCategory("Scanning",Results.Classification):
 		
 			self.On_scanning_parameters = self.On_scanning_parameters.replace("$From_Extension$", Results.From_Extension)
 			self.On_scanning_parameters = self.On_scanning_parameters.replace("$From_IP$", Results.From_IP)
@@ -1082,7 +1086,7 @@ class Artemisa(object):
 	def SendResultsByEmail(self, HTMLData):
 		email = Email() # Creates an Email object
 	
-		if email.Enabled == False: 
+		if not email.Enabled: 
 			logger.info("E-mail notification is disabled.")
 		else:
 			logger.info("Sending this report by e-mail...")
@@ -1100,7 +1104,7 @@ class Artemisa(object):
 			while 1:
 				Filename = RESULTS_DIR + strftime("%Y-%m-%d") + "_" + str(a) + "." + Ext
 						
-				if os.path.isfile(Filename) == True:
+				if os.path.isfile(Filename):
 					a += 1
 				else:
 					break
@@ -1117,7 +1121,7 @@ class Artemisa(object):
 		self.WaitForPackets(5)
 	
 		# Create an instance of the Classifier
-		classifier_instance = Classifier(self.VERSION, self.verbose, self.Local_IP, self.Local_port, self.behaviour_mode, self.GetBehaviourActions(), SIP_Message_data, self.Extensions, self.ACKReceived, self.MediaReceived)
+		classifier_instance = Classifier(self.verbose, self.Local_IP, self.Local_port, self.behaviour_mode, self.GetBehaviourActions(), SIP_Message_data, self.Extensions, self.ACKReceived, self.MediaReceived)
 
 		# Start the classification
 		classifier_instance.Start()
@@ -1140,17 +1144,17 @@ class Artemisa(object):
 
 		# Save the raw SIP message in the report file
 		TXTFilenme = self.GetFilename("txt")
-		TXTData = get_results_txt(TXTFilenme, Results, self.VERSION, self.Local_IP, self.Local_port)
+		TXTData = get_results_txt(TXTFilenme, Results, self.Local_IP, self.Local_port)
 		self.SaveResultsToTextFile(TXTData, TXTFilenme)
 
 		# Save the results in a HTML file
 		HTMLFilenme = self.GetFilename("html")	
-		HTMLData = get_results_html(HTMLFilenme, Results, False, self.VERSION, self.Local_IP, self.Local_port)
+		HTMLData = get_results_html(HTMLFilenme, Results, False, self.Local_IP, self.Local_port)
 		self.SaveResultsToHTML(HTMLData, HTMLFilenme)
 
 		# Send the results by e-mail
 		# The function get_results_html is called again and it return an email-adapted format
-		HTMLMailData = get_results_html(HTMLFilenme, Results, True, self.VERSION, self.Local_IP, self.Local_port)
+		HTMLMailData = get_results_html(HTMLFilenme, Results, True, self.Local_IP, self.Local_port)
 		self.SendResultsByEmail(HTMLMailData)
 				
 		self.ACKReceived = False
@@ -1177,18 +1181,18 @@ class Artemisa(object):
 		"""
 		pjsua_logger.debug(str.strip())
 	
-		if self.IsMessage(str, "ACK") == True:
+		if self.IsMessage(str, "ACK"):
 			# Here we check if the ACK received is for the received INVITE.		
 			if Search("tag", str) == self.INVITETag:
 				self.ACKReceived = True
 			return
 
-		if self.IsMessage(str, "OPTIONS") == True:
+		if self.IsMessage(str, "OPTIONS"):
 			self.OPTIONSReceived = True
 			self.N_OPTIONS += 1
 			return
 
-		if self.IsMessage(str, "INVITE") == False:
+		if not self.IsMessage(str, "INVITE"):
 			# If False means that the received message was not an INVITE one
 			return
 

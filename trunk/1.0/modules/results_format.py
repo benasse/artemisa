@@ -17,12 +17,11 @@
 
 from time import strftime
 
-def get_results_txt(Filename, Results, VERSION, LocalIP, LocalPort):
+def get_results_txt(Filename, Results, LocalIP, LocalPort):
 	"""
 	Keyword Arguments:
 	Filename -- results file
 	Results -- an instance of commons.CallData
-	VERSION -- version of Artemisa
 	LocalIP -- local address where Artemisa is listening	
 	LocalPort -- local port where Artemisa is listening
 
@@ -48,13 +47,12 @@ def get_results_txt(Filename, Results, VERSION, LocalIP, LocalPort):
 
 	return Page
 
-def get_results_html(Filename, Results, ForEmail, VERSION, LocalIP, LocalPort):
+def get_results_html(Filename, Results, ForEmail, LocalIP, LocalPort):
 	"""
 	Keyword Arguments:
 	Filename -- results file
 	Results -- an instance of commons.CallData
 	ForEmail -- flag to know if the html is for e-mail sending
-	VERSION -- version of Artemisa
 	LocalIP -- local address where Artemisa is listening	
 	LocalPort -- local port where Artemisa is listening
 
@@ -68,7 +66,7 @@ def get_results_html(Filename, Results, ForEmail, VERSION, LocalIP, LocalPort):
 	Message = Message.replace("\r", "<br>")
 	
 	# Some inforation should not be present if the HTML is designed to be sent by e-mail
-	if ForEmail == False:
+	if not ForEmail:
 		Page = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">" + "\n"
 		Page = Page + "<html>" + "\n"
 		Page = Page + "<head>" + "\n"
@@ -102,7 +100,7 @@ def get_results_html(Filename, Results, ForEmail, VERSION, LocalIP, LocalPort):
 	Page = Page + "<hr style=\"width: 100%; height: 2px;\">"
 	Page = Page + "<small><span dir=\"ltr\" id=\":3s\">" + Filename + ": This is an automatically generated report by Artemisa version " + VERSION + " on " + strftime("%b %d %Y %H:%M:%S") + " running at " + LocalIP + ":" + LocalPort + ". </span></small><br>"  + "\n"
 
-	if ForEmail == False:	
+	if not ForEmail:	
 		Page = Page + "</body>" + "\n"
 		Page = Page + "</html>" + "\n"
 

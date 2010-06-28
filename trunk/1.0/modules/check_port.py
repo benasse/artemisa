@@ -42,7 +42,7 @@ def CheckPort(strIP, Port, Transport, verbose):
 			Command = "nmap -sS " + strIP + " -p " + Port
 			Process = Popen(Command, shell=True, stdout=PIPE)
 			
-		if verbose == True:
+		if verbose:
 			DataToSend = "+ Verbose" + "\n"
 			DataToSend = DataToSend + "| Tool employed: " + Command + "\n"
 			DataToSend = DataToSend + "|" + "\n"
@@ -51,7 +51,7 @@ def CheckPort(strIP, Port, Transport, verbose):
 		
 		strData = Process.communicate()[0].strip().split("\n")
 		
-		if verbose == True:
+		if verbose:
 			DataToSend = DataToSend + "| Tool output:" + "\n"
 			for line in strData:
 				DataToSend = DataToSend + "| " + line + "\n"

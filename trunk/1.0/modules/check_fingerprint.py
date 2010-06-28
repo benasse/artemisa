@@ -51,7 +51,7 @@ def CheckFingerprint(UserAgent):
 			
 	File.close()
 		
-	if Found == True:
+	if Found:
 		return ToolName
 	else:
 		return 0

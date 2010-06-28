@@ -38,24 +38,24 @@ def Correlator(Results, Flood):
 	####################################################################################
 	####################################################################################
     
-	if IfCategory("Attack tool", Results.Classification) == True:
+	if IfCategory("Attack tool", Results.Classification):
 		prtString = "* The attack was created employing the tool " + Results.ToolName + "."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
-	if Flood == True:
+	if Flood:
 		prtString = "* A flooding attack."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		return
      
-	if IfCategory("SPIT", Results.Classification) == True:
+	if IfCategory("SPIT", Results.Classification):
 		prtString = "* A SPIT call."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		return
 
-	if IfCategory("Scanning", Results.Classification) == True:
+	if IfCategory("Scanning", Results.Classification):
 		prtString = "* A scanning attempt."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
-	if IfCategory("Ringing", Results.Classification) == True:
+	if IfCategory("Ringing", Results.Classification):
 		prtString = "* The message belongs to a ringing attack."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
 	prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
@@ -72,7 +72,7 @@ def IfCategory(Category, Classification):
 			Found = True
 			break
 
-	if Found == True: 
+	if Found: 
 		return True
 	else:
 		return False

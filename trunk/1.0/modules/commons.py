@@ -21,8 +21,7 @@ import sys
 sys.path.append("../")
 
 from time import strftime
-import ConfigParser				# Read configuration files
-from libs.IPy.IPy import *			# Module to deal with IPs
+from libs.IPy.IPy import IP			# Module to deal with IPs
 from subprocess import Popen, PIPE
 
 from modules.logger import logger
@@ -249,7 +248,7 @@ def GetConfigSection(strFilename, strSection):
 			if line.find("[") != -1:
 				section_found = False
 
-			if section_found == True:
+			if section_found:
 				if line != "":
 					SectionData.append(line)
 							
@@ -263,40 +262,6 @@ def GetConfigSection(strFilename, strSection):
 		return ""
 	
 	return SectionData
-
-def ResolveDNS(strDNS):
-	"""
-	Keyword Arguments:
-	strDNS -- DNS to resolve
-	
-	Get the IP from a DNS name.
-	"""
-	
-	# Check if strDNS is an IP or a domain name
-	bDNS = False
-	try:
-		temp = IP(strDNS)
-	except:
-		bDNS = True
-			
-	if bDNS == True: # Get the IP from the domain name
-		try:		
-			Process = Popen("dig " + strDNS + " A +noall +answer +short", shell=True, stdout=PIPE)
-			Process.wait()
-			Data = Process.communicate()[0].strip().split("\n")
-			strDNS = Data[len(Data)-1]
-				
-		except OSError:
-			logger.warning("Error in ResolveDNS function. The dns couldn't be resolved.")
-			return -1
-
-	try:
-		temp = IP(strDNS)
-	except:
-		# The address could't be resolved.
-		return ""
-	
-	return IP(strDNS).strNormal()
 	
 def RemoveComments(strLine):
 	"""

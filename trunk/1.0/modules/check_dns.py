@@ -34,11 +34,11 @@ def CheckDNS(strIP, verbose):
 	# Check if strIP is an IP or a host name
 	bDNS = False
 	try:
-		temp = IP(strIP)
+		IP(strIP)
 	except:
 		bDNS = True
 			
-	if bDNS == False: # It's an IP
+	if not bDNS: # It's an IP
 		# If the address passed is an IP address we will not analyze it with reverse techniques (by now).
 		# TODO: Future implementations my consider this.
 		return "not DNS"
@@ -81,7 +81,7 @@ def CheckDNS(strIP, verbose):
 			Data = Process.communicate()[0].strip().split("\n")
 			IPResolved = Data[len(Data)-1]
 							
-			if verbose == True:
+			if verbose:
 				DataToSend = "+ Verbose" + "\n"
 				DataToSend = DataToSend + "| Tool employed: " + Command + "\n"
 				DataToSend = DataToSend + "|" + "\n"
@@ -103,7 +103,7 @@ def CheckDNS(strIP, verbose):
 			Process.wait()
 			Data = Process.communicate()[0]
 			
-			if verbose == True:
+			if verbose:
 				DataToSend = DataToSend + "+ Verbose" + "\n"
 				DataToSend = DataToSend + "| Tool employed: " + Command + "\n"
 				DataToSend = DataToSend + "|" + "\n"
@@ -123,7 +123,7 @@ def CheckDNS(strIP, verbose):
 		if IPResolved == "": 
 			return DataToSend + "IP resolved: none"
 		else:
-			if WhoisDataFound == True:
+			if WhoisDataFound:
 				return DataToSend + "IP resolved: " + IPResolved + "\n" + "WHOIS data found."
 			else:
 				return DataToSend + "IP resolved: " + IPResolved + "\n" + "WHOIS data not found."
