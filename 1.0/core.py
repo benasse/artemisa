@@ -969,7 +969,9 @@ class Artemisa(object):
 			logger.info("Executing " + Command + " ...")
 			# Execute a script
 			try:
-				Process = Popen(Command, shell=True, stdout=PIPE)
+				cmd_out=os.popen(Command)
+				for line in cmd_out.readlines():
+					logger.info(line)
 			except Exception, e:
 				logger.error("Cannot execute script. Details: " + str(e))
 
@@ -996,7 +998,9 @@ class Artemisa(object):
 			logger.info("Executing " + Command + " ...")
 			# Execute a script
 			try:
-				Process = Popen(Command, shell=True, stdout=PIPE)
+				cmd_out=os.popen(Command)
+				for line in cmd_out.readlines():
+					logger.info(line)
 			except Exception, e:
 				logger.error("Cannot execute script. Details: " + str(e))
 
@@ -1023,7 +1027,9 @@ class Artemisa(object):
 			logger.info("Executing " + Command + " ...")
 			# Execute a script
 			try:
-				Process = Popen(Command, shell=True, stdout=PIPE)
+				cmd_out=os.popen(Command)
+				for line in cmd_out.readlines():
+					logger.info(line)
 			except Exception, e:
 				logger.error("Cannot execute script. Details: " + str(e))
 
