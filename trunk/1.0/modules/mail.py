@@ -15,6 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Artemisa.  If not, see <http://www.gnu.org/licenses/>.
 
+# Definition of directories and files
+CONFIG_DIR = "./conf/"
+RESOURCES_DIR = "./res/"
+
+CONFIG_FILE_PATH = CONFIG_DIR + "artemisa.conf"
+ARTEMISA_WEBLOGO_PATH = RESOURCES_DIR + "weblogo.gif"
+
 from smtplib import *
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
@@ -28,27 +35,15 @@ class Email():
 	"""
 	This class is used to handle the email part.
 	"""
-	Enabled = True
-		  
-	SMTP_IP = ""
-	SMTP_PORT = ""
-	SMTP_USERNAME = ""
-	SMTP_PASSWORD = ""
-
-	From = ""
-	Recipients = ""
-	
-	Subject = ""
-	To_header = ""
-	TSLSSL = False
 	
 	def __init__(self):
-		
+	
 		config = ConfigParser.ConfigParser()
 		try:
-			strTemp = config.read("./conf/artemisa.conf")
+			strTemp = config.read(CONFIG_FILE_PATH)
 		except:
 			logger.error("The configuration file artemisa.conf cannot be read.")
+			return
 		
 		if strTemp == []:
 			logger.error("The configuration file artemisa.conf cannot be read.")
@@ -76,17 +71,25 @@ class Email():
 					self.TSLSSL = False
 	 
 			except:
-				logger.error("E-mail account configuration cannot be correctly read. E-mail reports cannot be sent.")
+				logger.error("E-mail account configuration cannot be correctly read. E-mail reports will not be sent.")
 				return
 	
 		del config
 
 	def sendemail(self, strData):
 		
-		if self.Enabled == False: return "E-mail notification is disabled."
-		if self.SMTP_IP == "": return "No SMTP server address configured."
-		if self.SMTP_PORT == "": return "SMTP server port is not configured."
-		if self.Recipients == "": return "No recipient address is configured."
+		if self.Enabled == False: 
+			logger.info("E-mail notification is disabled.")
+			return
+		if self.SMTP_IP == "":
+			logger.info("No SMTP server address configured.")
+			return
+		if self.SMTP_PORT == "":
+			logger.info("SMTP server port is not configured.")
+			return
+		if self.Recipients == "":
+			logger.info("No recipient address is configured.")
+			return
 		
 		msg = MIMEMultipart()
 		msg['To'] = self.To_header
@@ -97,10 +100,14 @@ class Email():
 		msg.attach(msgText)
 		
 		# Read the logo
-		fp = open('./res/weblogo.gif', 'rb')
-		msgImage = MIMEImage(fp.read())
-		fp.close()
-		
+		try:
+			fp = open(ARTEMISA_WEBLOGO_PATH, 'rb')
+			msgImage = MIMEImage(fp.read())
+			fp.close()
+		except:
+			logger.error("Cannot read file " + ARTEMISA_WEBLOGO_PATH)
+			return
+			
 		# Define the image's ID as referenced above
 		msgImage.add_header('Content-ID', '<weblogo>')
 		msg.attach(msgImage)
@@ -120,11 +127,10 @@ class Email():
 			server.sendmail(self.From, self.Recipients.split(","), msg.as_string())
 			server.quit()
 	  
-			return "NOTICE E-mail notification sent."
+			logger.info("E-mail notification sent.")
 		
 		except SMTPAuthenticationError:
-			return "E-mail account username and/or password refused by SMTP server."
+			logger.warning("E-mail account username and/or password refused by SMTP server.")
 		except Exception, e:
-			logger.error("E-mail notification wasn't able to be sent. Error: " + str(e))
-			return
+			logger.error("E-mail notification couldn't be sent. Error: " + str(e))
 		

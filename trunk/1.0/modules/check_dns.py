@@ -29,7 +29,7 @@ def CheckDNS(strIP, verbose):
 
 	if strIP == "": return 0
 	
-	strDataToSend = ""
+	DataToSend = ""
 	
 	# Check if strIP is an IP or a host name
 	bDNS = False
@@ -45,27 +45,27 @@ def CheckDNS(strIP, verbose):
 		
 		
 		#try:		
-		#	strCommand = "dig -x " + strIP + " +short"
-		#	Process = Popen(strCommand, shell=True, stdout=PIPE)
+		#	Command = "dig -x " + strIP + " +short"
+		#	Process = Popen(Command, shell=True, stdout=PIPE)
 		#	Process.wait()
-		#	strData = Process.communicate()[0].strip().split("\n")
+		#	Data = Process.communicate()[0].strip().split("\n")
 		#		
 		#	if verbose == True:
-		#		strDataToSend = "+ Verbose" + "\n"
-		#		strDataToSend = strDataToSend + "| Tool employed: " + strCommand + "\n"
-		#		strDataToSend = strDataToSend + "|" + "\n"
+		#		DataToSend = "+ Verbose" + "\n"
+		#		DataToSend = DataToSend + "| Tool employed: " + Command + "\n"
+		#		DataToSend = DataToSend + "|" + "\n"
 		#		
-		#		strDataToSend = strDataToSend + "| Tool output:" + "\n"
-		#		for line in strData:
-		#			strDataToSend = strDataToSend + "| " + line + "\n"
-		#		strDataToSend = strDataToSend + "\n"
+		#		DataToSend = DataToSend + "| Tool output:" + "\n"
+		#		for line in Data:
+		#			DataToSend = DataToSend + "| " + line + "\n"
+		#		DataToSend = DataToSend + "\n"
 		#		
-		#	strIP = strData[0]
+		#	strIP = Data[0]
 		#	
 		#	if strIP == "": 
-		#		return strDataToSend + "Domain name resolved: none"
+		#		return DataToSend + "Domain name resolved: none"
 		#	else:
-		#		return strDataToSend + "Domain name resolved: " + strIP
+		#		return DataToSend + "Domain name resolved: " + strIP
 		#		
 		#except OSError:
 		#	print "WARNING dig command is not installed."
@@ -75,21 +75,21 @@ def CheckDNS(strIP, verbose):
 		# The DNS analysis consists of a DNS lookup and a WHOIS search.
 			
 		try:	  
-			strCommand = "dig " + strIP + " A +noall +answer +short"  
-			Process = Popen(strCommand, shell=True, stdout=PIPE)
+			Command = "dig " + strIP + " A +noall +answer +short"  
+			Process = Popen(Command, shell=True, stdout=PIPE)
 			Process.wait()
-			strData = Process.communicate()[0].strip().split("\n")
-			strIPResolved = strData[len(strData)-1]
+			Data = Process.communicate()[0].strip().split("\n")
+			IPResolved = Data[len(Data)-1]
 							
 			if verbose == True:
-				strDataToSend = "+ Verbose" + "\n"
-				strDataToSend = strDataToSend + "| Tool employed: " + strCommand + "\n"
-				strDataToSend = strDataToSend + "|" + "\n"
+				DataToSend = "+ Verbose" + "\n"
+				DataToSend = DataToSend + "| Tool employed: " + Command + "\n"
+				DataToSend = DataToSend + "|" + "\n"
 				
-				strDataToSend = strDataToSend + "| Tool output:" + "\n"
-				for line in strData:
-					strDataToSend = strDataToSend + "| " + line + "\n"
-				strDataToSend = strDataToSend + "\n"
+				DataToSend = DataToSend + "| Tool output:" + "\n"
+				for line in Data:
+					DataToSend = DataToSend + "| " + line + "\n"
+				DataToSend = DataToSend + "\n"
 							
 		except OSError:
 			logger.warning("dig command is not installed.")
@@ -98,35 +98,35 @@ def CheckDNS(strIP, verbose):
 		# Try to use the whois command. If it fails, perhaps the command is not installed.
 		try:
 			# Store the whois' return in a variable.
-			strCommand = "whois " + strIP
-			Process = Popen(strCommand, shell=True, stdout=PIPE)
+			Command = "whois " + strIP
+			Process = Popen(Command, shell=True, stdout=PIPE)
 			Process.wait()
-			strData = Process.communicate()[0]
+			Data = Process.communicate()[0]
 			
 			if verbose == True:
-				strDataToSend = strDataToSend + "+ Verbose" + "\n"
-				strDataToSend = strDataToSend + "| Tool employed: " + strCommand + "\n"
-				strDataToSend = strDataToSend + "|" + "\n"
-				strDataToSend = strDataToSend + "| Tool output: -too large to show here-" + "\n"
-				strDataToSend = strDataToSend + "\n"
+				DataToSend = DataToSend + "+ Verbose" + "\n"
+				DataToSend = DataToSend + "| Tool employed: " + Command + "\n"
+				DataToSend = DataToSend + "|" + "\n"
+				DataToSend = DataToSend + "| Tool output: -too large to show here-" + "\n"
+				DataToSend = DataToSend + "\n"
 				
 			# TODO: this parsing is weak and could be improved.
-			if strData.find("NOT FOUND") != -1 or strData.find("No match for domain") != -1:
-				bWhoisDataFound = False
+			if Data.find("NOT FOUND") != -1 or Data.find("No match for domain") != -1:
+				WhoisDataFound = False
 			else:
-				bWhoisDataFound = True
+				WhoisDataFound = True
 				
 		except OSError:
 			logger.warning("whois is not installed.")
 			return -1   
 	
-		if strIPResolved == "": 
-			return strDataToSend + "IP resolved: none"
+		if IPResolved == "": 
+			return DataToSend + "IP resolved: none"
 		else:
-			if bWhoisDataFound == True:
-				return strDataToSend + "IP resolved: " + strIPResolved + "\n" + "WHOIS data found."
+			if WhoisDataFound == True:
+				return DataToSend + "IP resolved: " + IPResolved + "\n" + "WHOIS data found."
 			else:
-				return strDataToSend + "IP resolved: " + strIPResolved + "\n" + "WHOIS data not found."
+				return DataToSend + "IP resolved: " + IPResolved + "\n" + "WHOIS data not found."
 	
 if __name__ == '__main__':
 	if len(sys.argv) > 2:

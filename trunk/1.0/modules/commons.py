@@ -25,7 +25,9 @@ import ConfigParser				# Read configuration files
 from libs.IPy.IPy import *			# Module to deal with IPs
 from subprocess import Popen, PIPE
 
-class CallData():
+from modules.logger import logger
+
+class CallData(object):
 	"""
 	Class employed to store some data about the received call and the analysis
 	"""
@@ -72,183 +74,158 @@ class GetTimeClass:
 	def GetTime(self):
 		return "[" + str(strftime("%Y-%m-%d %H:%M:%S")) + "]"
 
-def Search(strLabel, strData):
+def Search(Label, Data):
 	"""
 	Keyword Arguments:
-	strLabel -- label to find
-	strData -- string containg the bunch of data
+	Label -- label to find
+	Data -- string containg the bunch of data
 	
 	Search a value in a bunch of data and return its content. The values to search have the
 	structure "label=value"
 	"""
 	
-	strTemp = strData.strip().splitlines(True)
+	Temp = Data.strip().splitlines(True)
 	
-	for line in strTemp:
-		if line.find(strLabel + "=") != -1:
+	for line in Temp:
+		if line.find(Label + "=") != -1:
 			try:
-				return strData.split("=")[1]
+				return Data.split("=")[1]
 			except:
 				raise Exception("Error in function commons.Search. Cannot return value=string.")
 				break
 
 	return ""
 
-def GetSIPHeader(strKeyword, strData):
+def GetSIPHeader(Keyword, Data):
 	"""
 	Keyword Arguments:
-	strKeyword -- pattern to identify the line
-	strData -- typically the SIP message to where the function looks for the header
+	Keyword -- pattern to identify the line
+	Data -- typically the SIP message to where the function looks for the header
 	
 	This function searches a line of the SIP header and returns it.
 	"""
-	strTemp = strData.splitlines()
+	Temp = Data.splitlines()
 
-	for line in strTemp:
-		if line[0:len(strKeyword)] == strKeyword:
+	for line in Temp:
+		if line[0:len(Keyword)] == Keyword:
 			return line.strip()
 
 	return ""
 
-def GetIPfromSIP(strHeaderLine):
+def GetIPfromSIP(HeaderLine):
 	"""
 	Keyword Arguments:
-	strHeaderLine -- a string containing a specific SIP header
+	HeaderLine -- a string containing a specific SIP header
 	
 	This function gets and returns the IP address from a SIP header field.
 	"""
-	if strHeaderLine == "": return ""
+	if HeaderLine == "": return ""
 
-	if strHeaderLine.find("sip:") != -1:
-		strIP = strHeaderLine.split("sip:")[1]
-		if strIP.find("@") != -1:
-			strIP = strIP.split("@")[1]
-		strIP = strIP.split(">")[0]
-		strIP = strIP.split(":")[0]
+	try:
+		if HeaderLine.find("sip:") != -1:
+			IPaddr = HeaderLine.split("sip:")[1]
+			if IPaddr.find("@") != -1:
+				IPaddr = IPaddr.split("@")[1]
+			IPaddr = IPaddr.split(">")[0]
+			IPaddr = IPaddr.split(":")[0]
 
-		return strIP.strip()
+			return IPaddr.strip()
 
-	strIP = strHeaderLine.split(">")[0]
-	if strIP.find("@") != -1:
-		strIP = strIP.split("@")[1]
-	strIP = strIP.split(";")[0]
-	if strIP.find(" ") != -1:
-		strIP = strIP.split(" ")[len(strIP.split(" "))-1]
-	strIP = strIP.split(":")[0]
-	strIP = strIP.split("<")[len(strIP.split("<"))-1]
+		IPaddr = HeaderLine.split(">")[0]
+		if IPaddr.find("@") != -1:
+			IPaddr = IPaddr.split("@")[1]
+		IPaddr = IPaddr.split(";")[0]
+		if IPaddr.find(" ") != -1:
+			IPaddr = IPaddr.split(" ")[len(IPaddr.split(" "))-1]
+		IPaddr = IPaddr.split(":")[0]
+		IPaddr = IPaddr.split("<")[len(IPaddr.split("<"))-1]
+	except Exception, e:
+		logger.error("Error in GetIPfromSIP function. Details: " + str(e))
+		return ""
 	
-	return strIP.strip()
+	return IPaddr.strip()
 	
-def GetPortfromSIP(strHeaderLine):
+def GetPortfromSIP(HeaderLine):
 	"""
 	Keyword Arguments:
-	strHeaderLine -- a string containing a specific SIP header
+	HeaderLine -- a string containing a specific SIP header
 	
 	This function gets and returns the port number from a SIP header field.
 	"""
-	if strHeaderLine == "": return ""
+	if HeaderLine == "": return ""
 
-	if strHeaderLine.find("sip:") != -1:
-		strPort = strHeaderLine.split("sip:")[1]
-		strPort = strPort.split(" ")[0]
-		strPort = strPort.split(";")[0]
-		if strPort.find("@") != -1:
-			strPort = strPort.split("@")[1]
-		strPort = strPort.split(">")[0]
-		
-		if strPort.find(":") != -1:
-			strPort = strPort.split(":")[1].strip()
+	try:
+		if HeaderLine.find("sip:") != -1:
+			Port = HeaderLine.split("sip:")[1]
+			Port = Port.split(" ")[0]
+			Port = Port.split(";")[0]
+			if Port.find("@") != -1:
+				Port = Port.split("@")[1]
+			Port = Port.split(">")[0]
+			
+			if Port.find(":") != -1:
+				Port = Port.split(":")[1].strip()
+			else:
+				return ""
+
+			return Port.strip()
+
+		Port = HeaderLine.split(">")[0]
+		if Port.find("@") != -1:
+			Port = Port.split("@")[1]
+		Port = Port.split(";")[0]
+		if Port.find(" ") != -1:
+			Port = Port.split(" ")[len(Port.split(" "))-1]
+
+		if Port.find(":") != -1:
+			Port = Port.split(":")[len(Port.split(":"))-1].strip()
 		else:
 			return ""
-
-		return strPort.strip()
-
-	strPort = strHeaderLine.split(">")[0]
-	if strPort.find("@") != -1:
-		strPort = strPort.split("@")[1]
-	strPort = strPort.split(";")[0]
-	if strPort.find(" ") != -1:
-		strPort = strPort.split(" ")[len(strPort.split(" "))-1]
-
-	if strPort.find(":") != -1:
-		strPort = strPort.split(":")[len(strPort.split(":"))-1].strip()
-	else:
+	except Exception, e:
+		logger.error("Error in GetPortfromSIP function. Details: " + str(e))
 		return ""
+		
+	return Port.strip()
 	
-	return strPort.strip()
-	
-def GetExtensionfromSIP(strHeaderLine):
+def GetExtensionfromSIP(HeaderLine):
 	"""
 	Keyword Arguments:
-	strHeaderLine -- a string containing a specific SIP header
+	HeaderLine -- a string containing a specific SIP header
 	
 	This function gets and returns the extension value from a SIP header field.
 	"""
-	if strHeaderLine == "": return ""
+	if HeaderLine == "": return ""
 
-	if strHeaderLine.find("@") == -1:
-		return "" # This means that there is not extension found
+	try:
+		if HeaderLine.find("@") == -1:
+			return "" # This means that there is not extension found
 
-	if strHeaderLine.find("sip:") == -1:
-		return "" # This means that there is not extension found
+		if HeaderLine.find("sip:") == -1:
+			return "" # This means that there is not extension found
+			
+		Extension = HeaderLine.split("sip:")[1]
+		Extension = Extension.split("@")[0]
 		
-	strExtension = strHeaderLine.split("sip:")[1]
-	strExtension = strExtension.split("@")[0]
+	except Exception, e:
+		logger.error("Error in GetExtensionfromSIP function. Details: " + str(e))
+		return ""
+		
+	return Extension.strip()
 	
-	return strExtension.strip()
-	
-def GetTransportfromSIP(strHeaderLine):
+def GetTransportfromSIP(HeaderLine):
 	"""
 	Keyword Arguments:
-	strHeaderLine -- a string containing a specific SIP header
+	HeaderLine -- a string containing a specific SIP header
 	
 	This function gets and returns the transport protocol value from a SIP header field.
 	"""
-	if strHeaderLine.lower().find("udp") != -1: 
+	if HeaderLine.lower().find("udp") != -1: 
 		return "udp"
-	elif strHeaderLine.lower().find("tcp") != -1: 
+	elif HeaderLine.lower().find("tcp") != -1: 
 		return "tcp"
 	else:
 		return "udp" # By default	
 
-#class PrintClass(log, GetTimeClass):
-#
-#	def __init__(self):
-#		self.PrintFile = ""
-#
-#	def Print(self, strData, bPrint=True):
-#		"""
-#		Keyword Arguments:
-#		strData -- string to print
-#		bPrint -- boolean to know whether the string shoud (True) or not (False) be printed on screen
-#		
-#		This method prints strData in console (unless bPrint is False) and log it.
-#		"""
-#		
-#		strTemp = strData.splitlines()
-#		
-#		if bPrint == True:
-#			if strData == "":
-#				print self.GetTime()
-#			else:
-#				for line in strTemp:
-#					print self.GetTime() + " " + line.replace("\n","").replace("\r","")
-#		   	
-#		# if self.PrintFile has a string value, it prints the string into a file   
-#		if self.PrintFile != "":
-#			File = open(self.PrintFile, "a")
-#			
-#			if strData == "":
-#				File.write("\n")
-#			else:
-#				for line in strTemp:
-#					File.write(line.replace("\n","").replace("\r","" + "\n") + "\n")
-#								
-#			File.close()
-#			
-#			
-#		self.Log(strData)
-	
 def GetConfigSection(strFilename, strSection):
 	"""
 	Keyword Arguments:
@@ -260,25 +237,30 @@ def GetConfigSection(strFilename, strSection):
 	"""
 	SectionData = []
 	
-	File = open(strFilename, "r")
-	
-	section_found = False
-	
-	for line in File:
-		line = RemoveComments(line)
-		line = line.strip()
+	try:
+		File = open(strFilename, "r")
 		
-		if line.find("[") != -1:
-			section_found = False
+		section_found = False
+		
+		for line in File:
+			line = RemoveComments(line)
+			line = line.strip()
+			
+			if line.find("[") != -1:
+				section_found = False
 
-		if section_found == True:
-			if line != "":
-				SectionData.append(line)
-						
-		if line.find("[" + strSection + "]") != -1:
-			section_found = True
+			if section_found == True:
+				if line != "":
+					SectionData.append(line)
+							
+			if line.find("[" + strSection + "]") != -1:
+				section_found = True
 
-	File.close()
+		File.close()
+		
+	except Exception, e:
+		logger.error("Error in GetConfigSection function. Details: " + str(e))
+		return ""
 	
 	return SectionData
 
@@ -301,10 +283,11 @@ def ResolveDNS(strDNS):
 		try:		
 			Process = Popen("dig " + strDNS + " A +noall +answer +short", shell=True, stdout=PIPE)
 			Process.wait()
-			strData = Process.communicate()[0].strip().split("\n")
-			strDNS = strData[len(strData)-1]
+			Data = Process.communicate()[0].strip().split("\n")
+			strDNS = Data[len(Data)-1]
 				
 		except OSError:
+			logger.warning("Error in ResolveDNS function. The dns couldn't be resolved.")
 			return -1
 
 	try:

@@ -49,28 +49,6 @@ class Classifier():
 		self.CallInformation = CallData() # Creates an instance of CallData
 		self.CallInformation.SIP_Message = SIP_Message # Stores the SIP message to classify (usually the INVITE)
 
-	def GetFilename(self):
-		"""
-		Defines a file name to store the output. The idea is to make a temporary file to store all the
-		output of the screen and then use it to build the HTML report as well as the plain text report.
-		"""
-
-		strFilename = ""
-		try:
-			a = 0
-			while 1:
-						
-				strFilename = "./results/" + strftime("temp_%Y-%m-%d") + "_" + str(a)
-						
-				if os.path.isfile(strFilename) == True:
-					a += 1
-				else:
-					break
-		except:
-			raise Exception("Can't create the temporary file " + strFilename)
-
-		return strFilename
-
 	def Tests_CheckFingerprint(self):
 		"""
 		This method carries out the fingerprint test
@@ -79,16 +57,16 @@ class Classifier():
 		prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		prtString = "| " + self.CallInformation.UserAgent; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
-		self.ToolName = CheckFingerprint(self.CallInformation.UserAgent)
-		if self.ToolName < 0:
+		self.CallInformation.ToolName = CheckFingerprint(self.CallInformation.UserAgent)
+		if self.CallInformation.ToolName < 0:
 			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			prtString = "| Fingerprint check failed."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-		elif self.ToolName == 0:
+		elif self.CallInformation.ToolName == 0:
 			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			prtString = "| No fingerprint found."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		else:
 			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-			prtString = "| Fingerprint found. The following attack tool was employed: " + self.ToolName; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+			prtString = "| Fingerprint found. The following attack tool was employed: " + self.CallInformation.ToolName; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			prtString = "| Category: Attack tool"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			self.AddCategory("Attack tool")
@@ -449,21 +427,21 @@ class Classifier():
 				self.CallInformation.Via.append([GetIPfromSIP(line.strip()), GetPortfromSIP(line.strip()), GetTransportfromSIP(GetSIPHeader(line.strip(),self.CallInformation.SIP_Message))])
 		
 		
-	def AddCategory(self, strCategory):
+	def AddCategory(self, Category):
 		"""
 		Keyword Arguments:
-		strCategory -- category to add
+		Category -- category to add
 		
 		"""
-		bFound = False
+		Found = False
 		
 		for i in range(len(self.CallInformation.Classification)):
-			if self.CallInformation.Classification[i] == strCategory:
-				bFound = True
+			if self.CallInformation.Classification[i] == Category:
+				Found = True
 				break
 
-		if bFound == True: return
+		if Found == True: return
 
-		self.CallInformation.Classification.append(strCategory)
+		self.CallInformation.Classification.append(Category)
 
 	

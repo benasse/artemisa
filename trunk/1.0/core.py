@@ -15,13 +15,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CONFIG_FILE_PATH = "./conf/artemisa.conf"
-BEHAVIOUR_FILE_PATH = "./conf/behaviour.conf"
-ACTIONS_FILE_PATH = "./conf/actions.conf"
-EXTENSIONS_FILE_PATH = "./conf/extensions.conf"
-SERVERS_FILE_PATH = "./conf/servers.conf"
+VERSION = "1.0."
+
+# Definition of directories and files
+CONFIG_DIR = "./conf/"
+SCRIPTS_DIR = "./scripts/"
+RESULTS_DIR = "./results/"
+AUDIOFILES_DIR = "./audiofiles/"
+LOGS_DIR = "./logs/"
+RECORDED_CALLS_DIR = "./recorded_calls/"
+
+CONFIG_FILE_PATH = CONFIG_DIR + "artemisa.conf"
+BEHAVIOUR_FILE_PATH = CONFIG_DIR + "behaviour.conf"
+ACTIONS_FILE_PATH = CONFIG_DIR + "actions.conf"
+EXTENSIONS_FILE_PATH = CONFIG_DIR + "extensions.conf"
+SERVERS_FILE_PATH = CONFIG_DIR + "servers.conf"
+ON_FLOOD_SCRIPT_PATH = SCRIPTS_DIR + "on_flood.sh"
+ON_SPIT_SCRIPT_PATH = SCRIPTS_DIR + "on_spit.sh"
+ON_SCANNING_SCRIPT_PATH = SCRIPTS_DIR + "on_scanning.sh"
 
 try:
+	"""
+	Try to import the PJSUA library. It's used for the SIP stack handling.
+	"""
 	import pjsua as pj
 except ImportError:
 	print ""
@@ -50,41 +66,34 @@ except ImportError:
 
 import sys, os
 	
-import ConfigParser				# Read configuration files
+import ConfigParser							# Read configuration files
 
 from time import strftime, sleep, time
 import sched
-#from modules.logger import logger		# Logger manager
-from modules.commons import *			# Import functions from commons.py
+from modules.commons import *				# Import functions from commons.py
 from modules.classifier import Classifier	# Message classifier 
 from modules.correlator import Correlator	# Correlator
 from modules.correlator import IfCategory
-import threading				# Use of threads
+import threading							# Use of threads
 
 from modules.mail import Email
 from modules.results_format import get_results_txt, get_results_html
 
 from subprocess import Popen, PIPE
 
-from modules.logger import logger
-from modules.logger import pjsua_logger
+from modules.logger import logger 			# Instance a logger for information about Artemisa
+from modules.logger import pjsua_logger 	# Instance a logger for information about the PJSUA library
 
-#from modules.logs import Logger			# Import the logger class
-# Instance a logger for information about Artemisa
-#logger = Logger("artemisa")
-# Instance a logger for information about the PJSUA library
-#pjsua_logger = Logger("artemisa_pjsua")
-
-Unregister = False # Flag to know whether the unregistration process is taking place
+Unregister = False 							# Flag to know whether the unregistration process is taking place
 
 class Extension(object):
 	"""
 	Keeps the user data with an unique extension.
 	"""
-	def __init__(self):
-		self.Extension = ""
-		self.Username = ""
-		self.Password = ""
+	def __init__(self, Extension, Username, Password):
+		self.Extension = Extension
+		self.Username = Username
+		self.Password = Password
    
 class Server(object):
 	"""
@@ -225,7 +234,7 @@ class MyAccountCallback(pj.AccountCallback):
 					self.current_call.answer(200)
 
 		elif self.behaviour_mode == "aggressive":
-			for item in self.Passive_mode:
+			for item in self.Aggressive_mode:
 				if item == "send_180":
 					self.current_call.answer(180)
 				if item == "send_200":
@@ -292,8 +301,7 @@ class MyCallCallback(pj.CallCallback):
 					
 					a = 0
 					while 1:
-						
-						Filename = "./recorded_calls/" + strftime("%Y-%m-%d") + "_call_from_" + str(self.call.info().remote_uri).split("@")[0].split(":")[1] + "_" + str(a) + ".wav"
+						Filename = RECORDED_CALLS_DIR + strftime("%Y-%m-%d") + "_call_from_" + str(self.call.info().remote_uri).split("@")[0].split(":")[1] + "_" + str(a) + ".wav"
 						
 						if os.path.isfile(Filename) == True:
 							a += 1
@@ -312,7 +320,7 @@ class MyCallCallback(pj.CallCallback):
 					self.MediaReceived = True
 				
 			except Exception, e:
-				logger.error("Error while trying to record the call. Error: " + str(e))
+				logger.error("Error while trying to record the call. Details: " + str(e))
 
 			try:
 				if self.player_id < 0:
@@ -320,8 +328,8 @@ class MyCallCallback(pj.CallCallback):
 					# And now set the file player
 					if self.Playfile != "":
 						self.call_slot = self.call.info().conf_slot 
-
-						WAVPlayFilename = "./audiofiles/" + self.Playfile
+						
+						WAVPlayFilename = AUDIOFILES_DIR + self.Playfile
 
 						self.player_id = self.lib.create_player(WAVPlayFilename)
 						self.player_slot = self.lib.player_get_slot(self.player_id)
@@ -332,7 +340,7 @@ class MyCallCallback(pj.CallCallback):
 						logger.info("The following audio file is now being played: " + self.Playfile)
 	
 			except Exception, e:
-				logger.error("Error while trying to play the WAV file. Error: " + str(e))
+				logger.error("Error while trying to play the WAV file. Details: " + str(e))
   
 		else:
 
@@ -357,7 +365,7 @@ class Artemisa(object):
 
 	def __init__(self, args=[]):
 
-		self.VERSION = "1.0."
+		self.VERSION = VERSION
 		self.SIP_VERSION = "2.0"
 
 		# Environment configuration
@@ -483,7 +491,11 @@ class Artemisa(object):
 		self.log_cfg.callback = self.log_cb
 		self.log_cfg.console_level = 5 # The value console_level MUST be 5 since it's used to analyze the messages
 			
-		self.lib.init(self.ua_cfg, self.log_cfg, self.media_cfg)
+		try:
+			self.lib.init(self.ua_cfg, self.log_cfg, self.media_cfg)
+		except Exception, e:
+			logger.error(str(e))
+			sys.exit(0)
 	
 		try:
 			self.lib.create_transport(pj.TransportType.UDP, pj.TransportConfig(int(self.Local_port)))
@@ -493,8 +505,11 @@ class Artemisa(object):
 			self.lib = None
 			sys.exit(1)
 	
-			
-		self.lib.start()
+		try:
+			self.lib.start()
+		except Exception, e:
+			logger.error(str(e))
+			sys.exit(0)
 	
 		if Show_sound_devices == True:
 			a = 0
@@ -512,7 +527,6 @@ class Artemisa(object):
 			print ""
 			print ""
 		
-			self.__del__()
 			sys.exit(0)
 
 		# Put some lines into the log file
@@ -551,12 +565,12 @@ class Artemisa(object):
 		self.ReadKeyboard()
 
 		# Here finalizes the program when the ReadKeyboard() function is returned.
-		self.__del__()
+		sys.exit(0)
 	
-	def ShowHelp(self, bCommands = True):
+	def ShowHelp(self, Commands = True):
 		"""
 		Keyword Arguments:
-		bCommands -- when True the commands list is shown. 
+		Commands -- when True the commands list is shown. 
 	
 		Shows the help
 		"""
@@ -564,7 +578,7 @@ class Artemisa(object):
 		print "  -v, --verbose			Verbose mode (it shows more information)."
 		print "  -g, --get_sound_devices   Show the available sound devices."
 	
-		if bCommands == False: return
+		if Commands == False: return
 	
 		print ""	
 		print "Commands list:"
@@ -622,26 +636,26 @@ class Artemisa(object):
 				print "Done"
 			
 			elif s == "clean logs":
-				Process = Popen("rm -f ./logs/*.log", shell=True, stdout=PIPE)
+				Process = Popen("rm -f " + LOGS_DIR + "*.log", shell=True, stdout=PIPE)
 				Process.wait()
 				print "Cleaned"
 			
 			elif s == "clean results":
-				Process = Popen("rm -f ./results/*", shell=True, stdout=PIPE)
+				Process = Popen("rm -f " + RESULTS_DIR + "*", shell=True, stdout=PIPE)
 				Process.wait()
 				print "Cleaned"
 			
 			elif s == "clean calls":
-				Process = Popen("rm -f ./recorded_calls/*", shell=True, stdout=PIPE)
+				Process = Popen("rm -f " + RECORDED_CALLS_DIR + "*", shell=True, stdout=PIPE)
 				Process.wait()
 				print "Cleaned"
 						
 			elif s == "clean all":
-				Process = Popen("rm -f ./logs/*.log", shell=True, stdout=PIPE)
+				Process = Popen("rm -f " + LOGS_DIR + "*.log", shell=True, stdout=PIPE)
 				Process.wait()
-				Process = Popen("rm -f ./results/*", shell=True, stdout=PIPE)
+				Process = Popen("rm -f " + RESULTS_DIR + "*", shell=True, stdout=PIPE)
 				Process.wait()
-				Process = Popen("rm -f ./recorded_calls/*", shell=True, stdout=PIPE)
+				Process = Popen("rm -f " + RECORDED_CALLS_DIR + "*", shell=True, stdout=PIPE)
 				Process.wait()
 				print "Cleaned"
 							   
@@ -718,12 +732,12 @@ class Artemisa(object):
 		"""
 		config = ConfigParser.ConfigParser()
 		try:
-			strTemp = config.read(EXTENSIONS_FILE_PATH)
+			Temp = config.read(EXTENSIONS_FILE_PATH)
 		except:
 			logger.critical("The configuration file extensions.conf cannot be read.")
 			sys.exit(1)
 	
-		if strTemp == []:
+		if Temp == []:
 			logger.critical("The configuration file extensions.conf cannot be read.")
 			sys.exit(1)
 		else:
@@ -733,17 +747,10 @@ class Artemisa(object):
 					sys.exit(1)
 
 				for item in config.sections():
-
-					self.Extensions.append(Extension())
-					
-					i = len(self.Extensions)-1
-					
-					self.Extensions[i].Extension = item
-					self.Extensions[i].Username = config.get(item, "username")
-					self.Extensions[i].Password = config.get(item, "password")
+					self.Extensions.append(Extension(item, config.get(item, "username"), config.get(item, "password")))
 					
 			except:
-				logger.critical("The configuration file extensions.conf cannot be correctly read. Check it out carefully.")
+				logger.critical("The configuration file extensions.conf cannot be correctly read. Check it out carefully. More info: " + str(e))
 				sys.exit(1)
 
 		del config
@@ -754,12 +761,12 @@ class Artemisa(object):
 		"""
 		config = ConfigParser.ConfigParser()
 		try:
-			strTemp = config.read(SERVERS_FILE_PATH)
+			Temp = config.read(SERVERS_FILE_PATH)
 		except:
 			logger.critical("The configuration file servers.conf cannot be read.")
 			sys.exit(1)
 	
-		if strTemp == []:
+		if Temp == []:
 			logger.critical("The configuration file servers.conf cannot be read.")
 			sys.exit(1)
 		else:
@@ -770,13 +777,13 @@ class Artemisa(object):
 
 				for item in config.sections():
 
-					strTemp2 = config.get(item, "exten")
-					strTemp2 = strTemp2.split(",")
+					Temp2 = config.get(item, "exten")
+					Temp2 = Temp2.split(",")
 
 					exten_list = []
-					for x in range(len(strTemp2)):
+					for x in range(len(Temp2)):
 						for j in range(len(self.Extensions)):
-							if strTemp2[x] == self.Extensions[j].Extension:
+							if Temp2[x] == self.Extensions[j].Extension:
 								exten_list.append(self.Extensions[j])
 								break
 
@@ -784,7 +791,7 @@ class Artemisa(object):
 			
 			except Exception, e:
 				print str(e)
-				logger.critical("The configuration file servers.conf cannot be correctly read. Check it out carefully.")
+				logger.critical("The configuration file servers.conf cannot be correctly read. Check it out carefully. More info: " + str(e))
 				sys.exit(1)
 
 		del config
@@ -795,12 +802,12 @@ class Artemisa(object):
 		"""
 		config = ConfigParser.ConfigParser()
 		try:
-			strTemp = config.read(CONFIG_FILE_PATH)
+			Temp = config.read(CONFIG_FILE_PATH)
 		except:
 			logger.critical("The configuration file artemisa.conf cannot be read.")
 			sys.exit(1)
 	
-		if strTemp == []:
+		if Temp == []:
 			logger.critical("The configuration file artemisa.conf cannot be read.")
 			sys.exit(1)
 		else:
@@ -865,8 +872,8 @@ class Artemisa(object):
 					self.behaviour_mode = "passive"
 					logger.info("behaviour_mode value is invalid. Changed to passive.")
 					
-			except:
-				logger.critical("The configuration file artemisa.conf cannot be correctly read. Check it out carefully.")
+			except Exception, e:
+				logger.critical("The configuration file artemisa.conf cannot be correctly read. Check it out carefully. Details: " + str(e))
 				sys.exit(1)
 
 		del config
@@ -874,12 +881,12 @@ class Artemisa(object):
 		# Now it reads the actions.conf file to load the user-defined parameters to sent when calling the scripts
 		config = ConfigParser.ConfigParser()
 		try:
-			strTemp = config.read(ACTIONS_FILE_PATH)
+			Temp = config.read(ACTIONS_FILE_PATH)
 		except:
 			logger.critical("The configuration file actions.conf cannot be read.")
 			sys.exit(1)	
 
-		if strTemp == []:
+		if Temp == []:
 			logger.critical("The configuration file actions.conf cannot be read.")
 			sys.exit(1)
 		else:
@@ -941,11 +948,14 @@ class Artemisa(object):
 			self.On_flood_parameters = self.On_flood_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
 			self.On_flood_parameters = self.On_flood_parameters.replace("$Connection_IP$", Results.Connection)
 			self.On_flood_parameters = self.On_flood_parameters.replace("$Owner_IP$", Results.Owner)
-		
-			Command = "bash ./scripts/on_flood.sh " + self.On_flood_parameters
+			
+			Command = "bash " + ON_FLOOD_SCRIPT_PATH + " " + self.On_flood_parameters
 			logger.info("Executing " + Command + " ...")
 			# Execute a script
-			Process = Popen(Command, shell=True, stdout=PIPE)
+			try:
+				Process = Popen(Command, shell=True, stdout=PIPE)
+			except Exception, e:
+				logger.error("Cannot execute script. Details: " + str(e))
 
 	def CheckCategory(self, Results):
 		"""
@@ -966,10 +976,13 @@ class Artemisa(object):
 			self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Connection_IP$", Results.Connection)
 			self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Owner_IP$", Results.Owner)
 		
-			Command = "bash ./scripts/on_spit.sh " + self.On_SPIT_parameters
+			Command = "bash " + ON_SPIT_SCRIPT_PATH + " " + self.On_SPIT_parameters
 			logger.info("Executing " + Command + " ...")
 			# Execute a script
-			Process = Popen(Command, shell=True, stdout=PIPE)
+			try:
+				Process = Popen(Command, shell=True, stdout=PIPE)
+			except Exception, e:
+				logger.error("Cannot execute script. Details: " + str(e))
 
 	def CheckIfScanning(self, Results):
 		"""
@@ -990,10 +1003,13 @@ class Artemisa(object):
 			self.On_scanning_parameters = self.On_scanning_parameters.replace("$Connection_IP$", Results.Connection)
 			self.On_scanning_parameters = self.On_scanning_parameters.replace("$Owner_IP$", Results.Owner)
 		
-			Command = "bash ./scripts/on_scanning.sh " + self.On_scanning_parameters
+			Command = "bash " + ON_SCANNING_SCRIPT_PATH + " " + self.On_scanning_parameters
 			logger.info("Executing " + Command + " ...")
 			# Execute a script
-			Process = Popen(Command, shell=True, stdout=PIPE)
+			try:
+				Process = Popen(Command, shell=True, stdout=PIPE)
+			except Exception, e:
+				logger.error("Cannot execute script. Details: " + str(e))
 
 	def SaveResultsToTextFile(self, Results, Filename):
 		"""
@@ -1002,11 +1018,14 @@ class Artemisa(object):
 
 		This functions creates a plain text file for the results.
 		"""
-		File = open(Filename, "w")
-		File.write(Results)
-		File.close()
-		logger.info("This report has been saved on file " + Filename)
-
+		try:
+			File = open(Filename, "w")
+			File.write(Results)
+			File.close()
+			logger.info("This report has been saved on file " + Filename)
+		except Exception, e:
+			logger.error("Cannot save file " + Filename + ". Details: " + str(e))
+			
 	def SaveResultsToHTML(self, Results, Filename):
 		"""
 		Keyword Arguments:
@@ -1014,24 +1033,26 @@ class Artemisa(object):
 
 		This functions creates a HTML file for the results.
 		"""
-		File = open(Filename, "w")
-		File.write(Results)
-		File.close()
-		logger.info("NOTICE This report has been saved on file " + Filename)
-
+		try:
+			File = open(Filename, "w")
+			File.write(Results)
+			File.close()
+			logger.info("NOTICE This report has been saved on file " + Filename)
+		except Exception, e:
+			logger.error("Cannot save file " + Filename + ". Details: " + str(e))
+			
 		return Filename
 
 	def SendResultsByEmail(self, HTMLData):
 		email = Email() # Creates an Email object
-
+	
 		if email.Enabled == False: 
 			logger.info("E-mail notification is disabled.")
 		else:
-
 			logger.info("Sending this report by e-mail...")
-			logger.info(email.sendemail(HTMLData))
+			email.sendemail(HTMLData)
 	
-			del email
+		del email
 
 	def GetFilename(self, Ext):
 		"""
@@ -1041,17 +1062,14 @@ class Artemisa(object):
 		try:
 			a = 0
 			while 1:
-						
-				Filename = "./results/" + strftime("%Y-%m-%d") + "_" + str(a) + "." + Ext
+				Filename = RESULTS_DIR + strftime("%Y-%m-%d") + "_" + str(a) + "." + Ext
 						
 				if os.path.isfile(Filename) == True:
 					a += 1
 				else:
 					break
-		except:
-			strErr = "Can't create the results file " + Filename
-			Exception(strErr)
-			logger.error(strErr)
+		except Exception, e:
+			logger.error("Cannot create the results file " + Filename + ". Details: " + str(e))
 
 		return Filename
 
@@ -1157,20 +1175,16 @@ class Artemisa(object):
 					INVITEMessage = line
 	
 		if self.LastINVITEreceived == INVITEMessage:
-			#Output.Print("Duplicated INVITE arrived. Seq: " + str(nSeq))
 			logger.info("Duplicated INVITE detected.")
 			return # Don't analyze repeated messages
 			
-		#Output.Print("INVITE message detected and logged. Seq: " + str(nSeq))
-		logger.info("INVITE message detected and logged.")
-			
-		#logging.InviteLog(strINVITEMessage)
+		logger.info("INVITE message detected.")
 
 		# Store the INVITE message for the future
 		self.LastINVITEreceived = INVITEMessage
 
 		if self.NumCalls == self.MaxCalls:
-			logger.info("The maximum number of calls to analyze simultaneously has been reached.")
+			logger.info("The maximum number of calls to simultaneously analyze has been reached.")
 			self.FLOOD = "yes"
 			self.Flood = True
 				 
