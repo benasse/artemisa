@@ -76,6 +76,8 @@ from modules.correlator import Correlator	# Correlator
 from modules.correlator import IfCategory
 import threading							# Use of threads
 
+from libs.IPy.IPy import IP					# Module to deal with IPs
+
 from modules.mail import Email
 from modules.results_format import get_results_txt, get_results_html
 
@@ -511,19 +513,19 @@ class Artemisa(object):
 		try:
 			self.lib.init(self.ua_cfg, self.log_cfg, self.media_cfg)
 		except Exception, e:
-			logger.error(str(e))
+			logger.critical(str(e))
 			sys.exit(0)
 	
 		try:
-			self.lib.create_transport(pj.TransportType.UDP, pj.TransportConfig(int(self.Local_port)))
+			self.lib.create_transport(pj.TransportType.UDP, pj.TransportConfig(port=int(self.Local_port), bound_addr=self.Local_IP))
 		except:
-			logger.error("Error while opening port. The port number " + self.Local_port + " is already in use by another process.")
+			logger.critical("Error while opening port. The port number " + self.Local_port + " is either invalid or already in use by another process.")
 			sys.exit(1)
 	
 		try:
 			self.lib.start()
 		except:
-			logger.error("Error while starting pj.Lib.")
+			logger.critical("Error while starting pj.Lib.")
 			sys.exit(0)
 	
 		if Show_sound_devices == True:
@@ -760,13 +762,13 @@ class Artemisa(object):
 		else:
 			try:
 				if len(config.sections()) == 0:
-					logger.error("At least one extension must be defined in extensions.conf")
+					logger.critical("At least one extension must be defined in extensions.conf")
 					sys.exit(1)
 
 				for item in config.sections():
 					self.Extensions.append(Extension(item, config.get(item, "username"), config.get(item, "password")))
 					
-			except:
+			except Exception, e:
 				logger.critical("The configuration file extensions.conf cannot be correctly read. Check it out carefully. More info: " + str(e))
 				sys.exit(1)
 
@@ -789,7 +791,7 @@ class Artemisa(object):
 		else:
 			try:
 				if len(config.sections()) == 0:
-					logger.error("At least one server must be defined in servers.conf")
+					logger.critical("At least one server must be defined in servers.conf")
 					sys.exit(1)
 
 				for item in config.sections():
@@ -851,6 +853,14 @@ class Artemisa(object):
 						self.Aggressive_mode.remove(item)
 	
 				self.Local_IP = config.get("environment", "local_ip")
+				
+				# Now check if the given IP is a valid IP (valid format)
+				try:
+					IP(self.Local_IP)
+				except:
+					logger.critical("The IP address configured at local_ip in file artemisa.conf is not valid (IP address: " + self.Local_IP + ").")
+					sys.exit(1)
+		
 				self.Local_port = config.get("environment", "local_port")
 
 				try:
