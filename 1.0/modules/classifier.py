@@ -19,7 +19,7 @@
 import os
 from time import strftime
 
-from commons import GetSIPHeader, Search, GetTimeClass, GetIPfromSIP, GetPortfromSIP, GetExtensionfromSIP, GetTransportfromSIP, RemoveComments, ResolveDNS, CallData
+from commons import GetSIPHeader, Search, GetTimeClass, GetIPfromSIP, GetPortfromSIP, GetExtensionfromSIP, GetTransportfromSIP, RemoveComments, CallData
 
 from mail import Email
 
@@ -34,8 +34,7 @@ class Classifier():
 	This class performs the classification of the received SIP message.
 	"""
 	
-	def __init__(self, VERSION, verbose, strLocal_IP, strLocal_port, behaviour_mode, behaviour_actions, SIP_Message, Extensions, bACKReceived, bMediaReceived):
-		self.VERSION = VERSION # Artemisa's version
+	def __init__(self, verbose, strLocal_IP, strLocal_port, behaviour_mode, behaviour_actions, SIP_Message, Extensions, bACKReceived, bMediaReceived):
 		self.strLocal_IP = strLocal_IP
 		self.strLocal_port = strLocal_port
 		self.verbose = verbose # Flag to know whether the verbose mode is set or not
@@ -213,16 +212,16 @@ class Classifier():
 
 		# Now it checks if the extension contained in the "To" field is one of the honeypot's registered
 		# extesions.
-		bFound = False
+		Found = False
 		for i in range(len(self.Extensions)):
 			if str(self.Extensions[i].Extension) == self.CallInformation.To_Extension:
 				# The extension contained in the "To" field is an extension of the honeypot.
-				bFound = True
+				Found = True
 				prtString = "| Request addressed to the honeypot? Yes"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 				self.bRequestURI = True
 				break
 				
-		if bFound == False:
+		if not Found:
 			prtString = "| Request addressed to the honeypot? No"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			self.bRequestURI = False
 
@@ -233,7 +232,7 @@ class Classifier():
 		This method carries out the Via test
 		"""
 		# This entire tests depends on the result of the previous
-		if self.bRequestURI == False:
+		if not self.bRequestURI:
 
 			# Via[0] is the first Via field, so that it has the IP of the last proxy.
 			
@@ -270,7 +269,7 @@ class Classifier():
 		prtString = "+ Checking for ACK..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
-		if self.bACKReceived == True:
+		if self.bACKReceived:
 			prtString = "| ACK received: Yes"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		else:
 			prtString = "| ACK received: No"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
@@ -287,7 +286,7 @@ class Classifier():
 		prtString = "+ Checking for received media..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 		
-		if self.bMediaReceived == True:
+		if self.bMediaReceived:
 			prtString = "| Media received: Yes"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 			prtString = "| Category: SPIT"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
@@ -440,7 +439,7 @@ class Classifier():
 				Found = True
 				break
 
-		if Found == True: return
+		if Found: return
 
 		self.CallInformation.Classification.append(Category)
 
