@@ -299,7 +299,6 @@ class MyCallCallback(pj.CallCallback):
 					logger.warning("Error while closing the conferences in method on_state().")
 					
 				self.current_call = None
-				logger.info("Current call is " + str(self.current_call))
 		
 	# Notification when call's media state has changed.
 	def on_media_state(self):
@@ -1144,17 +1143,17 @@ class Artemisa(object):
 
 		# Save the raw SIP message in the report file
 		TXTFilenme = self.GetFilename("txt")
-		TXTData = get_results_txt(TXTFilenme, Results, self.Local_IP, self.Local_port)
+		TXTData = get_results_txt(TXTFilenme, self.VERSION, Results, self.Local_IP, self.Local_port)
 		self.SaveResultsToTextFile(TXTData, TXTFilenme)
 
 		# Save the results in a HTML file
 		HTMLFilenme = self.GetFilename("html")	
-		HTMLData = get_results_html(HTMLFilenme, Results, False, self.Local_IP, self.Local_port)
+		HTMLData = get_results_html(HTMLFilenme, self.VERSION, Results, False, self.Local_IP, self.Local_port)
 		self.SaveResultsToHTML(HTMLData, HTMLFilenme)
 
 		# Send the results by e-mail
 		# The function get_results_html is called again and it return an email-adapted format
-		HTMLMailData = get_results_html(HTMLFilenme, Results, True, self.Local_IP, self.Local_port)
+		HTMLMailData = get_results_html(HTMLFilenme, self.VERSION, Results, True, self.Local_IP, self.Local_port)
 		self.SendResultsByEmail(HTMLMailData)
 				
 		self.ACKReceived = False
