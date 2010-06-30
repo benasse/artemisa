@@ -28,7 +28,7 @@ import sys
 from core import Artemisa
 
 try:
-	# Creates an instance of object artemisa
-	proc = Artemisa(sys.argv)
+    # Creates an instance of object artemisa
+    proc = Artemisa(sys.argv)
 except KeyboardInterrupt:
-	del proc
+    del proc

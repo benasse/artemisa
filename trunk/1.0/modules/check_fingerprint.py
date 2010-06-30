@@ -28,38 +28,38 @@ from modules.logger import logger
 
 def CheckFingerprint(UserAgent):
 
-	# Now the program should read the fingerprint.txt in order to get the strings to search and compare.
+    # Now the program should read the fingerprint.txt in order to get the strings to search and compare.
 
-	try:
-		File = open(FINGERPRINT_PATH, "r")
-		
-	except:
-		logger.warning("Can't read " + FINGERPRINT_PATH)
-		return -1
-		
-	Found = False
-		
-	for line in File:
-		line = line.strip()
-		line = RemoveComments(line)
-		if line == "": continue
-		ToolName = line.split("=")[0]
-		Fingerprint = line.split("=")[1]
-		if UserAgent.find(Fingerprint) != -1:
-			Found = True
-			break
-			
-	File.close()
-		
-	if Found:
-		return ToolName
-	else:
-		return 0
-	
+    try:
+        File = open(FINGERPRINT_PATH, "r")
+        
+    except:
+        logger.warning("Can't read " + FINGERPRINT_PATH)
+        return -1
+        
+    Found = False
+        
+    for line in File:
+        line = line.strip()
+        line = RemoveComments(line)
+        if line == "": continue
+        ToolName = line.split("=")[0]
+        Fingerprint = line.split("=")[1]
+        if UserAgent.find(Fingerprint) != -1:
+            Found = True
+            break
+            
+    File.close()
+        
+    if Found:
+        return ToolName
+    else:
+        return 0
+    
 
 if __name__ == '__main__':
-	if len(sys.argv) > 1:
-		 print CheckFingerprint(sys.argv[1])
-	else:
-		print "Arguments are required!"
-		sys.exit(1)
+    if len(sys.argv) > 1:
+         print CheckFingerprint(sys.argv[1])
+    else:
+        print "Arguments are required!"
+        sys.exit(1)
