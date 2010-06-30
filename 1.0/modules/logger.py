@@ -23,40 +23,40 @@ from time import strftime
 LOG_PATH = './logs'
 
 def CreateLogger(logger, log_file):
-	info = logger.info
-	debug = logger.debug
-	warning = logger.warning
-	critical = logger.critical
-	error = logger.error
-	exception = logger.exception
+    info = logger.info
+    debug = logger.debug
+    warning = logger.warning
+    critical = logger.critical
+    error = logger.error
+    exception = logger.exception
 
-	File_created = True
+    File_created = True
 
-	# Create the directory
-	if not os.path.exists(LOG_PATH):
-	    try:
-		os.mkdir(LOG_PATH)
-	    except OSError:
-		File_created = False
+    # Create the directory
+    if not os.path.exists(LOG_PATH):
+        try:
+        os.mkdir(LOG_PATH)
+        except OSError:
+        File_created = False
 
-	try:
-	    file_hdl = logging.FileHandler(log_file)
-	    formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s %(message)s")
-	    file_hdl.setFormatter(formatter)
-	except IOError:
-	    File_created = False
+    try:
+        file_hdl = logging.FileHandler(log_file)
+        formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s %(message)s")
+        file_hdl.setFormatter(formatter)
+    except IOError:
+        File_created = False
 
-	cons_hdl = logging.StreamHandler()
-	cons_hdl.setLevel(logging.INFO) 
+    cons_hdl = logging.StreamHandler()
+    cons_hdl.setLevel(logging.INFO) 
 
-	if File_created == True:
-	    logger.addHandler(file_hdl)
-			    
-	logger.addHandler(cons_hdl)
-	logger.setLevel(logging.DEBUG)
+    if File_created == True:
+        logger.addHandler(file_hdl)
+                
+    logger.addHandler(cons_hdl)
+    logger.setLevel(logging.DEBUG)
 
-	if File_created == False:
-	    logger.warning("Cannot create the log file. Logging to " + log_file +" is disabled.")
+    if File_created == False:
+        logger.warning("Cannot create the log file. Logging to " + log_file +" is disabled.")
 
 
 logger_log_file = LOG_PATH + "/" + "artemisa" + "_" + strftime("%Y-%m-%d") + ".log"

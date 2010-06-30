@@ -18,61 +18,61 @@
 from modules.logger import logger
 
 def Correlator(Results, Flood):
-	"""
-	Keyword Arguments:
-	Results -- an instance of commons.CallData
-	Flood -- flag from core.py
+    """
+    Keyword Arguments:
+    Results -- an instance of commons.CallData
+    Flood -- flag from core.py
 
-	"""
-	
-	prtString = "************************************** Correlation ***************************************"; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-	prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-	prtString = "Artemisa concludes that the arrived message is likely to be:"; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-	prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-
-	####################################################################################
-	####################################################################################
-	##                                                                                ##
-	## FIXME: For now, this is a very simple correlator that should be improved.      ##
-	##                                                                                ##
-	####################################################################################
-	####################################################################################
+    """
     
-	if IfCategory("Attack tool", Results.Classification):
-		prtString = "* The attack was created employing the tool " + Results.ToolName + "."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+    prtString = "************************************** Correlation ***************************************"; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+    prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+    prtString = "Artemisa concludes that the arrived message is likely to be:"; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+    prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+
+    ####################################################################################
+    ####################################################################################
+    ##                                                                                ##
+    ## FIXME: For now, this is a very simple correlator that should be improved.      ##
+    ##                                                                                ##
+    ####################################################################################
+    ####################################################################################
+    
+    if IfCategory("Attack tool", Results.Classification):
+        prtString = "* The attack was created employing the tool " + Results.ToolName + "."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
-	if Flood:
-		prtString = "* A flooding attack."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-		prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-		return
+    if Flood:
+        prtString = "* A flooding attack."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+        prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+        return
      
-	if IfCategory("SPIT", Results.Classification):
-		prtString = "* A SPIT call."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-		prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-		return
+    if IfCategory("SPIT", Results.Classification):
+        prtString = "* A SPIT call."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+        prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+        return
 
-	if IfCategory("Scanning", Results.Classification):
-		prtString = "* A scanning attempt."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-		prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+    if IfCategory("Scanning", Results.Classification):
+        prtString = "* A scanning attempt."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+        prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
-	if IfCategory("Ringing", Results.Classification):
-		prtString = "* The message belongs to a ringing attack."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+    if IfCategory("Ringing", Results.Classification):
+        prtString = "* The message belongs to a ringing attack."; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
-	prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+    prtString = ""; Results.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
         
 def IfCategory(Category, Classification):
-	"""
-	Returns whether a category is found or not.
-	"""
-	Found = False
+    """
+    Returns whether a category is found or not.
+    """
+    Found = False
        
-	for i in range(len(Classification)):
-		if Classification[i] == Category:
-			Found = True
-			break
+    for i in range(len(Classification)):
+        if Classification[i] == Category:
+            Found = True
+            break
 
-	if Found: 
-		return True
-	else:
-		return False
+    if Found: 
+        return True
+    else:
+        return False
