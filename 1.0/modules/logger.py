@@ -35,19 +35,22 @@ def CreateLogger(logger, log_file):
     # Create the directory
     if not os.path.exists(LOG_PATH):
         try:
-        os.mkdir(LOG_PATH)
+            os.mkdir(LOG_PATH)
         except OSError:
-        File_created = False
+            File_created = False
+
+    file_formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s %(message)s")
+    cons_formatter = logging.Formatter("%(asctime)s %(message)s")
 
     try:
         file_hdl = logging.FileHandler(log_file)
-        formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s %(message)s")
-        file_hdl.setFormatter(formatter)
+        file_hdl.setFormatter(file_formatter)
     except IOError:
         File_created = False
 
     cons_hdl = logging.StreamHandler()
     cons_hdl.setLevel(logging.INFO) 
+    cons_hdl.setFormatter(cons_formatter)
 
     if File_created == True:
         logger.addHandler(file_hdl)
