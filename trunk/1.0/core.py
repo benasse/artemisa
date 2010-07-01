@@ -165,7 +165,10 @@ class Server(object):
         """
         This method do the re-registration.
         """
-        self.acc.set_registration(True)
+        try:
+            self.account.set_registration(True)
+        except:
+            logger.error("Error in on_reg_state() while trying to do set_registration().")
 
     def Unregister(self):
         """
@@ -203,7 +206,10 @@ class MyAccountCallback(pj.AccountCallback):
                 logger.info("Extension " + str(self.account.info().uri) + " registration failed, status=" + str(self.account.info().reg_status) + " (" + str(self.account.info().reg_reason) + ")")
                 # This part is important since it's necessary to try the registration again if it fails.
                 logger.info("Trying to register again.")
-                self.account.set_registration(True)
+                try:
+                    self.account.set_registration(True)
+                except:
+                    logger.error("Error in on_reg_state() while trying to do set_registration().")
             else:
                 logger.info("Extension " + str(self.account.info().uri) + " registration status=" + str(self.account.info().reg_status) + " (" + str(self.account.info().reg_reason) + ")")
         else:
@@ -260,7 +266,7 @@ class MyCallCallback(pj.CallCallback):
     """
     Callback to receive events from Call
     """
-     def __init__(self, lib, current_call, Sound_enabled, MediaReceived, Playfile):
+    def __init__(self, lib, current_call, Sound_enabled, MediaReceived, Playfile):
         self.current_call = current_call
         pj.CallCallback.__init__(self, self.current_call)
         self.rec_slot = None
