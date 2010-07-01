@@ -382,13 +382,13 @@ class Artemisa(object):
         self.SIP_VERSION = "2.0"
 
         # Environment configuration
-        self.Local_IP = ""                        # Local IP
+        self.Local_IP = ""                      # Local IP
         self.Local_port = ""                    # Local port
-        self.SIPdomain = ""                        # Local SIP domain
-        self.UserAgent = ""                        # User-Agent name used by Artemisa 
-        self.MaxCalls = 0                        # Max number of calls to handle
-        self.NumCalls = 0                        # Number of calls being analysed
-        self.Playfile = ""                        # Name of the file to be played
+        self.SIPdomain = ""                     # Local SIP domain
+        self.UserAgent = ""                     # User-Agent name used by Artemisa 
+        self.MaxCalls = 0                       # Max number of calls to handle
+        self.NumCalls = 0                       # Number of calls being analysed
+        self.Playfile = ""                      # Name of the file to be played
 
         # Sound configuration
         self.Sound_enabled = True
