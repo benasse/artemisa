@@ -15,7 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-VERSION = "1.0."
+# Important note:
+# The following string "repvernumber" will be autimatically replaced by 
+# the clean_and_prepare_for_release.sh script. So, don't modify it!
+VERSION = "repvernumber"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
