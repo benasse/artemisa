@@ -625,8 +625,8 @@ class Artemisa(object):
         print "verbose off                  Turn verbose mode off"
         print "email on                     Turn e-mail report on"
         print "email off                    Turn e-mail report off"
-
-        print "show statistics, stats   Show the statistics of the current instance."
+        print ""
+        print "show statistics, stats       Show the statistics of the current instance."
         print ""
         print "clean logs                   Remove all log files"
         print "clean results                Remove all results files"
