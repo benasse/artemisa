@@ -11,3 +11,4 @@
 SIPVicious=friendly-scanner
 SIPSCAN=X-Lite
 SipSendFun=Bad Guy Scripting Host
+inviteflood=Elite 1.0
