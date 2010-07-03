@@ -33,7 +33,11 @@ def Correlator(Results, Flood):
     ####################################################################################
     ####################################################################################
     ##                                                                                ##
-    ## FIXME: For now, this is a very simple correlator that should be improved.      ##
+    ## TODO: For now, this is a very simple correlator that should be improved.       ##
+    ##                                                                                ##
+    ## The "Results" parameter is a CallData object which contains all the data       ##    
+    ## related with the call and the classifier, so if you wish you can extract it    ##
+    ## and define your own rules.                                                     ##
     ##                                                                                ##
     ####################################################################################
     ####################################################################################
