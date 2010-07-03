@@ -238,6 +238,12 @@ class Classifier():
             
             prtString = "+ Checking if proxy in Via..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
             prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+
+            if len(self.CallInformation.Via) == 0:
+                prtString = "| No Via found."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+                prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+                return
+
             prtString = "| + Checking " + self.CallInformation.Via[0][0] + ":" + self.CallInformation.Via[0][1] + "/" + self.CallInformation.Via[0][2] + "..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
             prtString = "| |"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
