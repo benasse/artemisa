@@ -448,6 +448,8 @@ class Artemisa(object):
 
         global Unregister
         
+        del self.email
+
         Unregister = True
 
         # Delete the Server instances which will close the connections
@@ -509,6 +511,8 @@ class Artemisa(object):
         # Read the registrar servers configuration in servers.conf
         self.LoadServers()
                 
+        self.email = Email() # Creates an Email object
+
         self.ua_cfg = pj.UAConfig()
         self.ua_cfg.user_agent = self.UserAgent
         self.ua_cfg.max_calls = self.MaxCalls
@@ -600,40 +604,42 @@ class Artemisa(object):
     def ShowHelp(self, Commands = True):
         """
         Keyword Arguments:
-        Commands -- when True the commands list is shown. 
+        Commands -- when True the commands list is shown 
     
         Shows the help
         """
         print "Usage: artemisa [Options]"
-        print "  -v, --verbose            Verbose mode (it shows more information)."
-        print "  -g, --get_sound_devices   Show the available sound devices."
+        print "  -v, --verbose              Verbose mode (it shows more information)"
+        print "  -g, --get_sound_devices    Show the available sound devices"
     
         if not Commands: return
     
         print ""    
         print "Commands list:"
         print ""
-        print "mode active              Change behaviour mode to active."
-        print "mode passive             Change behaviour mode to passive."
-        print "mode aggressive          Change behaviour mode to aggressive."
+        print "mode active                  Change behaviour mode to active"
+        print "mode passive                 Change behaviour mode to passive"
+        print "mode aggressive              Change behaviour mode to aggressive"
         print ""
-        print "verbose on               Turn verbose mode on (it shows more information)."
-        print "verbose off              Turn verbose mode off."
-        print ""
+        print "verbose on                   Turn verbose mode on (it shows more information)"
+        print "verbose off                  Turn verbose mode off"
+        print "email on                     Turn e-mail report on"
+        print "email off                    Turn e-mail report off"
+
         print "show statistics, stats   Show the statistics of the current instance."
         print ""
-        print "clean logs               Remove all log files."
-        print "clean results            Remove all results files."
-        print "clean calls              Remove all the recorded calls."
-        print "clean all                Remove all files."
-        print "                         (Use these commands carefully)"
+        print "clean logs                   Remove all log files"
+        print "clean results                Remove all results files"
+        print "clean calls                  Remove all the recorded calls"
+        print "clean all                    Remove all files"
+        print "                             (Use these commands carefully)"
         print ""
-        print "hangup all               Hang up all calls."
+        print "hangup all                   Hang up all calls"
         print ""
-        print "show warranty            Show the program warrany."
-        print "show license             Show the program license."
+        print "show warranty                Show the program warrany"
+        print "show license                 Show the program license"
         print ""
-        print "s, q, quit, exit         Exit"
+        print "s, q, quit, exit             Exit"
      
     def ReadKeyboard(self): 
         """
@@ -710,6 +716,14 @@ class Artemisa(object):
                 self.verbose = False
                 logger.info("Verbose mode off.")
                         
+            elif s.find("email") != -1 and s.find("on") != -1:
+                self.email.Enabled = True
+                logger.info("E-mail reporting on.")
+            
+            elif s.find("email") != -1 and s.find("off") != -1:
+                self.email.Enabled = False
+                logger.info("E-mail reporting off.")
+
             elif s == "show warranty":
                 print ""
                 print "THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY"
@@ -1092,16 +1106,13 @@ class Artemisa(object):
         return Filename
 
     def SendResultsByEmail(self, HTMLData):
-        email = Email() # Creates an Email object
     
-        if not email.Enabled: 
+        if not self.email.Enabled: 
             logger.info("E-mail notification is disabled.")
         else:
             logger.info("Sending this report by e-mail...")
-            email.sendemail(HTMLData)
+            self.email.sendemail(HTMLData)
     
-        del email
-
     def GetFilename(self, Ext):
         """
         Defines a file name to store the output.
