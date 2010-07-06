@@ -56,7 +56,8 @@ class Classifier():
         prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         prtString = "| " + self.CallInformation.UserAgent; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
-        self.CallInformation.ToolName = CheckFingerprint(self.CallInformation.UserAgent)
+        # Artemisa will find fingerprint signatures in the whole SIP message
+        self.CallInformation.ToolName = CheckFingerprint(self.CallInformation.SIP_Message)
         if self.CallInformation.ToolName < 0:
             prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
             prtString = "| Fingerprint check failed."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
