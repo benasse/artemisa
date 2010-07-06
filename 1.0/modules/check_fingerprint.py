@@ -26,10 +26,14 @@ from commons import RemoveComments
 
 from modules.logger import logger
 
-def CheckFingerprint(UserAgent):
+def CheckFingerprint(SourceData):
+    """
+    Keyword Arguments:
+    SourceData -- the data to where the signature will be searched
 
+    This scripts searchs signatures in a set of data.
+    """
     # Now the program should read the fingerprint.txt in order to get the strings to search and compare.
-
     try:
         File = open(FINGERPRINT_PATH, "r")
         
@@ -45,7 +49,7 @@ def CheckFingerprint(UserAgent):
         if line == "": continue
         ToolName = line.split("=")[0]
         Fingerprint = line.split("=")[1]
-        if UserAgent.find(Fingerprint) != -1:
+        if SourceData.find(Fingerprint) != -1:
             Found = True
             break
             
