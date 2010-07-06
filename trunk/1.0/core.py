@@ -1001,7 +1001,8 @@ class Artemisa(object):
             self.On_flood_parameters = self.On_flood_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
             self.On_flood_parameters = self.On_flood_parameters.replace("$Connection_IP$", Results.Connection)
             self.On_flood_parameters = self.On_flood_parameters.replace("$Owner_IP$", Results.Owner)
-            
+            self.On_flood_parameters = self.On_flood_parameters.replace("$Tool_name$", Results.ToolName)
+
             Command = "bash " + ON_FLOOD_SCRIPT_PATH + " " + self.On_flood_parameters
             logger.info("Executing " + Command + " ...")
             # Execute a script
@@ -1031,7 +1032,8 @@ class Artemisa(object):
             self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
             self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Connection_IP$", Results.Connection)
             self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Owner_IP$", Results.Owner)
-        
+            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Tool_name$", Results.ToolName)
+
             Command = "bash " + ON_SPIT_SCRIPT_PATH + " " + self.On_SPIT_parameters
             logger.info("Executing " + Command + " ...")
             # Execute a script
@@ -1061,6 +1063,7 @@ class Artemisa(object):
             self.On_scanning_parameters = self.On_scanning_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
             self.On_scanning_parameters = self.On_scanning_parameters.replace("$Connection_IP$", Results.Connection)
             self.On_scanning_parameters = self.On_scanning_parameters.replace("$Owner_IP$", Results.Owner)
+            self.On_scanning_parameters = self.On_scanning_parameters.replace("$Tool_name$", Results.ToolName)
         
             Command = "bash " + ON_SCANNING_SCRIPT_PATH + " " + self.On_scanning_parameters
             logger.info("Executing " + Command + " ...")
