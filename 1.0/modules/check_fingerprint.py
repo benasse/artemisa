@@ -39,7 +39,7 @@ def CheckFingerprint(SourceData):
         
     except:
         logger.warning("Can't read " + FINGERPRINT_PATH)
-        return -1
+        return ""
         
     Found = False
         
@@ -58,7 +58,7 @@ def CheckFingerprint(SourceData):
     if Found:
         return ToolName
     else:
-        return 0
+        return ""
     
 
 if __name__ == '__main__':

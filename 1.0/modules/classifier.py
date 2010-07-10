@@ -34,13 +34,13 @@ class Classifier():
     This class performs the classification of the received SIP message.
     """
     
-    def __init__(self, verbose, strLocal_IP, strLocal_port, behaviour_mode, behaviour_actions, SIP_Message, Extensions, bACKReceived, bMediaReceived):
+    def __init__(self, verbose, strLocal_IP, strLocal_port, behaviour_mode, behaviour_actions, SIP_Message, Extensions, bACKReceived, MediaReceived):
         self.strLocal_IP = strLocal_IP
         self.strLocal_port = strLocal_port
         self.verbose = verbose # Flag to know whether the verbose mode is set or not
         self.Extensions = Extensions # Extensions registered by Artemisa
         self.bACKReceived = bACKReceived
-        self.bMediaReceived = bMediaReceived
+        self.MediaReceived = MediaReceived
         self.Behaviour = behaviour_mode
         self.Behaviour_actions = behaviour_actions
         self.bRequestURI = False
@@ -58,10 +58,10 @@ class Classifier():
         
         # Artemisa will find fingerprint signatures in the whole SIP message
         self.CallInformation.ToolName = CheckFingerprint(self.CallInformation.SIP_Message)
-        if self.CallInformation.ToolName < 0:
-            prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-            prtString = "| Fingerprint check failed."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
-        elif self.CallInformation.ToolName == 0:
+        #if self.CallInformation.ToolName < 0:
+        #    prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+        #    prtString = "| Fingerprint check failed."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
+        if self.CallInformation.ToolName == "":
             prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
             prtString = "| No fingerprint found."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         else:
@@ -293,7 +293,7 @@ class Classifier():
         prtString = "+ Checking for received media..."; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         
-        if self.bMediaReceived:
+        if self.MediaReceived:
             prtString = "| Media received: Yes"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
             prtString = "|"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
             prtString = "| Category: SPIT"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)

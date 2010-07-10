@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "repvernumber" will be autimatically replaced by 
+# The following string "1.0.8x" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "repvernumber"
+VERSION = "1.0.8x"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -90,6 +90,7 @@ from modules.logger import logger               # Instance a logger for informat
 from modules.logger import pjsua_logger         # Instance a logger for information about the PJSUA library
 
 Unregister = False                              # Flag to know whether the unregistration process is taking place
+MediaReceived = False                           # Flag to know if media has been received
 
 class Extension(object):
     """
@@ -105,7 +106,7 @@ class Server(object):
     Manage registration information.
     """
 
-    def __init__(self, behaviour_mode, Name, Active_mode, Passive_mode, Aggressive_mode, Registrar_IP, Registrar_port, Registrar_time, NAT_ka_interval, Extensions, lib, Sound_enabled, MediaReceived, Playfile):
+    def __init__(self, behaviour_mode, Name, Active_mode, Passive_mode, Aggressive_mode, Registrar_IP, Registrar_port, Registrar_time, NAT_ka_interval, Extensions, lib, Sound_enabled, Playfile):
         self.Name = Name
         self.Active_mode = Active_mode
         self.Passive_mode = Passive_mode
@@ -124,7 +125,6 @@ class Server(object):
 
         self.lib = lib
         self.Sound_enabled = Sound_enabled
-        self.MediaReceived = MediaReceived
         self.Playfile = Playfile
 
     def __del__(self):
@@ -145,20 +145,13 @@ class Server(object):
         except:
             pass
 
-        try:
-            self.acc = None
-            self.acc_cfg = None
-            self.acc_cb = None
-        except:
-            pass
-        
         for i in range(len(self.Extensions)):
             self.acc_cfg = pj.AccountConfig(self.Registrar_IP + ":" + self.Registrar_port, self.Extensions[i].Extension, self.Extensions[i].Password, self.Extensions[i].Username)
             self.acc_cfg.reg_timeout = self.Registrar_time * 60
             self.acc_cfg.ka_interval = self.NAT_ka_inverval
             self.acc = self.lib.create_account(self.acc_cfg)
 
-            self.acc_cb = MyAccountCallback(self.acc, self.lib, self.behaviour_mode, self.Active_mode, self.Passive_mode, self.Aggressive_mode, self.Sound_enabled, self.MediaReceived, self.Playfile)
+            self.acc_cb = MyAccountCallback(self.acc, self.lib, self.behaviour_mode, self.Active_mode, self.Passive_mode, self.Aggressive_mode, self.Sound_enabled, self.Playfile)
             self.acc.set_callback(self.acc_cb)
     
             logger.info("Extension " + str(self.Extensions[i].Extension) + " registration sent. Status: " + str(self.acc.info().reg_status) + " (" + str(self.acc.info().reg_reason) + ")")
@@ -183,13 +176,12 @@ class Server(object):
             pass
 
 
-
 class MyAccountCallback(pj.AccountCallback):
     """
     Callback to receive events from account.
     """
 
-    def __init__(self, account, lib, behaviour_mode, Active_mode, Passive_mode, Aggressive_mode, Sound_enabled, MediaReceived, Playfile):
+    def __init__(self, account, lib, behaviour_mode, Active_mode, Passive_mode, Aggressive_mode, Sound_enabled, Playfile):
         pj.AccountCallback.__init__(self, account)
         self.lib = lib
         self.behaviour_mode = behaviour_mode
@@ -197,8 +189,8 @@ class MyAccountCallback(pj.AccountCallback):
         self.Passive_mode = Passive_mode
         self.Aggressive_mode = Aggressive_mode
         self.Sound_enabled = Sound_enabled
-        self.MediaReceived = MediaReceived
         self.Playfile = Playfile
+        self.call_cb = None
 
     def on_reg_state(self):
         if not Unregister:
@@ -236,7 +228,7 @@ class MyAccountCallback(pj.AccountCallback):
         try:
             self.current_call = call
 
-            self.call_cb = MyCallCallback(self.lib, self.current_call, self.Sound_enabled, self.MediaReceived, self.Playfile)
+            self.call_cb = MyCallCallback(self.lib, self.current_call, self.Sound_enabled, self.Playfile)
             self.current_call.set_callback(self.call_cb)
 
             if self.behaviour_mode == "active":
@@ -269,9 +261,7 @@ class MyCallCallback(pj.CallCallback):
     """
     Callback to receive events from Call
     """
-    def __init__(self, lib, current_call, Sound_enabled, MediaReceived, Playfile):
-        self.current_call = current_call
-        pj.CallCallback.__init__(self, self.current_call)
+    def __init__(self, lib, current_call, Sound_enabled, Playfile):
         self.rec_slot = None
         self.rec_id = None
         self.player_slot = None
@@ -279,8 +269,10 @@ class MyCallCallback(pj.CallCallback):
 
         self.lib = lib
         self.Sound_enabled = Sound_enabled
-        self.MediaReceived = MediaReceived
         self.Playfile = Playfile
+
+        self.current_call = current_call
+        pj.CallCallback.__init__(self, self.current_call)
 
     # Notification when call state has changed
     def on_state(self):
@@ -312,6 +304,8 @@ class MyCallCallback(pj.CallCallback):
     # Notification when call's media state has changed.
     def on_media_state(self):
         
+        global MediaReceived
+
         if not self.Sound_enabled: return
         
         if self.call.info().media_state == pj.MediaState.ACTIVE: 
@@ -339,7 +333,7 @@ class MyCallCallback(pj.CallCallback):
                     
                     logger.info("Audio is now being recorded on file: " + Filename)
                     
-                    self.MediaReceived = True
+                    MediaReceived = True
                 
             except:
                 logger.error("Error while trying to record the call.")
@@ -436,7 +430,6 @@ class Artemisa(object):
 
         self.INVITETag = ""                     # Tag of the received INVITE
         self.ACKReceived = False                # We must know if an ACK was received
-        self.MediaReceived = False              # Flag to know whether media has been received
         self.Flood = False                      # Flag to know whether flood was detected
     
         self.main(args)                         # Here invokes the method that starts Artemisa
@@ -832,7 +825,7 @@ class Artemisa(object):
                                 exten_list.append(self.Extensions[j])
                                 break
 
-                    self.Servers.append(Server(self.behaviour_mode, item, self.Active_mode, self.Passive_mode, self.Aggressive_mode, config.get(item, "registrar_ip"), config.get(item, "registrar_port"), int(config.get(item, "registrar_time")), int(config.get(item, "nat_keepalive_interval")), exten_list, self.lib, self.Sound_enabled, self.MediaReceived, self.Playfile))
+                    self.Servers.append(Server(self.behaviour_mode, item, self.Active_mode, self.Passive_mode, self.Aggressive_mode, config.get(item, "registrar_ip"), config.get(item, "registrar_port"), int(config.get(item, "registrar_time")), int(config.get(item, "nat_keepalive_interval")), exten_list, self.lib, self.Sound_enabled, self.Playfile))
             
             except Exception, e:
                 print str(e)
@@ -1141,9 +1134,11 @@ class Artemisa(object):
         """
         # Wait 5 seconds for an ACK and media events. 
         self.WaitForPackets(5)
-    
+
+        global MediaReceived
+
         # Create an instance of the Classifier
-        classifier_instance = Classifier(self.verbose, self.Local_IP, self.Local_port, self.behaviour_mode, self.GetBehaviourActions(), SIP_Message_data, self.Extensions, self.ACKReceived, self.MediaReceived)
+        classifier_instance = Classifier(self.verbose, self.Local_IP, self.Local_port, self.behaviour_mode, self.GetBehaviourActions(), SIP_Message_data, self.Extensions, self.ACKReceived, MediaReceived)
 
         # Start the classification
         classifier_instance.Start()
@@ -1180,7 +1175,9 @@ class Artemisa(object):
         self.SendResultsByEmail(HTMLMailData)
                 
         self.ACKReceived = False
-        self.MediaReceived = False
+
+        MediaReceived = False
+
         self.Flood = False
     
         self.NumCalls -= 1
