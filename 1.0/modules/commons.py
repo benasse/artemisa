@@ -31,9 +31,10 @@ class CallData(object):
     Class employed to store some data about the received call and the analysis
     """
 
-    def __init__(self):
-        self.SIP_Message = ""
+    def __init__(self, SIP_Message):
+        self.SIP_Message = SIP_Message
 
+        # All the properties are created (empty)
         self.INVITE_IP = "" # Corresponds to the first line of a INVITE message
         self.INVITE_Port = ""
         self.INVITE_Transport = ""
@@ -51,7 +52,7 @@ class CallData(object):
         self.Contact_Port = ""
         self.Contact_Transport = ""
         self.Contact_Extension = ""
-        
+
         self.Via = []
         
         self.Record_Route = ""
@@ -65,6 +66,61 @@ class CallData(object):
         self.Classification = []
         self.ToolName = "" # Flag to store the attack tool detected
         self.Results_File_Buffer = "" # Stores the results printed on screen
+
+        # And then some of them are filled
+        self.GetDataFromMessage()
+    
+    def GetDataFromMessage(self):
+        """
+        This method fill the object properies with the data extracted from 
+        the SIP message
+        """
+
+        # First line of the SIP message (We call it INVITE). In case the message is not an INVITE
+        # there is no problem since that is filled with "".
+        self.INVITE_IP = GetIPfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
+        self.INVITE_Port = GetPortfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
+        if self.INVITE_Port == "": self.INVITE_Port = "5060" # By default
+        self.INVITE_Extension = GetExtensionfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
+        self.INVITE_Transport = GetTransportfromSIP(GetSIPHeader("INVITE",self.SIP_Message))
+    
+        # Field To
+        self.To_IP = GetIPfromSIP(GetSIPHeader("To",self.SIP_Message))
+        self.To_Extension = GetExtensionfromSIP(GetSIPHeader("To",self.SIP_Message))
+        
+        # Field From
+        self.From_IP = GetIPfromSIP(GetSIPHeader("From",self.SIP_Message))
+        self.From_Port = GetPortfromSIP(GetSIPHeader("From",self.SIP_Message))
+        if self.From_Port == "": self.From_Port = "5060" # By default
+        self.From_Extension = GetExtensionfromSIP(GetSIPHeader("From",self.SIP_Message))
+        self.From_Transport = GetTransportfromSIP(GetSIPHeader("From",self.SIP_Message))
+
+        # Field Contact
+        self.Contact_IP = GetIPfromSIP(GetSIPHeader("Contact",self.SIP_Message))
+        self.Contact_Port = GetPortfromSIP(GetSIPHeader("Contact",self.SIP_Message))
+        if self.Contact_Port == "": self.Contact_Port = "5060" # By default
+        self.Contact_Extension = GetExtensionfromSIP(GetSIPHeader("Contact",self.SIP_Message))
+        self.Contact_Transport = GetTransportfromSIP(GetSIPHeader("Contact",self.SIP_Message))
+            
+        # Field Connection
+        self.Connection = GetIPfromSIP(GetSIPHeader("c=",self.SIP_Message))
+        
+        # Field Owner
+        self.Owner = GetIPfromSIP(GetSIPHeader("o=",self.SIP_Message))
+            
+        # Field UserAgent
+        self.UserAgent = GetSIPHeader("User-Agent",self.SIP_Message)
+    
+        # Field RecordRoute
+        #Record_Route = GetSIPHeader("Record-Route",self.SIP_Message)
+        
+        # Field Via
+        for line in self.SIP_Message.splitlines():
+            if line[0:4] == "Via:":
+                self.Via.append([GetIPfromSIP(line.strip()), GetPortfromSIP(line.strip()), GetTransportfromSIP(GetSIPHeader(line.strip(),self.SIP_Message))])
+        
+
+
 
 class GetTimeClass:
     """

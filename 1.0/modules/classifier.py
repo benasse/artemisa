@@ -45,8 +45,7 @@ class Classifier():
         self.Behaviour_actions = behaviour_actions
         self.bRequestURI = False
         self.Running = True # State of the analysis
-        self.CallInformation = CallData() # Creates an instance of CallData
-        self.CallInformation.SIP_Message = SIP_Message # Stores the SIP message to classify (usually the INVITE)
+        self.CallInformation = CallData(SIP_Message) # Creates an instance of CallData
 
     def Tests_CheckFingerprint(self):
         """
@@ -310,8 +309,6 @@ class Classifier():
         """
         This function starts the process. 
         """
-
-        self.GetCallData() # Retrieves all the necessary data from the message for further analysis
         
         prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
         prtString = "******************************* Information about the call *******************************"; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
@@ -380,58 +377,6 @@ class Classifier():
         prtString = ""; self.CallInformation.Results_File_Buffer += "\n" + prtString; logger.info(prtString)
 
         self.Running = False
-
-
-    def GetCallData(self):
-        """
-        This method extracts information from the SIP message.
-        """
-                
-        # First line of the SIP message (We call it INVITE)
-        self.CallInformation.INVITE_IP = GetIPfromSIP(GetSIPHeader("INVITE",self.CallInformation.SIP_Message))
-        self.CallInformation.INVITE_Port = GetPortfromSIP(GetSIPHeader("INVITE",self.CallInformation.SIP_Message))
-        if self.CallInformation.INVITE_Port == "": self.CallInformation.INVITE_Port = "5060" # By default
-        self.CallInformation.INVITE_Extension = GetExtensionfromSIP(GetSIPHeader("INVITE",self.CallInformation.SIP_Message))
-
-        self.CallInformation.INVITE_Transport = GetTransportfromSIP(GetSIPHeader("INVITE",self.CallInformation.SIP_Message))
-    
-        # Field To
-        self.CallInformation.To_IP = GetIPfromSIP(GetSIPHeader("To",self.CallInformation.SIP_Message))
-        self.CallInformation.To_Extension = GetExtensionfromSIP(GetSIPHeader("To",self.CallInformation.SIP_Message))
-        
-        # Field From
-        self.CallInformation.From_IP = GetIPfromSIP(GetSIPHeader("From",self.CallInformation.SIP_Message))
-        self.CallInformation.From_Port = GetPortfromSIP(GetSIPHeader("From",self.CallInformation.SIP_Message))
-        if self.CallInformation.From_Port == "": self.CallInformation.From_Port = "5060" # By default
-        self.CallInformation.From_Extension = GetExtensionfromSIP(GetSIPHeader("From",self.CallInformation.SIP_Message))
-
-        self.CallInformation.From_Transport = GetTransportfromSIP(GetSIPHeader("From",self.CallInformation.SIP_Message))
-
-        # Field Contact
-        self.CallInformation.Contact_IP = GetIPfromSIP(GetSIPHeader("Contact",self.CallInformation.SIP_Message))
-        self.CallInformation.Contact_Port = GetPortfromSIP(GetSIPHeader("Contact",self.CallInformation.SIP_Message))
-        if self.CallInformation.Contact_Port == "": self.CallInformation.Contact_Port = "5060" # By default
-        self.Contact_Extension = GetExtensionfromSIP(GetSIPHeader("Contact",self.CallInformation.SIP_Message))
-
-        self.CallInformation.Contact_Transport = GetTransportfromSIP(GetSIPHeader("Contact",self.CallInformation.SIP_Message))
-            
-        # Field Connection
-        self.CallInformation.Connection = GetIPfromSIP(GetSIPHeader("c=",self.CallInformation.SIP_Message))
-        
-        # Field Owner
-        self.CallInformation.Owner = GetIPfromSIP(GetSIPHeader("o=",self.CallInformation.SIP_Message))
-            
-        # Field UserAgent
-        self.CallInformation.UserAgent = GetSIPHeader("User-Agent",self.CallInformation.SIP_Message)
-    
-        # Field RecordRoute
-        #self.CallInformation.Record_Route = GetSIPHeader("Record-Route",self.CallInformation.SIP_Message)
-        
-        # Field Via
-        for line in self.CallInformation.SIP_Message.splitlines():
-            if line[0:4] == "Via:":
-                self.CallInformation.Via.append([GetIPfromSIP(line.strip()), GetPortfromSIP(line.strip()), GetTransportfromSIP(GetSIPHeader(line.strip(),self.CallInformation.SIP_Message))])
-        
         
     def AddCategory(self, Category):
         """
