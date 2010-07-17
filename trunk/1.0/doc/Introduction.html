@@ -1,0 +1,314 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Artemisa v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Artemisa v1.0 documentation" href="index.html" />
+    <link rel="next" title="Downloading and installation" href="Installation.html" />
+    <link rel="prev" title="Artemisa’s documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Installation.html" title="Downloading and installation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Artemisa’s documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Artemisa v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-artemisa">
+<h2>What is Artemisa?<a class="headerlink" href="#what-is-artemisa" title="Permalink to this headline">¶</a></h2>
+<p>Artemisa is a honeypot software designed for VoIP networks which implements the SIP protocol. Basically, it registers
+itself just like a conventional telephone to the registrar server inside the enterprise domain where it is deployed, and
+detects malicious activity at an early stage. In an advanced deployment, Artemisa can play a role in the real-time
+adjustment of the security policies of the domain.</p>
+</div>
+<div class="section" id="what-is-a-honeypot-and-why-is-it-needed">
+<h2>What is a honeypot and why is it needed?<a class="headerlink" href="#what-is-a-honeypot-and-why-is-it-needed" title="Permalink to this headline">¶</a></h2>
+<p><em>A honeypot is an information system resource whose value lies in unauthorized or illicit use of that resource.</em> <a class="footnote-reference" href="#id2" id="id1">[1]</a></p>
+<p>A honeypot is like a bait, which simulates being some well-known system or service, that without being part of the
+production itself, it has the aim of watching and studying the behavior of anyone who interacts with it. In other words,
+a honeypot is a parallel system to the production one, whose main objective is to simulate being this last one, and
+to achieve that anyone who interacts with it believes that she/he is doing it on the production system.</p>
+<p>Suppose you have a VoIP network like this:</p>
+<img alt="_images/voip_honeypot_1_en.png" src="_images/voip_honeypot_1_en.png" />
+<p>As is shown in the picture, the network has an Internet connection through a firewall. Suppose
+you have received some SIP attacks last month and therefore you want to improve its security. Setting up
+the firewall in order to deny any unknown IP address is not a practical solution, since you would
+likely be blocking many interesting calls whose IP addresses you don&#8217;t know. Then, here is where
+Artemisa takes place. Suppose that Artemisa is registered with twenty extensions to the SIP
+registrar server or PBX. When a hacker tries to investigate the network, she/he will find out the extensions
+of Artemisa. By that time, Artemisa will have the calls investigated, and will have reported the
+intruder. With this information, the system administrator will be able to properly configure
+the firewall. It&#8217;s also possible to make Artemisa run some user-configurable script that automatically adjusts the
+domain policies.</p>
+</div>
+<div class="section" id="how-does-it-work">
+<h2>How does it work?<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline">¶</a></h2>
+<p>Artemisa is based on the analysis of SIP messages. It analyzes the data found in the messages, and
+according to the results obtained by several verifications, Artemisa classifies the message. Such
+classification can be: <em>attack tool</em>, <em>scanning</em>, <em>ringing</em>, <em>SPIT</em>, among others.</p>
+<p>You just need to run Artemisa in a machine inside your domain and configure it in order to let it
+register at least with one extension to the SIP registrar server of your domain. Is recommended to
+deploy Artemisa in a virtual machine in order not to compromise a production machine.</p>
+<p>The following picture briefly depicts how Artemisa works:</p>
+<img alt="_images/example1_en.png" src="_images/example1_en.png" />
+<p>First, a call is received and it&#8217;s addressed to Artemisa (of course, the intruder doesn&#8217;t know about its existence).
+Artemisa answers the call, and at the same time investigates it. After finishing the investigation, it
+shows the report of results on screen and sends it by e-mail (if it&#8217;s configured).</p>
+</div>
+<div class="section" id="about-the-call-analysis">
+<h2>About the call analysis<a class="headerlink" href="#about-the-call-analysis" title="Permalink to this headline">¶</a></h2>
+<p>The analysis involves the following points (we explain them briefly):</p>
+<ul class="simple">
+<li>Look for fingerprints: The attack could have been created with a well-known attacking tool.</li>
+<li>Check the domain names: Are the domain names found in the SIP messages real? Can some public information about them be obtained?</li>
+<li>Check the SIP ports: Are the SIP ports of the attacker opened as they are pretended to be?</li>
+<li>Check media ports: Are media ports opened?</li>
+<li>Check request URI: Is the call (in such case) addressed to the honeypot?</li>
+<li>Check for ACK: Does the caller/attacker send the correct ACK messages?</li>
+<li>Check received media: Is there (RTP) media involved?</li>
+</ul>
+</div>
+<div class="section" id="about-the-results">
+<h2>About the results<a class="headerlink" href="#about-the-results" title="Permalink to this headline">¶</a></h2>
+<p>When the investigation of the call concludes, the results are shown in different manners:</p>
+<ul class="simple">
+<li>Console of Artemisa</li>
+<li>Plain text file on directory <em>/results</em></li>
+<li>HTML file on directory  <em>/results</em></li>
+<li>Notification by e-mail (if it&#8217;s activated and properly configured in <em>/conf/artemisa.conf</em>)</li>
+</ul>
+<p>This is an example of the results shown in the console of Artemisa (for privacy reasons in this document, the domain names and IP addresses have been replaced with &#8220;X&#8221;):</p>
+<div class="highlight-python"><pre>[2010-04-02 02:57:56] ******************************* Information about the call *******************************
+[2010-04-02 02:57:56]
+[2010-04-02 02:57:56] From: 3001 in XXX.XXX.XXX.XXX
+[2010-04-02 02:57:56] To: 3001 in XXX.XXX.XXX.XXX
+[2010-04-02 02:57:56] Contact: 3001 in XXXX:5061/udp
+[2010-04-02 02:57:56] Connection: XXX.XXX.XXX.XXX
+[2010-04-02 02:57:56] Owner: XXX.XXX.XXX.XXX
+[2010-04-02 02:57:56] Via 0: XXX.XXX.XXX.XXX:5061/udp
+[2010-04-02 02:57:56] User-Agent: Twinkle/1.4.2
+[2010-04-02 02:57:56]
+[2010-04-02 02:57:56] ************************************* Classification *************************************
+[2010-04-02 02:57:56]
+[2010-04-02 02:57:56] + Checking fingerprint...
+[2010-04-02 02:57:56] |
+[2010-04-02 02:57:56] | User-Agent: Twinkle/1.4.2
+[2010-04-02 02:57:56] |
+[2010-04-02 02:57:56] | No fingerprint found.
+[2010-04-02 02:57:56]
+[2010-04-02 02:57:56] + Checking DNS...
+[2010-04-02 02:57:56] |
+[2010-04-02 02:57:56] | + Checking XXXX...
+[2010-04-02 02:57:56] | |
+[2010-04-02 02:57:56] | | IP resolved: XXX.XXX.XXX.XXX
+[2010-04-02 02:57:56] | | WHOIS data found.
+[2010-04-02 02:57:56] | |
+[2010-04-02 02:57:56] | | Category: Interactive attack
+[2010-04-02 02:57:56] |
+[2010-04-02 02:57:56] | + Checking XXX.XXX.XXX.XXX...
+[2010-04-02 02:57:56] | |
+[2010-04-02 02:57:56] | | This is already an IP address. Nothing done.
+[2010-04-02 02:57:56] |
+[2010-04-02 02:57:56] | + Checking XXX.XXX.XXX.XXX...
+[2010-04-02 02:57:56] | |
+[2010-04-02 02:57:56] | | This is already an IP address. Nothing done.
+[2010-04-02 02:57:56]
+[2010-04-02 02:57:56] + Checking if SIP port is opened...
+[2010-04-02 02:57:56] |
+[2010-04-02 02:57:56] | + Checking XXXX:5061/udp...
+[2010-04-02 02:57:56] | |
+[2010-04-02 02:57:57] | | Port state: open|filtered
+[2010-04-02 02:57:57] | |
+[2010-04-02 02:57:57] | | Category: Interactive attack
+[2010-04-02 02:57:57]
+[2010-04-02 02:57:57] + Checking if media port is opened...
+[2010-04-02 02:57:57] |
+[2010-04-02 02:57:57] | + Checking XXXX:8000/udp...
+[2010-04-02 02:57:57] | |
+[2010-04-02 02:57:58] | | Port state: open|filtered
+[2010-04-02 02:57:58] | |
+[2010-04-02 02:57:58] | | Category: Interactive attack
+[2010-04-02 02:57:58]
+[2010-04-02 02:57:58] + Checking request URI...
+[2010-04-02 02:57:58] |
+[2010-04-02 02:57:58] | Extension in field To: 3001
+[2010-04-02 02:57:58] |
+[2010-04-02 02:57:58] | Request addressed to the honeypot? Yes
+[2010-04-02 02:57:58]
+[2010-04-02 02:57:58] + Checking for ACK...
+[2010-04-02 02:57:58] |
+[2010-04-02 02:57:58] | ACK received: No
+[2010-04-02 02:57:58] |
+[2010-04-02 02:57:58] | Category: Scanning
+[2010-04-02 02:57:58]
+[2010-04-02 02:57:58] + Checking for received media...
+[2010-04-02 02:57:58] |
+[2010-04-02 02:57:58] | Media received: Yes
+[2010-04-02 02:57:58] |
+[2010-04-02 02:57:58] | Category: SPIT
+[2010-04-02 02:57:58]
+[2010-04-02 02:57:58] + The message is classified as:
+[2010-04-02 02:57:58] | Interactive attack
+[2010-04-02 02:57:58] | Scanning
+[2010-04-02 02:57:58] | SPIT
+[2010-04-02 02:57:58]
+[2010-04-02 02:57:58] ************************************** Correlation ***************************************
+[2010-04-02 02:57:58]
+[2010-04-02 02:57:58] Artemisa concludes that the arrived message is likely to be:
+[2010-04-02 02:57:58]
+[2010-04-02 02:57:58] * A SPIT call.
+[2010-04-02 02:57:58]
+[2010-04-02 02:57:58] NOTICE This report has been saved on file ./results/2010-04-02_12.txt
+[2010-04-02 02:57:58] NOTICE This report has been saved on file ./results/2010-04-02_12.html
+[2010-04-02 02:57:58] NOTICE Sending this report by e-mail...</pre>
+</div>
+</div>
+<div class="section" id="user-configurable-scripts">
+<h2>User-configurable scripts<a class="headerlink" href="#user-configurable-scripts" title="Permalink to this headline">¶</a></h2>
+<p>There are some <em>bash</em> scripts that are executed when the investigation of a call is finished. The script executed
+is appropriate to the nature of the call (e.g. SPIT). These are found on directory <em>/scripts</em>.</p>
+<ul class="simple">
+<li><em>on_flood.sh</em></li>
+<li><em>on_spit.sh</em></li>
+<li><em>on_scanning.sh</em></li>
+</ul>
+<p>Each script is executed with a set of arguments given, which are defined in file <em>/conf/actions.conf</em>. These parameters
+are for example: IP addresses, port numbers, extensions, et cetera. The administrador is able to use these information
+provided by Artemisa to create automatical responses to the attacks, e.g. setting a rule in <em>iptables</em> for dropping all
+packets incoming from the attacker&#8217;s IP address when flood is detected. Interesting ideas for usage of these scripts are:</p>
+<ul class="simple">
+<li>Setting firewall (e.g. iptables) rules to drop the attacker IP</li>
+<li>Setting rules in the VoIP PBX (e.g. Asterisk) to hang up calls incoming with certain IP or extension</li>
+<li>Launch other tools (e.g. svcrash.py to crash SIPVicious)</li>
+</ul>
+</div>
+<div class="section" id="record-of-calls">
+<h2>Record of calls<a class="headerlink" href="#record-of-calls" title="Permalink to this headline">¶</a></h2>
+<p>The audio of the received calls is stored (if it&#8217;s configured) with WAV format on directory <em>/recorded_calls</em>.</p>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Has a SPIT detection mechanism</li>
+<li>Can record calls, which is useful to detect and analyze SPIT</li>
+<li>Can take actions based on fingerprints</li>
+<li>Detects INVITE flooding</li>
+<li>Detects OPTIONS flooding</li>
+<li>Generates reports by e-mail when it receives a call</li>
+<li>Has different configurable modes of working</li>
+<li>It&#8217;s open source</li>
+</ul>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>L Spitzner, &#8220;Honeypots: Tracking Hackers&#8221;, Addison-Wesley Professional, 2002</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo_artemisa.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Introduction</a><ul>
+<li><a class="reference external" href="#what-is-artemisa">What is Artemisa?</a></li>
+<li><a class="reference external" href="#what-is-a-honeypot-and-why-is-it-needed">What is a honeypot and why is it needed?</a></li>
+<li><a class="reference external" href="#how-does-it-work">How does it work?</a></li>
+<li><a class="reference external" href="#about-the-call-analysis">About the call analysis</a></li>
+<li><a class="reference external" href="#about-the-results">About the results</a></li>
+<li><a class="reference external" href="#user-configurable-scripts">User-configurable scripts</a></li>
+<li><a class="reference external" href="#record-of-calls">Record of calls</a></li>
+<li><a class="reference external" href="#features">Features</a></li>
+<li><a class="reference external" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">Artemisa&#8217;s documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Installation.html"
+                                  title="next chapter">Downloading and installation</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Installation.html" title="Downloading and installation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Artemisa’s documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">Artemisa v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010, Mohamed Nassar, Rodrigo do Carmo, Pablo Masri.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Running Artemisa &mdash; Artemisa v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Artemisa v1.0 documentation" href="index.html" />
+    <link rel="next" title="License" href="License.html" />
+    <link rel="prev" title="Advanced configuration" href="Advanced.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="License.html" title="License"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Advanced.html" title="Advanced configuration"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Artemisa v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="running-artemisa">
+<h1>Running Artemisa<a class="headerlink" href="#running-artemisa" title="Permalink to this headline">¶</a></h1>
+<p>To run Artemisa write:</p>
+<div class="highlight-python"><pre>$ ./artemisa.py
+
+or
+
+$ python artemisa.py</pre>
+</div>
+<p>In order to obtain the list of parameters write:</p>
+<div class="highlight-python"><pre>$ ./artemisa.py -h
+
+or
+
+$ ./artemisa.py --help</pre>
+</div>
+<p>Inside the console of Artemisa, type &#8220;help&#8221; in order to get the list of available commands.</p>
+<p>When Artemisa is executed, it registers itself to the configured SIP servers and it waits for
+calls. For this reason <strong>it is very important</strong> to have Artemisa properly configured <strong>before</strong>
+executing it.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Some third-party tools used by Artemisa in order to investigate the source of the attack may require
+to be launched with super-user privileges. In such way, we recommend to deploy Artemisa within a virtual
+machine.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo_artemisa.png" alt="Logo"/>
+            </a></p>
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Advanced.html"
+                                  title="previous chapter">Advanced configuration</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="License.html"
+                                  title="next chapter">License</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="License.html" title="License"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Advanced.html" title="Advanced configuration"
+             >previous</a> |</li>
+        <li><a href="index.html">Artemisa v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010, Mohamed Nassar, Rodrigo do Carmo, Pablo Masri.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>
