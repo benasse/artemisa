@@ -33,6 +33,8 @@ ACTIONS_FILE_PATH = CONFIG_DIR + "actions.conf"
 EXTENSIONS_FILE_PATH = CONFIG_DIR + "extensions.conf"
 SERVERS_FILE_PATH = CONFIG_DIR + "servers.conf"
 
+NUMBER_OF_OPTIONS_MATCHES = 3 # Maximum number of different extension that an OPTIONS message can "target" after being considered a scanning attack
+
 try:
     """
     Try to import the PJSUA library. It's used for the SIP stack handling.
@@ -67,11 +69,12 @@ import sys, os
     
 import ConfigParser                             # Read configuration files
 
-from time import strftime, sleep, time
+from time import strftime, sleep, time, gmtime
 
 from modules.commons import *                   # Import functions from commons.py
 from modules.classifier import Classifier       # Message classifier 
 from modules.correlator import Correlator       # Correlator
+from modules.correlator import CheckIfScanning, CheckIfFlood
 
 import threading                                # Use of threads
 
@@ -410,19 +413,18 @@ class Artemisa(object):
         self.Extensions = []                    # Extensions
 
         self.LastINVITEreceived = ""            # Store the last INVITE message received in order to avoid analysing repeated messages
+        self.LastOPTIONSreceived = ""           # Same for OPTIONS
 
         #self.nSeq = 0                          # Number of received messages
 
         # Statistics
         self.N_INVITE = 0
         self.N_OPTIONS = 0
-        self.FLOOD = "no"
 
         self.OPTIONSReceived = False            # Flag to know if a OPTIONS was received
+        self.OPTIONS_Last_time = gmtime()       # Time of the last OPTIONS received (used to detect flood)
 
-        # TODO: Anti-flood mechanism for OPTIONS flood not yet implemented
-        #self.OPTIONS_Flood_timer0 = 0          # Flag to set a timer to detect OPTIONS flood
-        #self.OPTIONS_Flood_timer1 = 0          # Flag to set a timer to detect OPTIONS flood
+        self.OPTIONS_Exten = []                 # Extensions of the honeypot targeted with OPTIONS of the same source
 
         self.INVITETag = ""                     # Tag of the received INVITE
         self.ACKReceived = False                # We must know if an ACK was received
@@ -653,7 +655,11 @@ class Artemisa(object):
                 print ""
                 print "INVITE messages received: " + str(self.N_INVITE)
                 print "OPTIONS messages received: " + str(self.N_OPTIONS)
-                print "Flood detected?: " + self.FLOOD
+                if self.Flood: 
+                    FloodDetected = "yes"
+                else:
+                    FloodDetected = "no"
+                print "Flood detected?: " + FloodDetected
                 print ""
                 
             elif s == "hangup all":
@@ -1030,55 +1036,111 @@ class Artemisa(object):
 
         return Filename
 
-    def AnalyzeCall(self, SIP_Message_data):    
+    def AnalyzeMessage(self, SIP_Message_data, MessageType):    
         """
         Core of the program. Here is where the honeypot concludes if the packet received is trusted or not.
         """
-        # Wait 5 seconds for an ACK and media events. 
-        self.WaitForPackets(5)
-
         global MediaReceived
 
-        # Create an instance of the Classifier
-        classifier_instance = Classifier(self.verbose, self.Local_IP, self.Local_port, self.behaviour_mode, self.GetBehaviourActions(), SIP_Message_data, self.Extensions, self.ACKReceived, MediaReceived)
+        if MessageType == "INVITE":
 
-        # Start the classification
-        classifier_instance.Start()
+            # Wait 5 seconds for an ACK and media events. 
+            self.WaitForPackets(5)
 
-        while classifier_instance.Running:
-            pass
-    
-        Results = classifier_instance.CallInformation    
+            # Create an instance of the Classifier
+            classifier_instance = Classifier(self.verbose, self.Local_IP, self.Local_port, self.behaviour_mode, self.GetBehaviourActions(), SIP_Message_data, self.Extensions, self.ACKReceived, MediaReceived)
 
-        del classifier_instance
+            # Start the classification
+            classifier_instance.Start()
 
-        # Call the correlator
-        Correlator(Results, self.Flood, self.On_flood_parameters, self.On_SPIT_parameters, self.On_scanning_parameters)
-    
-        # Save the raw SIP message in the report file
-        TXTFilenme = self.GetFilename("txt")
-        TXTData = get_results_txt(TXTFilenme, self.VERSION, Results, self.Local_IP, self.Local_port)
-        self.SaveResultsToTextFile(TXTData, TXTFilenme)
-
-        # Save the results in a HTML file
-        HTMLFilenme = self.GetFilename("html")    
-        HTMLData = get_results_html(HTMLFilenme, self.VERSION, Results, False, self.Local_IP, self.Local_port)
-        self.SaveResultsToHTML(HTMLData, HTMLFilenme)
-
-        # Send the results by e-mail
-        # The function get_results_html is called again and it return an email-adapted format
-        HTMLMailData = get_results_html(HTMLFilenme, self.VERSION, Results, True, self.Local_IP, self.Local_port)
-        self.SendResultsByEmail(HTMLMailData)
+            while classifier_instance.Running:
+                pass
         
-        Results = None
+            Results = classifier_instance.CallInformation    
+
+            del classifier_instance
+
+            # Call the correlator
+            Correlator(Results, self.Flood, self.On_flood_parameters, self.On_SPIT_parameters, self.On_scanning_parameters)
         
-        self.ACKReceived = False
+            # Save the raw SIP message in the report file
+            TXTFilenme = self.GetFilename("txt")
+            TXTData = get_results_txt(TXTFilenme, self.VERSION, Results, self.Local_IP, self.Local_port)
+            self.SaveResultsToTextFile(TXTData, TXTFilenme)
 
-        MediaReceived = False
+            # Save the results in a HTML file
+            HTMLFilenme = self.GetFilename("html")    
+            HTMLData = get_results_html(HTMLFilenme, self.VERSION, Results, False, self.Local_IP, self.Local_port)
+            self.SaveResultsToHTML(HTMLData, HTMLFilenme)
 
-        self.Flood = False
+            # Send the results by e-mail
+            # The function get_results_html is called again and it return an email-adapted format
+            HTMLMailData = get_results_html(HTMLFilenme, self.VERSION, Results, True, self.Local_IP, self.Local_port)
+            self.SendResultsByEmail(HTMLMailData)
+            
+            Results = None
+            
+            self.ACKReceived = False
+
+            MediaReceived = False
+
+            self.Flood = False
+        
+            self.NumCalls -= 1
+
+        elif MessageType == "OPTIONS":
+
+            # The proceedment with the OPTIONS messages is rather different. 
+
+            # Get useful data from the message
+            MessageInformation = CallData(SIP_Message_data)
+
+            logger.info("OPTIONS message detected in extension " + MessageInformation.To_Extension + " from " + MessageInformation.Contact_IP + ":" + MessageInformation.Contact_Port)
+
+            # Warning: don't analyze the OPTIONS message if it comes from the Registrar servers since it can
+            # cause that Artemisa detects it as a scanning.
+            for item in self.Servers:
+                if MessageInformation.Contact_IP == item.Registrar_IP:
+                    if MessageInformation.Contact_Port == item.Registrar_port:
+                        logger.info("OPTIONS message seems to come from one of the SIP proxies. Nothing done.")
+                        return
+
+            # Save the information that links the extension of Artemisa and the IP of the message
+            #
+            # NOTE: the extensions could be, in fact, any extension (not just extension of Artemisa)
+            self.OPTIONS_Exten.append([MessageInformation.To_Extension, MessageInformation.Contact_IP])
+
+            # Now we check if OPTIONS messages from the same source has been seen in two
+            # more registered extensions of the honeypot.
+            Matches = 1
+            for item in self.OPTIONS_Exten:
+                if item[0] != MessageInformation.To_Extension: # The extension shoudln't be the same
+                    if item[1] == MessageInformation.Contact_IP:
+                        Matches += 1
+
+            if Matches == NUMBER_OF_OPTIONS_MATCHES:
+                MessageInformation.Classification.append("Scanning")
+
+                logger.info("*********************************** OPTIONS analysis *************************************")
+                logger.info("")
+                logger.info("The OPTIONS message is detected as an scanning attack!")                
+                logger.info("")
+
+                # And call the same method of the correlator used to deal with INVITEs scannings
+                CheckIfScanning(MessageInformation, self.On_scanning_parameters)
     
-        self.NumCalls -= 1
+                # Clear the buffer for future detections
+                self.OPTIONS_Exten = []
+                    
+            # If flood is present then call CheckIfFlood
+            if self.Flood:
+                logger.info("*********************************** OPTIONS analysis *************************************")
+                logger.info("")
+                logger.info("The OPTIONS message is detected as a flood attack!")                
+                logger.info("")
+
+                CheckIfFlood(MessageInformation, True, self.On_flood_parameters)
+                self.Flood = False
 
     def IsMessage(self, Message, Type):
         Temp = Message.strip().splitlines(True)
@@ -1102,54 +1164,87 @@ class Artemisa(object):
             # Here we check if the ACK received is for the received INVITE.        
             if Search("tag", str) == self.INVITETag:
                 self.ACKReceived = True
-            return
 
-        if self.IsMessage(str, "OPTIONS"):
+        elif self.IsMessage(str, "OPTIONS"):
+            # Actions if the message is an INVITE
+
             self.OPTIONSReceived = True
             self.N_OPTIONS += 1
-            return
 
-        if not self.IsMessage(str, "INVITE"):
-            # If False means that the received message was not an INVITE one
-            return
+            TimeNow = gmtime()
 
-        self.N_INVITE += 1
+            # If the distance in time between this OPTIONS message and the last received is less than
+            # a second, then it's reported as flood.
+            if (TimeNow.tm_hour - self.OPTIONS_Last_time.tm_hour) == 0:
+                if (TimeNow.tm_min - self.OPTIONS_Last_time.tm_min) == 0:
+                    if (TimeNow.tm_sec - self.OPTIONS_Last_time.tm_sec) == 0:
+                        self.Flood = True
 
-        # Store the tag of the INVITE to be used later to identify the ACK
-        self.INVITETag = Search("tag", str)
-    
-        INVITEMessage = ""
+            self.OPTIONS_Last_time = TimeNow
 
-        Temp = str.strip().splitlines(True)            
-        i = -1
-        for line in Temp:
-            line = line.strip()
-            i += 1
-            if i > 0 and line.find("--end msg--") == -1:
-                if INVITEMessage != "":
-                    INVITEMessage += "\n" + line
-                else:
-                    INVITEMessage = line
-    
-        if self.LastINVITEreceived == INVITEMessage:
-            logger.info("Duplicated INVITE detected.")
-            return # Don't analyze repeated messages
-            
-        logger.info("INVITE message detected.")
+            OPTIONSMessage = ""
 
-        # Store the INVITE message for the future
-        self.LastINVITEreceived = INVITEMessage
+            Temp = str.strip().splitlines(True)            
+            i = -1
+            for line in Temp:
+                line = line.strip()
+                i += 1
+                if i > 0 and line.find("--end msg--") == -1:
+                    if OPTIONSMessage != "":
+                        OPTIONSMessage += "\n" + line
+                    else:
+                        OPTIONSMessage = line
+        
+            if self.LastOPTIONSreceived == OPTIONSMessage:
+                logger.info("Duplicated OPTIONS detected.")
+                return # Don't analyze repeated messages
+                
+            # Store the OPTIONS message for the future
+            self.LastOPTIONSreceived = OPTIONSMessage
 
-        if self.NumCalls == self.MaxCalls:
-            logger.info("The maximum number of calls to simultaneously analyze has been reached.")
-            self.FLOOD = "yes"
-            self.Flood = True
-                 
-            return
+            # Convert function AnalyzeMessage in a thread and call it.
+            thrAnalyzeMessage = threading.Thread(target = self.AnalyzeMessage, args = (OPTIONSMessage,"OPTIONS",))
+            thrAnalyzeMessage.start()
 
-        # Convert function AnalyzeCall in a thread and call it.
-        thrAnalyzeCall = threading.Thread(target = self.AnalyzeCall, args = (INVITEMessage,))
-    
-        self.NumCalls += 1
+        elif self.IsMessage(str, "INVITE"):
+            # Actions if the message is an INVITE
 
-        thrAnalyzeCall.start()
+            self.N_INVITE += 1
+
+            # Store the tag of the INVITE to be used later to identify the ACK
+            self.INVITETag = Search("tag", str)
+        
+            INVITEMessage = ""
+
+            Temp = str.strip().splitlines(True)            
+            i = -1
+            for line in Temp:
+                line = line.strip()
+                i += 1
+                if i > 0 and line.find("--end msg--") == -1:
+                    if INVITEMessage != "":
+                        INVITEMessage += "\n" + line
+                    else:
+                        INVITEMessage = line
+        
+            if self.LastINVITEreceived == INVITEMessage:
+                logger.info("Duplicated INVITE detected.")
+                return # Don't analyze repeated messages
+                
+            logger.info("INVITE message detected.")
+
+            # Store the INVITE message for the future
+            self.LastINVITEreceived = INVITEMessage
+
+            if self.NumCalls == self.MaxCalls:
+                logger.info("The maximum number of calls to simultaneously analyze has been reached.")
+                self.Flood = True
+                     
+                return
+
+            # Convert function AnalyzeMessage in a thread and call it.
+            thrAnalyzeMessage = threading.Thread(target = self.AnalyzeMessage, args = (INVITEMessage,"INVITE",))
+        
+            self.NumCalls += 1
+
+            thrAnalyzeMessage.start()

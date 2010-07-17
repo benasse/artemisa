@@ -1,6 +1,12 @@
 Artemisa 1.0
 ************
 
+Documentation
+=============
+
+Full documentation is provided inside "doc" directory. Open "/doc/index.html" 
+with your browser, or visit http://artemisa.sourceforge.net/documentation/en/
+
 Prerequisites
 =============
 
@@ -15,15 +21,19 @@ Artemisa requires the following installed components:
 Downloading
 ===========
 
-Artemisa is free and you can download the latest version from: http://artemisa.sourceforge.net/ 
+Artemisa is free and you can download the latest version from: 
+    
+    http://artemisa.sourceforge.net/ 
 
-There is also a SVN version for developers: https://artemisa.svn.sourceforge.net/svnroot/artemisa/
+There is also a SVN version for developers: 
+
+    https://artemisa.svn.sourceforge.net/svnroot/artemisa/
 
 Installation
 ============
 
-Artemisa doesn't require installation. You should unpack the downloaded source code and just run 
-it by typing:
+Artemisa doesn't require installation. You should unpack the downloaded source 
+code and just run it by typing:
 
     $ ./artemisa.py
     
@@ -32,9 +42,6 @@ it by typing:
     $ python artemisa.py
 
 
-DO NOT run Artemisa until having read and set up the configuration files found in /conf directory.
-    
-    
-   
---------------------------------------------------------------------------------------------------    
-Visit http://artemisa.sourceforge.net/ for a full documentation.
+DO NOT run Artemisa until having read and set up the configuration files found 
+in /conf directory.
+

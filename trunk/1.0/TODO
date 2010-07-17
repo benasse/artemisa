@@ -4,7 +4,6 @@ Artemisa 1.0
 Ideas for future implementations:
 
 * Relate the traceroute results to google maps.
-* Develop the "aggressive" mode in order to counterattack the intruder.
 * Implement advanced fingerprinting.
 
 
