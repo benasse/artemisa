@@ -22,7 +22,6 @@ VERSION = "1.0.8x"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
-SCRIPTS_DIR = "./scripts/"
 RESULTS_DIR = "./results/"
 AUDIOFILES_DIR = "./audiofiles/"
 LOGS_DIR = "./logs/"
@@ -33,9 +32,6 @@ BEHAVIOUR_FILE_PATH = CONFIG_DIR + "behaviour.conf"
 ACTIONS_FILE_PATH = CONFIG_DIR + "actions.conf"
 EXTENSIONS_FILE_PATH = CONFIG_DIR + "extensions.conf"
 SERVERS_FILE_PATH = CONFIG_DIR + "servers.conf"
-ON_FLOOD_SCRIPT_PATH = SCRIPTS_DIR + "on_flood.sh"
-ON_SPIT_SCRIPT_PATH = SCRIPTS_DIR + "on_spit.sh"
-ON_SCANNING_SCRIPT_PATH = SCRIPTS_DIR + "on_scanning.sh"
 
 try:
     """
@@ -76,7 +72,7 @@ from time import strftime, sleep, time
 from modules.commons import *                   # Import functions from commons.py
 from modules.classifier import Classifier       # Message classifier 
 from modules.correlator import Correlator       # Correlator
-from modules.correlator import IfCategory
+
 import threading                                # Use of threads
 
 from libs.IPy.IPy import IP                     # Module to deal with IPs
@@ -975,100 +971,6 @@ class Artemisa(object):
         elif self.behaviour_mode == "aggressive":
             return self.Aggressive_mode
         
-    def CheckIfFlood(self, Results):
-        """
-        Keyword Arguments:
-        Results -- A CallData instance that contains call information.
-    
-        This functions runs a script if flood was detected.
-        """
-
-        if self.Flood:
-
-            self.On_flood_parameters = self.On_flood_parameters.replace("$From_Extension$", Results.From_Extension)
-            self.On_flood_parameters = self.On_flood_parameters.replace("$From_IP$", Results.From_IP)
-            self.On_flood_parameters = self.On_flood_parameters.replace("$From_Port$", Results.From_Port)
-            self.On_flood_parameters = self.On_flood_parameters.replace("$From_Transport$", Results.From_Transport)
-            self.On_flood_parameters = self.On_flood_parameters.replace("$Contact_IP$", Results.Contact_IP)
-            self.On_flood_parameters = self.On_flood_parameters.replace("$Contact_Port$", Results.Contact_Port)
-            self.On_flood_parameters = self.On_flood_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
-            self.On_flood_parameters = self.On_flood_parameters.replace("$Connection_IP$", Results.Connection)
-            self.On_flood_parameters = self.On_flood_parameters.replace("$Owner_IP$", Results.Owner)
-            self.On_flood_parameters = self.On_flood_parameters.replace("$Tool_name$", Results.ToolName)
-
-            Command = "bash " + ON_FLOOD_SCRIPT_PATH + " " + self.On_flood_parameters
-            logger.info("Executing " + Command + " ...")
-            # Execute a script
-            try:
-                cmd_out=os.popen(Command)
-                for line in cmd_out.readlines():
-                    if line.strip() != "":
-                        logger.info(line.strip())
-            except Exception, e:
-                logger.error("Cannot execute script. Details: " + str(e))
-
-    def CheckCategory(self, Results):
-        """
-        Keyword Arguments:
-        Results -- A CallData instance that contains call information.
-
-        This functions runs a script if certain data was found on the call.
-        """
-        if IfCategory("SPIT",Results.Classification):
-        
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$From_Extension$", Results.From_Extension)
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$From_IP$", Results.From_IP)
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$From_Port$", Results.From_Port)
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$From_Transport$", Results.From_Transport)
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Contact_IP$", Results.Contact_IP)
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Contact_Port$", Results.Contact_Port)
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Connection_IP$", Results.Connection)
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Owner_IP$", Results.Owner)
-            self.On_SPIT_parameters = self.On_SPIT_parameters.replace("$Tool_name$", Results.ToolName)
-
-            Command = "bash " + ON_SPIT_SCRIPT_PATH + " " + self.On_SPIT_parameters
-            logger.info("Executing " + Command + " ...")
-            # Execute a script
-            try:
-                cmd_out=os.popen(Command)
-                for line in cmd_out.readlines():
-                    if line.strip() != "":
-                        logger.info(line.strip())
-            except Exception, e:
-                logger.error("Cannot execute script. Details: " + str(e))
-
-    def CheckIfScanning(self, Results):
-        """
-        Keyword Arguments:
-        Results -- A CallData instance that contains call information.
-
-        This functions runs a script if certain data was found on the call.
-        """
-        if IfCategory("Scanning",Results.Classification):
-        
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$From_Extension$", Results.From_Extension)
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$From_IP$", Results.From_IP)
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$From_Port$", Results.From_Port)
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$From_Transport$", Results.From_Transport)
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$Contact_IP$", Results.Contact_IP)
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$Contact_Port$", Results.Contact_Port)
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$Contact_Transport$", Results.Contact_Transport)
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$Connection_IP$", Results.Connection)
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$Owner_IP$", Results.Owner)
-            self.On_scanning_parameters = self.On_scanning_parameters.replace("$Tool_name$", Results.ToolName)
-        
-            Command = "bash " + ON_SCANNING_SCRIPT_PATH + " " + self.On_scanning_parameters
-            logger.info("Executing " + Command + " ...")
-            # Execute a script
-            try:
-                cmd_out=os.popen(Command)
-                for line in cmd_out.readlines():
-                    if line.strip() != "":
-                        logger.info(line.strip())
-            except Exception, e:
-                logger.error("Cannot execute script. Details: " + str(e))
-
     def SaveResultsToTextFile(self, Results, Filename):
         """
         Keyword Arguments:
@@ -1151,14 +1053,8 @@ class Artemisa(object):
         del classifier_instance
 
         # Call the correlator
-        Correlator(Results, self.Flood)
+        Correlator(Results, self.Flood, self.On_flood_parameters, self.On_SPIT_parameters, self.On_scanning_parameters)
     
-        self.CheckIfFlood(Results)
-        
-        self.CheckCategory(Results)
-        
-        self.CheckIfScanning(Results)
-
         # Save the raw SIP message in the report file
         TXTFilenme = self.GetFilename("txt")
         TXTData = get_results_txt(TXTFilenme, self.VERSION, Results, self.Local_IP, self.Local_port)
@@ -1173,7 +1069,9 @@ class Artemisa(object):
         # The function get_results_html is called again and it return an email-adapted format
         HTMLMailData = get_results_html(HTMLFilenme, self.VERSION, Results, True, self.Local_IP, self.Local_port)
         self.SendResultsByEmail(HTMLMailData)
-                
+        
+        Results = None
+        
         self.ACKReceived = False
 
         MediaReceived = False
