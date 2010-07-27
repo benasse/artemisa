@@ -1103,6 +1103,7 @@ class Artemisa(object):
                 if MessageInformation.Contact_IP == item.Registrar_IP:
                     if MessageInformation.Contact_Port == item.Registrar_port:
                         logger.info("OPTIONS message seems to come from one of the SIP proxies. Nothing done.")
+                        self.Flood = False
                         return
 
             # Save the information that links the extension of Artemisa and the IP of the message
