@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "1.0.8x" will be autimatically replaced by 
+# The following string "repvernumber" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "1.0.8x"
+VERSION = "repvernumber"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
