@@ -43,14 +43,14 @@ try:
 except ImportError:
     print ""
     print "Critical error:"
-    print "PJSIP library module MUST be installed!"
+    print "    PJSIP library module MUST be installed!"
     print ""
     print "Download it from:"
     print "    http://www.pjsip.org/download.htm"
     print ""
     print "    or do:"
     print ""
-    print "    wget http://www.pjsip.org/release/1.6/pjproject-1.6.tar.bz2"
+    print "    wget http://www.pjsip.org/release/1.8.5/pjproject-1.8.5.tar.bz2"
     print ""
     print "Installation steps:"
     print "    http://trac.pjsip.org/repos/wiki/Python_SIP/Build_Install"
@@ -61,7 +61,7 @@ except ImportError:
     print "       2) Build the PJSIP libraries first with \"# ./configure && make dep && make\" commands."
     print "          Note: if fails try:./configure CFLAGS=-fPIC"
     print "       3) Go to the pjsip-apps/src/python directory."
-    print "       4) Run \'# python setup.py install\' or just \'# make\'."
+    print "       4) Run \'# python setup.py install\' or just \'# make install\'."
     print ""
     sys.exit(1)
 
@@ -87,6 +87,8 @@ from subprocess import Popen, PIPE
 
 from modules.logger import logger               # Instance a logger for information about Artemisa
 from modules.logger import pjsua_logger         # Instance a logger for information about the PJSUA library
+
+from optparse import OptionParser               # For parsing command line parameters
 
 Unregister = False                              # Flag to know whether the unregistration process is taking place
 MediaReceived = False                           # Flag to know if media has been received
@@ -378,7 +380,7 @@ class Artemisa(object):
     This is the class which defines de whole program.
     """
 
-    def __init__(self, args=[]):
+    def __init__(self):
 
         self.VERSION = VERSION
         self.SIP_VERSION = "2.0"
@@ -430,7 +432,7 @@ class Artemisa(object):
         self.ACKReceived = False                # We must know if an ACK was received
         self.Flood = False                      # Flag to know whether flood was detected
     
-        self.main(args)                         # Here invokes the method that starts Artemisa
+        self.main()                             # Here invokes the method that starts Artemisa
 
     def __del__(self):
         """
@@ -439,7 +441,10 @@ class Artemisa(object):
 
         global Unregister
         
-        del self.email
+        try:
+            del self.email
+        except:
+            pass
 
         Unregister = True
 
@@ -458,29 +463,38 @@ class Artemisa(object):
 
         logger.debug("Artemisa ended.")
 
-    def main(self, args=[]):
+    def main(self):
         """
         Artemisa starts here.
         """
         global Unregister
         
-        Show_sound_devices = False
-    
+        self.Show_sound_devices = False
+        self.No_registration_param = False
+        self.No_audio_param = False
+
         # Check if some arguments has been passed
-        if len(args) > 1:
-            for i in range(1, len(args)):
-                if args[i] == "-h" or args[i] == "--help":
-                    self.ShowHelp(False)
-                    sys.exit(0)
-                elif args[i] == "-v" or args[i] == "--verbose":
-                    self.verbose = True
-                elif args[i] == "-g" or args[i] == "--get_sound_devices":
-                    Show_sound_devices = True
-                else:
-                    print "Invalid argument: " + args[i]
-                    sys.exit(0)
+        usage = "Usage: artemisa [options]"
+        parser = OptionParser(usage)
+        parser.add_option("-v", "--verbose", dest="verbose", action="store_true", help="verbose mode (shows more information)")
+        parser.add_option("-g", "--get_sound_devices", dest="sounddevices", action="store_true", help="show the available sound devices")
+        parser.add_option("-r", "--no_registration", dest="noreg", action="store_true", help="doesn't register any extension to the server(s)")
+        parser.add_option("-a", "--no_audio", dest="noaudio", action="store_true", help="soesn't use the audio device (audio recording disabled)")
+
+        (options, args) = parser.parse_args()
+        if len(args) != 0:
+            parser.error("Incorrect number of arguments.")
+        if options.verbose:
+            self.verbose = True
+        if options.sounddevices:
+            self.Show_sound_devices = True
+        if options.noreg:
+            self.No_registration_param = True
+        if options.noaudio:
+            self.No_audio_param = True
+
                     
-        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2010 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
+        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2011 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
         print ""
         print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
         print "This is free software, and you are welcome to redistribute it under certain"
@@ -524,7 +538,7 @@ class Artemisa(object):
             sys.exit(0)
     
         try:
-            self.lib.create_transport(pj.TransportType.UDP, pj.TransportConfig(port=int(self.Local_port), bound_addr=self.Local_IP))
+            self.transp = self.lib.create_transport(pj.TransportType.UDP, pj.TransportConfig(port=int(self.Local_port), bound_addr=self.Local_IP))
         except:
             logger.critical("Error while opening port. The port number " + self.Local_port + " is either invalid or already in use by another process.")
             sys.exit(1)
@@ -535,7 +549,7 @@ class Artemisa(object):
             logger.critical("Error while starting pj.Lib.")
             sys.exit(0)
     
-        if Show_sound_devices:
+        if self.Show_sound_devices:
             a = 0
             print ""
             print ""
@@ -556,7 +570,9 @@ class Artemisa(object):
         # Put some lines into the log file
         logger.debug("-------------------------------------------------------------------------------------------------")
         logger.debug("Artemisa started.")
-            
+        
+        if self.No_audio_param: self.Sound_enabled = False
+
         if self.Sound_enabled:
             # Configure the audio device 
             try:
@@ -568,6 +584,8 @@ class Artemisa(object):
             except:
                 logger.warning("Audio device not found. Calls will not be recorded.")
                 self.Sound_enabled = False
+        else:
+            print "The audio is disabled. Calls will not be recorded."
 
                 
         Unregister = False
@@ -579,11 +597,20 @@ class Artemisa(object):
         if len(self.Servers) == 0:
             print "No extensions have been configured."
         else:
-            print "Starting extensions registration process..."
+            if self.No_registration_param == False:
+                print "Starting extensions registration process..."
         
-            # Register each account
-            for i in range(len(self.Servers)):
-                self.Servers[i].Register()
+                # Register each account
+                for i in range(len(self.Servers)):
+                    self.Servers[i].Register()
+            else:
+                print "Server registration is disabled. No extension will be registered."
+                
+                # One accound must exist in pjsip; otherwise it crashes.
+                self.acc = self.lib.create_account_for_transport(self.transp)
+                self.acc_cb = MyAccountCallback(self.acc, self.lib, self.behaviour_mode, self.Active_mode, self.Passive_mode, self.Aggressive_mode, self.Sound_enabled, self.Playfile)
+                self.acc.set_callback(self.acc_cb)                
+
        
         # The keyboard is read:
         self.ReadKeyboard()
@@ -592,19 +619,13 @@ class Artemisa(object):
         self.__del__()
         sys.exit(0)
     
-    def ShowHelp(self, Commands = True):
+    def ShowHelp(self):
         """
         Keyword Arguments:
         Commands -- when True the commands list is shown 
     
         Shows the help
         """
-        print "Usage: artemisa [Options]"
-        print "  -v, --verbose              Verbose mode (it shows more information)"
-        print "  -g, --get_sound_devices    Show the available sound devices"
-    
-        if not Commands: return
-    
         print ""    
         print "Commands list:"
         print ""
