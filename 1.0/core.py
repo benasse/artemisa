@@ -416,15 +416,19 @@ class Artemisa(object):
 
         self.LastINVITEreceived = ""            # Store the last INVITE message received in order to avoid analysing repeated messages
         self.LastOPTIONSreceived = ""           # Same for OPTIONS
+        self.LastREGISTERreceived = ""          # Same for REGISTER
 
         #self.nSeq = 0                          # Number of received messages
 
         # Statistics
         self.N_INVITE = 0
         self.N_OPTIONS = 0
+        self.N_REGISTER = 0
 
         self.OPTIONSReceived = False            # Flag to know if a OPTIONS was received
         self.OPTIONS_Last_time = gmtime()       # Time of the last OPTIONS received (used to detect flood)
+        self.REGISTERReceived = False           # Same for REGISTER
+        self.REGISTER_Last_time = gmtime()      # Same for REGISTER
 
         self.OPTIONS_Exten = []                 # Extensions of the honeypot targeted with OPTIONS of the same source
 
@@ -1164,6 +1168,53 @@ class Artemisa(object):
                 CheckIfFlood(MessageInformation, True, self.On_flood_parameters)
                 self.Flood = False
 
+
+        elif MessageType == "REGISTER":
+
+            # The proceedment with the REGISTER messages is rather different. 
+
+            # Get useful data from the message
+            MessageInformation = CallData(SIP_Message_data)
+
+            logger.info("*********************************** REGISTER message **************************************")
+            logger.info("")
+            logger.info(" To: " + MessageInformation.To_Extension)
+            logger.info(" From: " + MessageInformation.Contact_IP + ":" + MessageInformation.Contact_Port)
+            logger.info("")
+
+            # TODO: here we must improve this part, for now copied from the OPTIONS analysis, and make especial
+            # considerations for the REGISTER messages.
+
+            # Store in memory the last REGISTER messages received.
+            # If the message has the same password, comes from the same sender, and tries to register several extensions,
+            # then is a scanning attempt.
+            # If the message tries to register one extension but trying to use different passwords, then register message
+            # is a password-cracking attack.
+
+            # TODO: THIS IS NOT YET IMPLEMENTED!!!!!!!
+
+            #if not self.Flood:
+            #    MessageInformation.Classification.append("Scanning")
+            #
+            #    logger.info("*********************************** REGISTER analysis *************************************")
+            #    logger.info("")
+            #    logger.info("The REGISTER message is detected as an scanning attack!")                
+            #    logger.info("")
+            #
+                # And call the same method of the correlator used to deal with INVITEs scannings
+            #    CheckIfScanning(MessageInformation, self.On_scanning_parameters)
+    
+                    
+            # If flood is present then call CheckIfFlood
+            if self.Flood:
+                logger.info("*********************************** REGISTER analysis *************************************")
+                logger.info("")
+                logger.info("The REGISTER message is detected as a flood attack!")                
+                logger.info("")
+
+                CheckIfFlood(MessageInformation, True, self.On_flood_parameters)
+                self.Flood = False
+
     def IsMessage(self, Message, Type):
         Temp = Message.strip().splitlines(True)
 
@@ -1182,13 +1233,16 @@ class Artemisa(object):
         """
         pjsua_logger.debug(str.strip())
     
+        # Intercepts ACK messages
         if self.IsMessage(str, "ACK"):
             # Here we check if the ACK received is for the received INVITE.        
             if Search("tag", str) == self.INVITETag:
                 self.ACKReceived = True
 
+
+        # Intercepts OPTIONS messages
         elif self.IsMessage(str, "OPTIONS"):
-            # Actions if the message is an INVITE
+            # Actions if the message is an OPTIONS
 
             self.OPTIONSReceived = True
             self.N_OPTIONS += 1
@@ -1228,6 +1282,51 @@ class Artemisa(object):
             thrAnalyzeMessage = threading.Thread(target = self.AnalyzeMessage, args = (OPTIONSMessage,"OPTIONS",))
             thrAnalyzeMessage.start()
 
+
+        # Intercepts REGISTER messages
+        elif self.IsMessage(str, "REGISTER"):
+            # Actions if the message is an REGISTER
+
+            self.REGISTERReceived = True
+            self.N_REGISTER += 1
+
+            TimeNow = gmtime()
+
+            # If the distance in time between this REGISTER message and the last received is less than
+            # a second, then it's reported as flood.
+            if (TimeNow.tm_hour - self.REGISTER_Last_time.tm_hour) == 0:
+                if (TimeNow.tm_min - self.REGISTER_Last_time.tm_min) == 0:
+                    if (TimeNow.tm_sec - self.REGISTER_Last_time.tm_sec) == 0:
+                        self.Flood = True
+
+            self.REGISTER_Last_time = TimeNow
+
+            REGISTERMessage = ""
+
+            Temp = str.strip().splitlines(True)            
+            i = -1
+            for line in Temp:
+                line = line.strip()
+                i += 1
+                if i > 0 and line.find("--end msg--") == -1:
+                    if REGISTERMessage != "":
+                        REGISTERMessage += "\n" + line
+                    else:
+                        REGISTERMessage = line
+        
+            if self.LastREGISTERreceived == REGISTERMessage:
+                logger.info("Duplicated REGISTER detected.")
+                return # Don't analyze repeated messages
+                
+            # Store the REGISTER message for the future
+            self.LastREGISTERreceived = REGISTERMessage
+
+            # Convert function AnalyzeMessage in a thread and call it.
+            thrAnalyzeMessage = threading.Thread(target = self.AnalyzeMessage, args = (REGISTERMessage,"REGISTER",))
+            thrAnalyzeMessage.start()
+
+
+        # Intercepts INVITE messages
         elif self.IsMessage(str, "INVITE"):
             # Actions if the message is an INVITE
 
