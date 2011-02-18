@@ -24,11 +24,10 @@ try:
 except:
     pass
 
-import sys
 from core import Artemisa
 
 try:
     # Creates an instance of object artemisa
-    proc = Artemisa(sys.argv)
+    proc = Artemisa()
 except KeyboardInterrupt:
     del proc
