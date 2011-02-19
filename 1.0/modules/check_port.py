@@ -20,7 +20,8 @@ import sys
 # Set a path to the main root
 sys.path.append("../")
 
-from subprocess import Popen, PIPE
+from subprocess import Popen
+from subprocess import PIPE
 from libs.IPy.IPy import *       # Module to deal with IPs
 
 from modules.logger import logger

@@ -18,15 +18,20 @@
 
 import os
 from time import strftime
-
-from commons import GetSIPHeader, Search, GetTimeClass, GetIPfromSIP, GetPortfromSIP, GetExtensionfromSIP, GetTransportfromSIP, RemoveComments, CallData
-
 from mail import Email
 
+from commons import GetSIPHeader
+from commons import Search
+from commons import GetTimeClass
+from commons import GetIPfromSIP
+from commons import GetPortfromSIP
+from commons import GetExtensionfromSIP
+from commons import GetTransportfromSIP
+from commons import RemoveComments
+from commons import CallData
 from check_fingerprint import CheckFingerprint
 from check_dns import CheckDNS
 from check_port import CheckPort
-
 from modules.logger import logger
 
 class Classifier():

@@ -23,7 +23,6 @@ import sys
 sys.path.append("../")
 
 from commons import RemoveComments
-
 from modules.logger import logger
 
 def CheckFingerprint(SourceData):

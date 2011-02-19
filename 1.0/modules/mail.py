@@ -22,12 +22,11 @@ RESOURCES_DIR = "./res/"
 CONFIG_FILE_PATH = CONFIG_DIR + "artemisa.conf"
 ARTEMISA_WEBLOGO_PATH = RESOURCES_DIR + "weblogo.gif"
 
+import ConfigParser                 # Read configuration files.
 from smtplib import *
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
-import ConfigParser                 # Read configuration files.
 
 from modules.logger import logger
 
