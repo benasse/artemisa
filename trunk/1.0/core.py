@@ -48,9 +48,9 @@ except ImportError:
     print "Download it from:"
     print "    http://www.pjsip.org/download.htm"
     print ""
-    print "    or do:"
+    print "    or, if you have the wget, can do in a console:"
     print ""
-    print "    wget http://www.pjsip.org/release/1.8.5/pjproject-1.8.5.tar.bz2"
+    print "    wget http://www.pjsip.org/release/1.8.10/pjproject-1.8.10.tar.bz2"
     print ""
     print "Installation steps:"
     print "    http://trac.pjsip.org/repos/wiki/Python_SIP/Build_Install"
@@ -65,30 +65,30 @@ except ImportError:
     print ""
     sys.exit(1)
 
-import sys, os
-    
+import sys
+import os
+from time import strftime
+from time import sleep
+from time import time
+from time import gmtime
+import threading                                # Use of threads
+from subprocess import Popen
+from subprocess import PIPE
 import ConfigParser                             # Read configuration files
+from optparse import OptionParser               # For parsing command line parameters
 
-from time import strftime, sleep, time, gmtime
+from libs.IPy.IPy import IP                     # Module to deal with IPs
 
 from modules.commons import *                   # Import functions from commons.py
 from modules.classifier import Classifier       # Message classifier 
 from modules.correlator import Correlator       # Correlator
-from modules.correlator import CheckIfScanning, CheckIfFlood
-
-import threading                                # Use of threads
-
-from libs.IPy.IPy import IP                     # Module to deal with IPs
-
+from modules.correlator import CheckIfScanning
+from modules.correlator import CheckIfFlood
 from modules.mail import Email
-from modules.results_format import get_results_txt, get_results_html
-
-from subprocess import Popen, PIPE
-
+from modules.results_format import get_results_txt
+from modules.results_format import get_results_html
 from modules.logger import logger               # Instance a logger for information about Artemisa
 from modules.logger import pjsua_logger         # Instance a logger for information about the PJSUA library
-
-from optparse import OptionParser               # For parsing command line parameters
 
 Unregister = False                              # Flag to know whether the unregistration process is taking place
 MediaReceived = False                           # Flag to know if media has been received
@@ -97,6 +97,7 @@ class Extension(object):
     """
     Keeps the user data with an unique extension.
     """
+
     def __init__(self, Extension, Username, Password):
         self.Extension = Extension
         self.Username = Username
@@ -133,7 +134,7 @@ class Server(object):
             
     def Register(self):
         """
-        This method registers the honeypot at the SIP server, and keeps it alive by sending REGISTRAR
+        This method registers the honeypot at the SIP server, and keeps it alive by sending REGISTER
         messages within the time specified in the configuration file.
         """
         if len(self.Extensions) == 0:
@@ -160,7 +161,7 @@ class Server(object):
 
     def Reregister(self):
         """
-        This method do the re-registration.
+        This method does the re-registration.
         """
         try:
             self.account.set_registration(True)
@@ -169,7 +170,7 @@ class Server(object):
 
     def Unregister(self):
         """
-        This method close the connections.
+        This method closes the connections.
         """
         try:
             del self.acc_cb
@@ -377,7 +378,7 @@ class MyCallCallback(pj.CallCallback):
 
 class Artemisa(object):
     """
-    This is the class which defines de whole program.
+    This is the class which defines the whole program.
     """
 
     def __init__(self):
@@ -436,6 +437,10 @@ class Artemisa(object):
         self.ACKReceived = False                # We must know if an ACK was received
         self.Flood = False                      # Flag to know whether flood was detected
     
+        self.Show_sound_devices = False
+        self.No_registration_param = False
+        self.No_audio_param = False
+
         self.main()                             # Here invokes the method that starts Artemisa
 
     def __del__(self):
@@ -467,37 +472,61 @@ class Artemisa(object):
 
         logger.debug("Artemisa ended.")
 
+    def CheckCommandLineParameters(self):
+        """
+        Checks if some command line parameter has been given and set the corresponding variables.
+        """
+
+        usage = "Usage: artemisa [options]"
+        parser = OptionParser(usage)
+        parser.add_option("-v",
+                        "--verbose",
+                        dest="verbose",
+                        action="store_true",
+                        help="verbose mode (shows more information)")
+        parser.add_option("-g",
+                        "--get_sound_devices",
+                        dest="sounddevices",
+                        action="store_true",
+                        help="show the available sound devices")
+        parser.add_option("-r",
+                        "--no_registration",
+                        dest="noreg",
+                        action="store_true",
+                        help="doesn't register any extension to the server(s)")
+        parser.add_option("-a",
+                        "--no_audio",
+                        dest="noaudio",
+                        action="store_true",
+                        help="doesn't use the audio device (audio recording disabled)")
+
+        (options, args) = parser.parse_args()
+        if len(args) != 0:
+            parser.error("Incorrect number of arguments.")
+
+        if options.verbose:
+            self.verbose = True
+
+        if options.sounddevices:
+            self.Show_sound_devices = True
+
+        if options.noreg:
+            self.No_registration_param = True
+
+        if options.noaudio:
+            self.No_audio_param = True
+
+
     def main(self):
         """
         Artemisa starts here.
         """
         global Unregister
-        
-        self.Show_sound_devices = False
-        self.No_registration_param = False
-        self.No_audio_param = False
 
-        # Check if some arguments has been passed
-        usage = "Usage: artemisa [options]"
-        parser = OptionParser(usage)
-        parser.add_option("-v", "--verbose", dest="verbose", action="store_true", help="verbose mode (shows more information)")
-        parser.add_option("-g", "--get_sound_devices", dest="sounddevices", action="store_true", help="show the available sound devices")
-        parser.add_option("-r", "--no_registration", dest="noreg", action="store_true", help="doesn't register any extension to the server(s)")
-        parser.add_option("-a", "--no_audio", dest="noaudio", action="store_true", help="soesn't use the audio device (audio recording disabled)")
+        # First check the command line parameters
+        self.CheckCommandLineParameters()
 
-        (options, args) = parser.parse_args()
-        if len(args) != 0:
-            parser.error("Incorrect number of arguments.")
-        if options.verbose:
-            self.verbose = True
-        if options.sounddevices:
-            self.Show_sound_devices = True
-        if options.noreg:
-            self.No_registration_param = True
-        if options.noaudio:
-            self.No_audio_param = True
 
-                    
         print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2011 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
         print ""
         print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
@@ -520,8 +549,10 @@ class Artemisa(object):
         # Read the registrar servers configuration in servers.conf
         self.LoadServers()
                 
-        self.email = Email() # Creates an Email object
+        # Create an Email object
+        self.email = Email()
 
+        # Set the parameters needed for the PJSUA library
         self.ua_cfg = pj.UAConfig()
         self.ua_cfg.user_agent = self.UserAgent
         self.ua_cfg.max_calls = self.MaxCalls
@@ -534,15 +565,18 @@ class Artemisa(object):
         self.log_cfg.level = 5
         self.log_cfg.callback = self.log_cb
         self.log_cfg.console_level = 5 # The value console_level MUST be 5 since it's used to analyze the messages
-            
+
+        # Initialize the PJSUA library
         try:
             self.lib.init(self.ua_cfg, self.log_cfg, self.media_cfg)
         except Exception, e:
             logger.critical(str(e))
-            sys.exit(0)
+            sys.exit(1)
     
         try:
-            self.transp = self.lib.create_transport(pj.TransportType.UDP, pj.TransportConfig(port=int(self.Local_port), bound_addr=self.Local_IP))
+            self.transp = self.lib.create_transport(pj.TransportType.UDP,
+                            pj.TransportConfig(port=int(self.Local_port),
+                            bound_addr=self.Local_IP))
         except:
             logger.critical("Error while opening port. The port number " + self.Local_port + " is either invalid or already in use by another process.")
             sys.exit(1)
@@ -551,8 +585,9 @@ class Artemisa(object):
             self.lib.start()
         except:
             logger.critical("Error while starting pj.Lib.")
-            sys.exit(0)
+            sys.exit(1)
     
+        # If the command line parameter "-g" has been given then:
         if self.Show_sound_devices:
             a = 0
             print ""
@@ -569,7 +604,7 @@ class Artemisa(object):
             print ""
             print ""
         
-            sys.exit(0)
+            exit()
 
         # Put some lines into the log file
         logger.debug("-------------------------------------------------------------------------------------------------")
@@ -594,14 +629,14 @@ class Artemisa(object):
                 
         Unregister = False
 
-        print "User Agent listening on: " + self.Local_IP + ":" + self.Local_port
+        print "SIP User-Agent listening on: " + self.Local_IP + ":" + self.Local_port
     
         print "Behaviour mode: " + self.behaviour_mode
 
         if len(self.Servers) == 0:
             print "No extensions have been configured."
         else:
-            if self.No_registration_param == False:
+            if not self.No_registration_param:
                 print "Starting extensions registration process..."
         
                 # Register each account
@@ -621,7 +656,7 @@ class Artemisa(object):
 
         # Here finalizes the program when the ReadKeyboard() function is returned.
         self.__del__()
-        sys.exit(0)
+        exit()
     
     def ShowHelp(self):
         """
@@ -661,11 +696,7 @@ class Artemisa(object):
         """
         This method handles the keyboard process.
         """
-        if os.getenv('HOSTNAME') == None:
-            # Well... some distributions don't export the environmental variable HOSTNAME...
-            CLIprompt = str(os.getenv('USER')) + "> "
-        else:
-            CLIprompt = str(os.getenv('HOSTNAME')) + "> "
+        CLIprompt = GetCLIprompt()
     
         while True:
         
@@ -680,6 +711,7 @@ class Artemisa(object):
                 print ""
                 print "INVITE messages received: " + str(self.N_INVITE)
                 print "OPTIONS messages received: " + str(self.N_OPTIONS)
+                print "REGISTER messages received: " + str(self.N_REGISTER)
                 if self.Flood: 
                     FloodDetected = "yes"
                 else:
@@ -789,7 +821,7 @@ class Artemisa(object):
                 continue
 
             else:
-                print "Command not found. Type \"help\" for a list of commands."
+                print "Command not found. Type \"help\" for the list of commands."
 
     def LoadExtensions(self):
         """
@@ -808,7 +840,7 @@ class Artemisa(object):
         else:
             try:
                 if len(config.sections()) == 0:
-                    logger.critical("At least one extension must be defined in extensions.conf")
+                    logger.critical("At least one extension must be defined in extensions.conf.")
                     sys.exit(1)
 
                 for item in config.sections():
@@ -837,7 +869,7 @@ class Artemisa(object):
         else:
             try:
                 if len(config.sections()) == 0:
-                    logger.critical("At least one server must be defined in servers.conf")
+                    logger.critical("At least one server must be defined in servers.conf.")
                     sys.exit(1)
 
                 for item in config.sections():
@@ -852,7 +884,19 @@ class Artemisa(object):
                                 exten_list.append(self.Extensions[j])
                                 break
 
-                    self.Servers.append(Server(self.behaviour_mode, item, self.Active_mode, self.Passive_mode, self.Aggressive_mode, config.get(item, "registrar_ip"), config.get(item, "registrar_port"), int(config.get(item, "registrar_time")), int(config.get(item, "nat_keepalive_interval")), exten_list, self.lib, self.Sound_enabled, self.Playfile))
+                    self.Servers.append(Server(self.behaviour_mode, 
+                                            item,
+                                            self.Active_mode,
+                                            self.Passive_mode,
+                                            self.Aggressive_mode,
+                                            config.get(item, "registrar_ip"),
+                                            config.get(item, "registrar_port"),
+                                            int(config.get(item, "registrar_time")),
+                                            int(config.get(item, "nat_keepalive_interval")),
+                                            exten_list,
+                                            self.lib,
+                                            self.Sound_enabled,
+                                            self.Playfile))
             
             except Exception, e:
                 print str(e)
@@ -904,7 +948,7 @@ class Artemisa(object):
                 try:
                     IP(self.Local_IP)
                 except:
-                    logger.critical("The IP address configured at local_ip in file artemisa.conf is not valid (IP address: " + self.Local_IP + ").")
+                    logger.critical("The IP address configured in local_ip in file artemisa.conf is not valid (IP address: " + self.Local_IP + ").")
                     sys.exit(1)
         
                 self.Local_port = config.get("environment", "local_port")
@@ -912,7 +956,7 @@ class Artemisa(object):
                 try:
                     int(self.Local_port)
                 except:
-                    logger.error("local_port in configuration file must be an integer. Set to 5060")
+                    logger.error("local_port in configuration file must be an integer. Set to 5060.")
                     self.Local_port = "5060"
 
                 self.SIPdomain = config.get("environment", "sip_domain")
@@ -921,7 +965,7 @@ class Artemisa(object):
                 try:
                     self.MaxCalls  = int(config.get("environment", "max_calls"))
                 except:
-                    logger.error("max_calls in configuration file must be an integer. Set to 1")
+                    logger.error("max_calls in configuration file must be an integer. Set to 1.")
                     self.MaxCalls = 1
                 self.Playfile = config.get("environment", "playfile")
 
@@ -932,13 +976,13 @@ class Artemisa(object):
                 try:
                     self.Sound_device = int(config.get("sound", "device"))
                 except:
-                    logger.error("device in configuration file must be an integer. Set to 0")
+                    logger.error("device in configuration file must be an integer. Set to 0.")
                     self.Sound_device = 0
 
                 try:
                     self.Sound_rate = int(config.get("sound", "rate"))
                 except:
-                    logger.error("rate in configuration file must be an integer. Set to 44100")
+                    logger.error("rate in configuration file must be an integer. Set to 44100.")
                     self.Sound_rate = 44100
             
                 if self.behaviour_mode != "active" and self.behaviour_mode != "passive" and self.behaviour_mode != "aggressive":
@@ -1073,7 +1117,15 @@ class Artemisa(object):
             self.WaitForPackets(5)
 
             # Create an instance of the Classifier
-            classifier_instance = Classifier(self.verbose, self.Local_IP, self.Local_port, self.behaviour_mode, self.GetBehaviourActions(), SIP_Message_data, self.Extensions, self.ACKReceived, MediaReceived)
+            classifier_instance = Classifier(self.verbose,
+                                            self.Local_IP,
+                                            self.Local_port,
+                                            self.behaviour_mode,
+                                            self.GetBehaviourActions(),
+                                            SIP_Message_data,
+                                            self.Extensions,
+                                            self.ACKReceived,
+                                            MediaReceived)
 
             # Start the classification
             classifier_instance.Start()
@@ -1086,21 +1138,39 @@ class Artemisa(object):
             del classifier_instance
 
             # Call the correlator
-            Correlator(Results, self.Flood, self.On_flood_parameters, self.On_SPIT_parameters, self.On_scanning_parameters)
+            Correlator(Results,
+                    self.Flood,
+                    self.On_flood_parameters,
+                    self.On_SPIT_parameters,
+                    self.On_scanning_parameters)
         
             # Save the raw SIP message in the report file
             TXTFilenme = self.GetFilename("txt")
-            TXTData = get_results_txt(TXTFilenme, self.VERSION, Results, self.Local_IP, self.Local_port)
+            TXTData = get_results_txt(TXTFilenme,
+                                    self.VERSION,
+                                    Results,
+                                    self.Local_IP,
+                                    self.Local_port)
             self.SaveResultsToTextFile(TXTData, TXTFilenme)
 
             # Save the results in a HTML file
             HTMLFilenme = self.GetFilename("html")    
-            HTMLData = get_results_html(HTMLFilenme, self.VERSION, Results, False, self.Local_IP, self.Local_port)
+            HTMLData = get_results_html(HTMLFilenme,
+                                        self.VERSION,
+                                        Results,
+                                        False,
+                                        self.Local_IP,
+                                        self.Local_port)
             self.SaveResultsToHTML(HTMLData, HTMLFilenme)
 
             # Send the results by e-mail
             # The function get_results_html is called again and it return an email-adapted format
-            HTMLMailData = get_results_html(HTMLFilenme, self.VERSION, Results, True, self.Local_IP, self.Local_port)
+            HTMLMailData = get_results_html(HTMLFilenme,
+                                            self.VERSION,
+                                            Results,
+                                            True,
+                                            self.Local_IP,
+                                            self.Local_port)
             self.SendResultsByEmail(HTMLMailData)
             
             Results = None
@@ -1279,7 +1349,7 @@ class Artemisa(object):
             self.LastOPTIONSreceived = OPTIONSMessage
 
             # Convert function AnalyzeMessage in a thread and call it.
-            thrAnalyzeMessage = threading.Thread(target = self.AnalyzeMessage, args = (OPTIONSMessage,"OPTIONS",))
+            thrAnalyzeMessage = threading.Thread(target=self.AnalyzeMessage, args=(OPTIONSMessage,"OPTIONS",))
             thrAnalyzeMessage.start()
 
 
@@ -1322,7 +1392,7 @@ class Artemisa(object):
             self.LastREGISTERreceived = REGISTERMessage
 
             # Convert function AnalyzeMessage in a thread and call it.
-            thrAnalyzeMessage = threading.Thread(target = self.AnalyzeMessage, args = (REGISTERMessage,"REGISTER",))
+            thrAnalyzeMessage = threading.Thread(target=self.AnalyzeMessage, args=(REGISTERMessage,"REGISTER",))
             thrAnalyzeMessage.start()
 
 
@@ -1364,7 +1434,7 @@ class Artemisa(object):
                 return
 
             # Convert function AnalyzeMessage in a thread and call it.
-            thrAnalyzeMessage = threading.Thread(target = self.AnalyzeMessage, args = (INVITEMessage,"INVITE",))
+            thrAnalyzeMessage = threading.Thread(target=self.AnalyzeMessage, args=(INVITEMessage,"INVITE",))
         
             self.NumCalls += 1
 

@@ -9,5 +9,6 @@ Artemisa 1.0.89
 * Option "-no_registration" added.
 * Option "-no_audio" added.
 * Parser improved for the command line parameters.
-* Fixed error while deleting an unexisting object (email object in artemisa destructor).
+* Fixed error while deleting an unexisting object (email object in artemisa
+  destructor).
 * Tested against the pjsip version 1.8.10.
