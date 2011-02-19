@@ -20,7 +20,9 @@ import sys
 # Set a path to the main root
 sys.path.append("../")
 
-from subprocess import Popen, PIPE
+from subprocess import Popen
+from subprocess import PIPE
+
 from libs.IPy.IPy import *       # Module to deal with IPs
 
 from modules.logger import logger
@@ -50,7 +52,7 @@ def CheckDNS(strIP, verbose):
         #    Process.wait()
         #    Data = Process.communicate()[0].strip().split("\n")
         #        
-        #    if verbose == True:
+        #    if verbose:
         #        DataToSend = "+ Verbose" + "\n"
         #        DataToSend = DataToSend + "| Tool employed: " + Command + "\n"
         #        DataToSend = DataToSend + "|" + "\n"

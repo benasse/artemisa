@@ -16,13 +16,16 @@
 # along with Artemisa. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import os
 
 # Set a path to the main root
 sys.path.append("../")
 
 from time import strftime
+from subprocess import Popen
+from subprocess import PIPE
+
 from libs.IPy.IPy import IP            # Module to deal with IPs
-from subprocess import Popen, PIPE
 
 from modules.logger import logger
 
@@ -333,3 +336,10 @@ def RemoveComments(strLine):
             break
         
     return strLine
+
+def GetCLIprompt():
+    if os.getenv('HOSTNAME') is None:
+        # Well... some distributions don't export the environmental variable HOSTNAME...
+        return str(os.getenv('USER')) + "> "
+    else:
+        return str(os.getenv('HOSTNAME')) + "> "

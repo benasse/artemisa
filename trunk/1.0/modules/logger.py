@@ -52,13 +52,13 @@ def CreateLogger(logger, log_file):
     cons_hdl.setLevel(logging.INFO) 
     cons_hdl.setFormatter(cons_formatter)
 
-    if File_created == True:
+    if File_created:
         logger.addHandler(file_hdl)
                 
     logger.addHandler(cons_hdl)
     logger.setLevel(logging.DEBUG)
 
-    if File_created == False:
+    if not File_created:
         logger.warning("Cannot create the log file. Logging to " + log_file +" is disabled.")
 
 
