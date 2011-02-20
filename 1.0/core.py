@@ -35,6 +35,8 @@ SERVERS_FILE_PATH = CONFIG_DIR + "servers.conf"
 
 NUMBER_OF_OPTIONS_MATCHES = 3 # Maximum number of different extension that an OPTIONS message can "target" after being considered a scanning attack
 
+import sys
+
 try:
     """
     Try to import the PJSUA library. It's used for the SIP stack handling.
@@ -65,7 +67,6 @@ except ImportError:
     print ""
     sys.exit(1)
 
-import sys
 import os
 from time import strftime
 from time import sleep
