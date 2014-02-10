@@ -91,6 +91,8 @@ from modules.results_format import get_results_html
 from modules.logger import logger               # Instance a logger for information about Artemisa
 from modules.logger import pjsua_logger         # Instance a logger for information about the PJSUA library
 from modules.xml_server import *
+from modules.threading_xml import *
+from threading import Thread
 
 
 Unregister = False                              # Flag to know whether the unregistration process is taking place
@@ -553,7 +555,7 @@ class Artemisa(object):
 
         # Read the registrar servers configuration in servers.conf
         self.LoadServers()
-                
+                        
         # Create an Email object
         self.email = Email()
 
@@ -613,6 +615,11 @@ class Artemisa(object):
             exit()
 
         # Put some lines into the log file
+        
+        #==================================
+        self.xml_input()
+        #==================================
+        
         logger.debug("-------------------------------------------------------------------------------------------------")
         logger.debug("Artemisa started.")
         
@@ -636,12 +643,8 @@ class Artemisa(object):
         Unregister = False
 
         print "SIP User-Agent listening on: " + self.Local_IP + ":" + self.Local_port
-        
-        #xml_listen = xml_serv()
-        #xml_listen.xml_server_run(a=True)
-    
-        print "Behaviour mode: " + self.behaviour_mode
 
+        print "Behaviour mode: " + self.behaviour_mode
         if len(self.Servers) == 0:
             print "No extensions have been configured."
         else:
@@ -672,7 +675,7 @@ class Artemisa(object):
         Keyword Arguments:
         Commands -- when True the commands list is shown 
     
-        Shows the help
+        Shows the help        
         """
         print ""    
         print "Commands list:"
@@ -695,6 +698,9 @@ class Artemisa(object):
         print "                             (Use these commands carefully)"
         print ""
         print "hangup all                   Hang up all calls"
+        #Modified by @authors: "Delivery UBP Team"
+        print "reload_extensions            To reload extensions in .conf"
+        #
         print ""
         print "show warranty                Show the program warrany"
         print "show license                 Show the program license"
@@ -784,6 +790,14 @@ class Artemisa(object):
             elif s.find("email") != -1 and s.find("off") != -1:
                 self.email.Enabled = False
                 logger.info("E-mail reporting off.")
+            
+            #Modified by @authors: "Delivery UBP Team"
+            elif s == "reload_extensions":
+                # Read the extensions configuration in extensions.conf
+                self.LoadExtensions()
+                # Read the registrar servers configuration in servers.conf
+                self.LoadServers()
+                logger.info("Extensios reloaded: OK")
 
             elif s == "show warranty":
                 print ""
@@ -1454,11 +1468,23 @@ class Artemisa(object):
             self.NumCalls += 1
 
             thrAnalyzeMessage.start()
-            
+
     '''
-    prueba!
+    #prueba!
     ''' 
-    #xml_listen = xml_serv()
-    #xml_listen.xml_server_run(a=True)
-    #xml_thread.start()
+    def xml_input(self):
+        
+        thread_xml_s = ThreadXml()
+        #thread_xml_s.start()
+        
+        if(thread_xml_s.start() == 'reload'):
+            # Read the extensions configuration in extensions.conf
+            self.LoadExtensions()
+            # Read the registrar servers configuration in servers.conf
+            self.LoadServers()
+            logger.info("##### Extensios reloaded: OK #####")
+        else:
+            logger.info("##### Unknown command artemisa.py #####")
+             
+        
 
