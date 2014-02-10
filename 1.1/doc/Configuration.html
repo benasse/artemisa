@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configuration &mdash; Artemisa v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Artemisa v1.0 documentation" href="index.html" />
+    <link rel="next" title="Advanced configuration" href="Advanced.html" />
+    <link rel="prev" title="Downloading and installation" href="Installation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Advanced.html" title="Advanced configuration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Installation.html" title="Downloading and installation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Artemisa v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>The configuartion of Artemisa is performed through files with extension <em>.conf</em> situated in the
+<em>/conf</em> directory. In this section each file is detailed and it&#8217;s explained how to configure them.</p>
+<div class="section" id="artemisa-conf">
+<h2>artemisa.conf<a class="headerlink" href="#artemisa-conf" title="Permalink to this headline">¶</a></h2>
+<p>In this file you will find important parameters related to the general operation of the program.</p>
+<p>Environment section:</p>
+<div class="highlight-python"><pre>    [environment]
+    local_ip=127.0.0.1
+    local_port=5065
+    sip_domain=127.0.0.1
+    user_agent=MySIPphone/1.5
+playfile=sample.wav
+    behaviour_mode=active
+    max_calls=2</pre>
+</div>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">local_ip</span></tt>: IP address of the machine (or an interface of it) where Artemisa runs</li>
+<li><tt class="docutils literal"><span class="pre">local_port</span></tt>: UDP port</li>
+<li><tt class="docutils literal"><span class="pre">sip_domain</span></tt>: network domain</li>
+<li><tt class="docutils literal"><span class="pre">user_agent</span></tt>: name that will appear in the <tt class="docutils literal"><span class="pre">User-Agent:</span></tt> field of the SIP header of the messages sent by Artemisa</li>
+<li><tt class="docutils literal"><span class="pre">playfile</span></tt>: name of the WAV file that will be played after sending an 200 OK to the caller. The file is searched into the <em>/audiofiles</em> directory. The format must be uncompressed 16 bit PCM or compressed G.711 A-law/U-law.</li>
+<li><tt class="docutils literal"><span class="pre">bahaviour_mode</span></tt>: behaviour mode of Artemisa. There are three possible modes: <tt class="docutils literal"><span class="pre">active</span></tt>, <tt class="docutils literal"><span class="pre">passive</span></tt> and <tt class="docutils literal"><span class="pre">aggressive</span></tt>. Each mode is defined on file <em>behaviour.conf</em>.</li>
+<li><tt class="docutils literal"><span class="pre">max_calls</span></tt>: maximum number of calls that Artemisa can answer at the same time</li>
+</ul>
+<p>Sound section:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">sound</span><span class="p">]</span>
+<span class="n">enabled</span><span class="o">=</span><span class="n">true</span>
+<span class="n">device</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">rate</span><span class="o">=</span><span class="mi">44100</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">enabled</span></tt>: if it contains &#8216;true&#8217; the calls shall be recorded</li>
+<li><tt class="docutils literal"><span class="pre">device</span></tt>: index of the sound device to be used. <strong>DO NOT</strong> simply modify this line unless you are sure of what you are changing. In order to get a list of the available sound devices run Artemisa with command-line parameter &#8216;-g&#8217;.</li>
+<li><tt class="docutils literal"><span class="pre">rate</span></tt>: sample rate (may happen that your device doesn&#8217;t support certain rates)</li>
+</ul>
+<p>E-mail section:</p>
+<div class="highlight-python"><pre>[email]
+enabled=false
+smtp_server_ip=smtp.somemail.com
+smtp_server_port=587
+smtp_server_use_tsl_ssl=true
+smtp_server_username=artemisareports@yourcompany.com
+smtp_server_password=thepassword
+from_mail=artemisareports@yourcompany.com
+recipients_mail=administrator@yourcompany.com, mike@yourcompany.com
+to_header="Administrator"
+subject="Artemisa report of activity"</pre>
+</div>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">enabled</span></tt>: if it&#8217;s set to &#8216;false&#8217;, no e-mail shall be sent.</li>
+<li><tt class="docutils literal"><span class="pre">smtp_server_ip</span></tt>: IP address of the SMPT server to use</li>
+<li><tt class="docutils literal"><span class="pre">smtp_server_port</span></tt>: SMPT server port address</li>
+<li><tt class="docutils literal"><span class="pre">smtp_server_use_tsl_ssl</span></tt>: use of encriptation</li>
+<li><tt class="docutils literal"><span class="pre">smtp_server_username</span></tt>: username</li>
+<li><tt class="docutils literal"><span class="pre">smtp_server_password</span></tt>: password</li>
+<li><tt class="docutils literal"><span class="pre">from_mail</span></tt>: From field address</li>
+<li><tt class="docutils literal"><span class="pre">recipients_mail</span></tt>: e-mail address of the recipients. You can add more than one recipient separated by comma.</li>
+<li><tt class="docutils literal"><span class="pre">to_header</span></tt>: To field address</li>
+<li><tt class="docutils literal"><span class="pre">subject</span></tt>: subject of the e-mail</li>
+</ul>
+</div>
+<div class="section" id="extensions-conf">
+<h2>extensions.conf<a class="headerlink" href="#extensions-conf" title="Permalink to this headline">¶</a></h2>
+<p>Here you <strong>must</strong> set up the extensions that shall be used by Artemisa in the registration process.
+The extensions must be valid.</p>
+<p>In order to define an extension use the following format:</p>
+<div class="highlight-python"><pre>[extension]
+username=
+password=</pre>
+</div>
+<p>For example, if you have a server and have decided to leave the extension 5000, 5001, 5002, 5003 and
+5004 for Artemisa, the file should be configured like (supposing usernames and passwords):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="mi">5000</span><span class="p">]</span>
+<span class="n">username</span><span class="o">=</span><span class="s">&quot;5000&quot;</span>
+<span class="n">password</span><span class="o">=</span><span class="mi">5000</span>
+
+<span class="p">[</span><span class="mi">5001</span><span class="p">]</span>
+<span class="n">username</span><span class="o">=</span><span class="s">&quot;5001&quot;</span>
+<span class="n">password</span><span class="o">=</span><span class="mi">5001</span>
+
+<span class="p">[</span><span class="mi">5002</span><span class="p">]</span>
+<span class="n">username</span><span class="o">=</span><span class="s">&quot;5002&quot;</span>
+<span class="n">password</span><span class="o">=</span><span class="mi">5002</span>
+
+<span class="p">[</span><span class="mi">5003</span><span class="p">]</span>
+<span class="n">username</span><span class="o">=</span><span class="s">&quot;5003&quot;</span>
+<span class="n">password</span><span class="o">=</span><span class="mi">5003</span>
+
+<span class="p">[</span><span class="mi">5004</span><span class="p">]</span>
+<span class="n">username</span><span class="o">=</span><span class="s">&quot;5004&quot;</span>
+<span class="n">password</span><span class="o">=</span><span class="mi">5004</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The extensions defined between square brackets must be unique.</p>
+</div>
+</div>
+<div class="section" id="servers-conf">
+<h2>servers.conf<a class="headerlink" href="#servers-conf" title="Permalink to this headline">¶</a></h2>
+<p>Here you are able to set the registrar servers configuration that Artemisa shall use to register
+itself. Each server it&#8217;s configured inside a section with the following format:</p>
+<div class="highlight-python"><pre>[some name]
+registrar_ip=127.0.0.1
+registrar_port=5060
+registrar_time=15
+nat_keepalive_interval=0
+exten=5000,5001,5002</pre>
+</div>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">registrar_ip</span></tt>: IP address of the SIP REGISTRAR</li>
+<li><tt class="docutils literal"><span class="pre">registrar_port</span></tt>: UDP port</li>
+<li><tt class="docutils literal"><span class="pre">registrar_time</span></tt>: time in minutes between automatic registrations</li>
+<li><tt class="docutils literal"><span class="pre">nat_keepalive_interval</span></tt>: when dealing with NAT proxies, you can set a value in seconds which indicates the time interval between keep alive messages. If zero is written, then the NAT keep alive messages shall not be sent.</li>
+<li><tt class="docutils literal"><span class="pre">exten</span></tt>: in this field you should set the extensions to be used. They must be declared in <em>extensions.conf</em>.</li>
+</ul>
+<p>For example, you have a test SIP server running in the same maching of Artemisa. Furthermore, Artemisa
+registers itself to the real server of your company, which is found in a certain IP address.
+On the other hand, you want to use some extensions for the test server and some for the real server.
+Then, the configuration file should look like:</p>
+<div class="highlight-python"><pre>[local]
+registrar_ip=127.0.0.1
+registrar_port=5060
+registrar_time=15
+nat_keepalive_interval=0
+exten=5003,5004
+
+[myserver]
+registrar_ip=192.168.0.205
+registrar_port=5060
+registrar_time=15
+nat_keepalive_interval=0
+exten=5000,5001,5002</pre>
+</div>
+</div>
+<div class="section" id="behaviour-conf">
+<h2>behaviour.conf<a class="headerlink" href="#behaviour-conf" title="Permalink to this headline">¶</a></h2>
+<p>Here each behavior mode is defined. There are just four sections, which names are <tt class="docutils literal"><span class="pre">[active]</span></tt>, <tt class="docutils literal"><span class="pre">[passive]</span></tt>, <tt class="docutils literal"><span class="pre">[aggressive]</span></tt> and <tt class="docutils literal"><span class="pre">[investigation]</span></tt>.</p>
+<p>Inside each section, the actions performed by Artemisa when a call is received are defined.</p>
+<p>The list of available commands for the sections is defined in <em>behaviour.conf</em> itself.</p>
+<p>The idea behind this, is that you can configure Artemisa in order to in some occasions just take the
+calls and answer them, which is a &#8220;passive&#8221; mode, and in other occasions to investigate the calls
+(&#8220;active&#8221; mode). You may want also that Artemisa counterattacks the intruder, which would be an
+&#8220;aggressive&#8221; mode.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">At the moment there are no actions available for an aggressive mode.</p>
+</div>
+</div>
+<div class="section" id="actions-conf">
+<h2>actions.conf<a class="headerlink" href="#actions-conf" title="Permalink to this headline">¶</a></h2>
+<p>In this configuration file you can define the parameters used when calling the user-configurable
+scripts such as &#8220;on_flood.sh&#8221;. For example, you will probably like to deny further incoming packets
+that have been already classified as SPIT. In this case, you can define a firewall rule inside the
+script on_spit.sh which is called everytime that SPIT is detected. So, in this file you can configure
+the parameters to be sent to that script (such as IP addresses).</p>
+<p>The list of available commands for the sections is defined in <em>actions.conf</em> itself. Here is a list of
+commands availables so far:</p>
+<div class="highlight-python"><pre>$From_Extension$
+$From_IP$
+$From_Port$
+$From_Transport$
+$Contact_IP$
+$Contact_Port$
+$Contact_Transport$
+$Connection_IP$
+$Owner_IP$
+$Via_IP$ This is the first Via detected
+$Via_Port$
+$Tool_name$</pre>
+</div>
+<p>For example, you can define the following configuration:</p>
+<div class="highlight-python"><pre>[actions]
+on_flood=$Contact_IP$ $Contact_Port$ $From_Extension$ $Tool_name$
+on_spit=$From_IP$ $From_Port$ $From_Extension$ $Owner_IP$ $Tool_name$
+on_scanning=$Contact_IP$ $Contact_Port$ $Via_IP$ $Via_Port$ $From_Extension$ $Tool_name$</pre>
+</div>
+<p>In this example, when a flood attack is detected and the <em>on_flood.sh</em> script is invoked, then all the commands
+will be replaced with the attacker data. For example:</p>
+<div class="highlight-python"><pre>bash on_flood.sh 10.0.30.2 5060 8888</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo_artemisa.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Configuration</a><ul>
+<li><a class="reference external" href="#artemisa-conf">artemisa.conf</a></li>
+<li><a class="reference external" href="#extensions-conf">extensions.conf</a></li>
+<li><a class="reference external" href="#servers-conf">servers.conf</a></li>
+<li><a class="reference external" href="#behaviour-conf">behaviour.conf</a></li>
+<li><a class="reference external" href="#actions-conf">actions.conf</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Installation.html"
+                                  title="previous chapter">Downloading and installation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Advanced.html"
+                                  title="next chapter">Advanced configuration</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Advanced.html" title="Advanced configuration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Installation.html" title="Downloading and installation"
+             >previous</a> |</li>
+        <li><a href="index.html">Artemisa v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010, Mohamed Nassar, Rodrigo do Carmo, Pablo Masri.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>
