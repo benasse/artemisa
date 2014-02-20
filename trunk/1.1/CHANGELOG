@@ -1,0 +1,18 @@
+CHANGELOG
+
+Artemisa 1.0.91
+
+* Bug fixed: Artemisa detects its own REGISTER messages.
+
+Artemisa 1.0.90
+
+* REGISTER messeges are now detected and informed.
+
+Artemisa 1.0.89
+
+* Option "-no_registration" added.
+* Option "-no_audio" added.
+* Parser improved for the command line parameters.
+* Fixed error while deleting an unexisting object (email object in artemisa
+  destructor).
+* Tested against the pjsip version 1.8.10.
