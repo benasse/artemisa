@@ -1,6 +1,6 @@
 # Artemisa v1.0
-# Copyright (C) 2009 Mohamed Nassar <nassar@loria.fr>, Rodrigo do Carmo <rodrigodocarmo@gmail.com>, 
-# and Pablo Masri <pablomasri87@gmail.com>
+# Copyright (C) 2009-2013 Mohamed Nassar <nassar@loria.fr>, Rodrigo do Carmo <rodrigodocarmo@gmail.com>,
+# Pablo Masri <pablomasri87@gmail.com>, Mauro Villarroel <villarroelmt@gmail.com> and Exequiel Barrirero <exequielrafaela@gmail.com>
 # 
 # Artemisa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "repvernumber" will be autimatically replaced by 
+# The following string "1.1.0" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "repvernumber"
+VERSION = "1.1.0"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -90,6 +90,8 @@ from modules.results_format import get_results_txt
 from modules.results_format import get_results_html
 from modules.logger import logger               # Instance a logger for information about Artemisa
 from modules.logger import pjsua_logger         # Instance a logger for information about the PJSUA library
+from modules.xml_server import *				# Module to deal and create an XML server 
+
 
 Unregister = False                              # Flag to know whether the unregistration process is taking place
 MediaReceived = False                           # Flag to know if media has been received
@@ -158,7 +160,6 @@ class Server(object):
             self.acc.set_callback(self.acc_cb)
     
             logger.info("Extension " + str(self.Extensions[i].Extension) + " registration sent. Status: " + str(self.acc.info().reg_status) + " (" + str(self.acc.info().reg_reason) + ")")
-
 
     def Reregister(self):
         """
@@ -502,6 +503,9 @@ class Artemisa(object):
                         help="doesn't use the audio device (audio recording disabled)")
 
         (options, args) = parser.parse_args()
+        
+        print (options,args)
+        
         if len(args) != 0:
             parser.error("Incorrect number of arguments.")
 
@@ -528,7 +532,7 @@ class Artemisa(object):
         self.CheckCommandLineParameters()
 
 
-        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2011 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
+        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2013 Mohamed Nassar, Rodrigo do Carmo, Pablo Masri, Mauro Villarroel and Exequiel Barrirero"
         print ""
         print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
         print "This is free software, and you are welcome to redistribute it under certain"
@@ -578,6 +582,7 @@ class Artemisa(object):
             self.transp = self.lib.create_transport(pj.TransportType.UDP,
                             pj.TransportConfig(port=int(self.Local_port),
                             bound_addr=self.Local_IP))
+            
         except:
             logger.critical("Error while opening port. The port number " + self.Local_port + " is either invalid or already in use by another process.")
             sys.exit(1)
@@ -631,6 +636,10 @@ class Artemisa(object):
         Unregister = False
 
         print "SIP User-Agent listening on: " + self.Local_IP + ":" + self.Local_port
+        
+		# XML Server Test
+        #xml_listen = xml_serv()
+        #xml_listen.xml_server_run(a=True)
     
         print "Behaviour mode: " + self.behaviour_mode
 
@@ -1247,6 +1256,12 @@ class Artemisa(object):
             # Get useful data from the message
             MessageInformation = CallData(SIP_Message_data)
 
+            # Warning: don't analyze the REGISTER message if it comes from Artemisa.
+            if MessageInformation.Contact_IP == self.Local_IP:
+                if MessageInformation.Contact_Port == self.Local_port:
+                    self.Flood = False
+                    return
+
             logger.info("*********************************** REGISTER message **************************************")
             logger.info("")
             logger.info(" To: " + MessageInformation.To_Extension)
@@ -1440,3 +1455,11 @@ class Artemisa(object):
             self.NumCalls += 1
 
             thrAnalyzeMessage.start()
+            
+    '''
+    XML Server Test
+    ''' 
+    #xml_listen = xml_serv()
+    #xml_listen.xml_server_run(a=True)
+    #xml_thread.start()
+
