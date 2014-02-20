@@ -1,0 +1,47 @@
+Artemisa 1.0
+************
+
+Documentation
+=============
+
+Full documentation is provided inside "doc" directory. Open "/doc/index.html" 
+with your browser, or visit http://artemisa.sourceforge.net/documentation/en/
+
+Prerequisites
+=============
+
+Artemisa requires the following installed components:
+
+* Python (=> 2.5.5)
+* bind-utils (Red Hat, Fedora), bind-tools (Gentoo), dnsutils (Debian)
+* PJSIP with the PJSUA Python Module (http://www.pjsip.org/)
+* nmap (http://nmap.org/)
+* jwhois (http://www.gnu.org/software/jwhois/)
+
+Downloading
+===========
+
+Artemisa is free and you can download the latest version from: 
+    
+    http://artemisa.sourceforge.net/ 
+
+There is also a SVN version for developers: 
+
+    https://artemisa.svn.sourceforge.net/svnroot/artemisa/
+
+Installation
+============
+
+Artemisa doesn't require installation. You should unpack the downloaded source 
+code and just run it by typing:
+
+    $ ./artemisa.py
+    
+    or
+    
+    $ python artemisa.py
+
+
+DO NOT run Artemisa until having read and set up the configuration files found 
+in /conf directory.
+
