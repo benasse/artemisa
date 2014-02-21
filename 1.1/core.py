@@ -1,4 +1,4 @@
-# Artemisa v1.0
+# Artemisa v1.1
 # Copyright (C) 2009-2013 Mohamed Nassar <nassar@loria.fr>, Rodrigo do Carmo <rodrigodocarmo@gmail.com>,
 # Pablo Masri <pablomasri87@gmail.com>, Mauro Villarroel <villarroelmt@gmail.com> and Exequiel Barrirero <exequielrafaela@gmail.com>.
 # 
@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "1.1.3" will be autimatically replaced by 
+# The following string "1.1.4" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "1.1.3"
+VERSION = "1.1.4"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -542,7 +542,6 @@ class Artemisa(object):
         if options.noaudio:
             self.No_audio_param = True
 
-
     def main(self):
         """
         Artemisa starts here.
@@ -554,7 +553,7 @@ class Artemisa(object):
         self.CheckCommandLineParameters()
 
 
-        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2013 Mohamed Nassar, Rodrigo do Carmo, Pablo Masri, Mauro Villarroel and Exequiel Barrirero."
+        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2011 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
         print ""
         print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
         print "This is free software, and you are welcome to redistribute it under certain"
@@ -727,6 +726,7 @@ class Artemisa(object):
         print "show warranty                Show the program warrany"
         print "show license                 Show the program license"
         print ""
+        print "modify extension             To add or delete an Extension"
         print "restart                      To restart Artemisa"
         print ""
         print "s, q, quit, exit             Exit"
@@ -815,6 +815,15 @@ class Artemisa(object):
                 self.email.Enabled = False
                 logger.info("E-mail reporting off.")
             
+            elif s == 'modify extension':
+                
+                mod = raw_input('add|delete: ').strip()
+                ext = raw_input ('extension: ').strip()
+                user = raw_input ('username: ').strip()
+                passwd = raw_input('password: ').strip()
+                
+                self.ModifyExt(mod,ext,user,passwd)
+                
             elif s == 'restart':
                 self.ArtemisaRestart()
                 
@@ -1067,6 +1076,9 @@ class Artemisa(object):
         del config            
 
     def ServerXml(self):
+        """
+        Creation of the XML Server
+        """
         global xml_serv
         xml_serv = SimpleXMLRPCServer(("127.0.0.1", 8000), requestHandler=RequestHandler)
         ### Function to allow XML-RPC Server to access and execute artemisa methods, which will be run by the XML-RPC Client.
@@ -1076,6 +1088,10 @@ class Artemisa(object):
         
         logger.info('XML Server Running')
        
+    
+        xml_serv.register_function(self.ModifyExt,'modify_extension')
+            
+        
         def RestartArtemisa():
             f= open('/dev/stdin','w')
             f.write('restart\n')
@@ -1094,8 +1110,52 @@ class Artemisa(object):
             def NewExten(self):
                 exten_conf = open('./conf/extensions.conf','w')
                 servers_conf = open('./conf/servers.conf','w')
-    
-
+                
+    def ModifyExt(self,mod,ext,user,passwd):
+        """
+        Modify extensions from file extensions.conf
+        """
+        username = 'username'
+        password = 'password'
+        
+        config = ConfigParser.ConfigParser()
+        config.read(EXTENSIONS_FILE_PATH)
+        
+        # We are going to use a configServer from ConfigParser Class to
+        # write in server.conf file. 
+        # configServer = ConfigParser.ConfigParser()
+        # configServer.read(EXTENSIONS_FILE_PATH)
+        
+        if mod == 'add':
+            if config.has_section(ext):
+                print 'Extension '+ext+' already exists'
+                return 'Extension '+ext+' already exists'
+            else:
+                config.add_section(ext)
+                config.set(ext,username,'"'+user+'"')
+                config.set(ext,password,passwd)
+                with open(EXTENSIONS_FILE_PATH,'wb') as configfile:
+                    config.write(configfile)
+                print 'Extension '+ext+' added'
+                return 'Extension '+ext+' added'
+                
+        elif mod == 'delete':
+            if config.has_section(ext):
+                config.remove_section(ext)
+                with open(EXTENSIONS_FILE_PATH,'wb') as configfile:
+                    config.write(configfile)
+                print 'Extension '+ext+' deleted.'
+                return 'Extension '+ext+' deleted.'
+                
+            else:
+                print 'Extension '+ext+' does not exists try with another one.'
+                return 'Extension '+ext+' does not exists try with another one'
+        else:
+            print 'wrong request please try with "add" or "delete"' 
+            return 'wrong request please try with "add" or "delete"'
+                              
+        del config
+        
     """
     The following methods do the message capturing part.
     """
