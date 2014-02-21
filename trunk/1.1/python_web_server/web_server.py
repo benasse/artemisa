@@ -1,0 +1,78 @@
+'''
+The main() tries to start the server at port 80 with a reference to the class we just implemented. 
+To quit the server you can press ctrl-c. And the server will close the socket and quit.
+
+The do_GET() gets invoked when you do a GET request. It do checking to see what type of file is requested. 
+If it is a html file it tries to open it and send it to the client. If it is a esp file, our dynamic content, it will print out the current day and year.
+
+The do_POST() gets invoked when you do a POST request. It then displays the content that is uploaded. 
+The name of the formelement is hardcoded to be "upfile".
+
+Running the example: 
+start the webserver with python webserver.py
+Then you can open your web browser and type in http://localhost/index.html or http://localhost/index.esp
+To test the upload, you open the upload.html, press browse, open a small text file, click "press", the server will echo back the file.
+'''
+#Copyright Jon Berg , turtlemeat.com
+
+import string,cgi,time
+from os import curdir, sep
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+#import pri
+
+class MyHandler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        try:
+            if self.path.endswith(".html"):
+                f = open(curdir + sep + self.path) #self.path has /test.html
+#note that this potentially makes every file on your computer readable by the internet
+                #print (f)
+                self.send_response(200)
+                self.send_header('Content-type',    'text/html')
+                self.end_headers()
+                self.wfile.write(f.read())
+                f.close()
+                return
+            if self.path.endswith(".esp"):   #our dynamic content
+                self.send_response(200)
+                self.send_header('Content-type',    'text/html')
+                self.end_headers()
+                self.wfile.write("hey, today is the" + str(time.localtime()[7]))
+                self.wfile.write(" day in the year " + str(time.localtime()[0]))
+                return
+                
+            return
+                
+        except IOError:
+            self.send_error(404,'File Not Found: %s' % self.path)
+     
+
+    def do_POST(self):
+        global rootnode
+        try:
+            ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+            if ctype == 'multipart/form-data':
+                query=cgi.parse_multipart(self.rfile, pdict)
+            self.send_response(301)
+            
+            self.end_headers()
+            upfilecontent = query.get('upfile')
+            print "filecontent", upfilecontent[0]
+            self.wfile.write("<HTML>POST OK.<BR><BR>");
+            self.wfile.write(upfilecontent[0]);
+            
+        except :
+            pass
+
+def main():
+    try:
+        server = HTTPServer(('', 80), MyHandler)
+        print 'started httpserver...'
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print '^C received, shutting down server'
+        server.socket.close()
+
+if __name__ == '__main__':
+    main()
