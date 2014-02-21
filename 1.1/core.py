@@ -1,6 +1,6 @@
 # Artemisa v1.0
 # Copyright (C) 2009-2013 Mohamed Nassar <nassar@loria.fr>, Rodrigo do Carmo <rodrigodocarmo@gmail.com>,
-# Pablo Masri <pablomasri87@gmail.com>, Mauro Villarroel <villarroelmt@gmail.com> and Exequiel Barrirero <exequielrafaela@gmail.com>
+# Pablo Masri <pablomasri87@gmail.com>, Mauro Villarroel <villarroelmt@gmail.com> and Exequiel Barrirero <exequielrafaela@gmail.com>.
 # 
 # Artemisa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "1.1.0" will be autimatically replaced by 
+# The following string "1.1.1" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -90,7 +90,9 @@ from modules.results_format import get_results_txt
 from modules.results_format import get_results_html
 from modules.logger import logger               # Instance a logger for information about Artemisa
 from modules.logger import pjsua_logger         # Instance a logger for information about the PJSUA library
-from modules.xml_server import *				# Module to deal and create an XML server 
+from modules.xml_server import *
+from modules.threading_xml import *
+from threading import Thread
 
 
 Unregister = False                              # Flag to know whether the unregistration process is taking place
@@ -532,7 +534,7 @@ class Artemisa(object):
         self.CheckCommandLineParameters()
 
 
-        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2013 Mohamed Nassar, Rodrigo do Carmo, Pablo Masri, Mauro Villarroel and Exequiel Barrirero"
+        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2013 Mohamed Nassar, Rodrigo do Carmo, Pablo Masri, Mauro Villarroel and Exequiel Barrirero."
         print ""
         print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
         print "This is free software, and you are welcome to redistribute it under certain"
@@ -613,6 +615,11 @@ class Artemisa(object):
             exit()
 
         # Put some lines into the log file
+        
+        #==================================
+        self.xml_input()
+        #==================================
+        
         logger.debug("-------------------------------------------------------------------------------------------------")
         logger.debug("Artemisa started.")
         
@@ -636,13 +643,8 @@ class Artemisa(object):
         Unregister = False
 
         print "SIP User-Agent listening on: " + self.Local_IP + ":" + self.Local_port
-        
-		# XML Server Test
-        #xml_listen = xml_serv()
-        #xml_listen.xml_server_run(a=True)
-    
-        print "Behaviour mode: " + self.behaviour_mode
 
+        print "Behaviour mode: " + self.behaviour_mode
         if len(self.Servers) == 0:
             print "No extensions have been configured."
         else:
@@ -696,6 +698,7 @@ class Artemisa(object):
         print "                             (Use these commands carefully)"
         print ""
         print "hangup all                   Hang up all calls"
+        print "reload_extensions            To reload extensions in .conf"
         print ""
         print "show warranty                Show the program warrany"
         print "show license                 Show the program license"
@@ -785,6 +788,13 @@ class Artemisa(object):
             elif s.find("email") != -1 and s.find("off") != -1:
                 self.email.Enabled = False
                 logger.info("E-mail reporting off.")
+            
+            elif s == "reload_extensions":
+                # Read the extensions configuration in extensions.conf
+                self.LoadExtensions()
+                # Read the registrar servers configuration in servers.conf
+                self.LoadServers()
+                logger.info("Extensios reloaded: OK")
 
             elif s == "show warranty":
                 print ""
@@ -1455,11 +1465,23 @@ class Artemisa(object):
             self.NumCalls += 1
 
             thrAnalyzeMessage.start()
-            
+
     '''
-    XML Server Test
+    XML-RPC Server/Client - Test
     ''' 
-    #xml_listen = xml_serv()
-    #xml_listen.xml_server_run(a=True)
-    #xml_thread.start()
+    def xml_input(self):
+        
+        thread_xml_s = ThreadXml()
+        #thread_xml_s.start()
+        
+        if(thread_xml_s.start() == 'reload'):
+            # Read the extensions configuration in extensions.conf
+            self.LoadExtensions()
+            # Read the registrar servers configuration in servers.conf
+            self.LoadServers()
+            logger.info("##### Extensios reloaded: OK #####")
+        else:
+            logger.info("##### Unknown command artemisa.py #####")
+             
+        
 
