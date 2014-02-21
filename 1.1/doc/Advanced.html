@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Advanced configuration &mdash; Artemisa v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Artemisa v1.0 documentation" href="index.html" />
+    <link rel="next" title="Running Artemisa" href="Running.html" />
+    <link rel="prev" title="Configuration" href="Configuration.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Running.html" title="Running Artemisa"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Configuration.html" title="Configuration"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Artemisa v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="advanced-configuration">
+<h1>Advanced configuration<a class="headerlink" href="#advanced-configuration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="fingerprint-conf">
+<h2>fingerprint.conf<a class="headerlink" href="#fingerprint-conf" title="Permalink to this headline">¶</a></h2>
+<p>This file inside <em>/fingerprint/</em> is used to list the tuples <em>application=fingerprint</em>. The parameter
+<em>fingerprint</em> is searched in the SIP message, so that Artemisa determines that the analyzed message
+was created by the tool <em>application</em>.</p>
+<p>For example, if you desire to tell Artemisa that the pattern &#8220;User-Agent: Twinkle/1.4.2&#8221; indicates that
+message was originated from Twinkle softphone, you may set the configuration file as:</p>
+<div class="highlight-python"><pre>Twinkle=Twinkle/1.4.2</pre>
+</div>
+<p>Another example could be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SIPVicious</span><span class="o">=</span><span class="n">friendly</span><span class="o">-</span><span class="n">scanner</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="flooding-armor">
+<h2>Flooding armor<a class="headerlink" href="#flooding-armor" title="Permalink to this headline">¶</a></h2>
+<p>The threshold for the flooding armor is the parameter <tt class="docutils literal"><span class="pre">max_calls</span></tt> in <em>artemisa.conf</em> file. When flooding
+is detected, the file <em>/scripts/on_flood.sh</em> is executed. The administrator can modify the script in order to
+define firewall rules to deny the flooder IP.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo_artemisa.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Advanced configuration</a><ul>
+<li><a class="reference external" href="#fingerprint-conf">fingerprint.conf</a></li>
+<li><a class="reference external" href="#flooding-armor">Flooding armor</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Configuration.html"
+                                  title="previous chapter">Configuration</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Running.html"
+                                  title="next chapter">Running Artemisa</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Running.html" title="Running Artemisa"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Configuration.html" title="Configuration"
+             >previous</a> |</li>
+        <li><a href="index.html">Artemisa v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2010, Mohamed Nassar, Rodrigo do Carmo, Pablo Masri.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>
