@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "1.1.2" will be autimatically replaced by 
+# The following string "1.1.3" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "1.1.2"
+VERSION = "1.1.3"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -684,7 +684,7 @@ class Artemisa(object):
         # Convert function ServerXml in a thread and call it.
         thrServerXml = threading.Thread(target=self.ServerXml)
         thrServerXml.start()
-        pj.Lib.thread_register(self.lib, thrServerXml.getName()) #Registro de un external thread a pjsua.
+        #pj.Lib.thread_register(self.lib, thrServerXml.getName()) #Registro de un external thread a pjsua.
         
         
         # The keyboard is read:
