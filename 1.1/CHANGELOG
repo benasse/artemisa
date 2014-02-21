@@ -1,5 +1,9 @@
 CHANGELOG
 
+Artemisa 1.0.91
+
+* Bug fixed: Artemisa detects its own REGISTER messages.
+
 Artemisa 1.0.90
 
 * REGISTER messeges are now detected and informed.
