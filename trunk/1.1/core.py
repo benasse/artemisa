@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "1.1.1" will be autimatically replaced by 
+# The following string "1.1.2" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "1.1.1"
+VERSION = "1.1.2"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -67,6 +67,7 @@ except ImportError:
     print ""
     sys.exit(1)
 
+
 import os
 from time import strftime
 from time import sleep
@@ -90,10 +91,13 @@ from modules.results_format import get_results_txt
 from modules.results_format import get_results_html
 from modules.logger import logger               # Instance a logger for information about Artemisa
 from modules.logger import pjsua_logger         # Instance a logger for information about the PJSUA library
-from modules.xml_server import *
-from modules.threading_xml import *
-from threading import Thread
 
+from SimpleXMLRPCServer import SimpleXMLRPCServer
+from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+
+#from modules.xml_server import *
+#rom modules.threading_xml import *
+#import thread
 
 Unregister = False                              # Flag to know whether the unregistration process is taking place
 MediaReceived = False                           # Flag to know if media has been received
@@ -181,6 +185,8 @@ class Server(object):
         except:
             pass
 
+class RequestHandler(SimpleXMLRPCRequestHandler):
+  rpc_paths = ('/RPC2',)
 
 class MyAccountCallback(pj.AccountCallback):
     """
@@ -383,8 +389,9 @@ class MyCallCallback(pj.CallCallback):
 class Artemisa(object):
     """
     This is the class which defines the whole program.
-    """
-
+    """ 
+    #  global xml_serv
+    
     def __init__(self):
 
         self.VERSION = VERSION
@@ -445,6 +452,9 @@ class Artemisa(object):
         self.No_registration_param = False
         self.No_audio_param = False
 
+        global reinicioXml
+        reinicioXml=False
+        
         self.main()                             # Here invokes the method that starts Artemisa
 
     def __del__(self):
@@ -474,8 +484,17 @@ class Artemisa(object):
         except:
             pass
 
+        xml_serv.server_close()
+        xml_serv.shutdown()
+        
+        
         logger.debug("Artemisa ended.")
 
+    def ArtemisaRestart(self):
+        self.__del__()
+        sleep(3)
+        self.__init__()
+        
     def CheckCommandLineParameters(self):
         """
         Checks if some command line parameter has been given and set the corresponding variables.
@@ -529,6 +548,7 @@ class Artemisa(object):
         Artemisa starts here.
         """
         global Unregister
+        global xml_serv
 
         # First check the command line parameters
         self.CheckCommandLineParameters()
@@ -555,6 +575,8 @@ class Artemisa(object):
 
         # Read the registrar servers configuration in servers.conf
         self.LoadServers()
+        
+              
                 
         # Create an Email object
         self.email = Email()
@@ -615,11 +637,6 @@ class Artemisa(object):
             exit()
 
         # Put some lines into the log file
-        
-        #==================================
-        self.xml_input()
-        #==================================
-        
         logger.debug("-------------------------------------------------------------------------------------------------")
         logger.debug("Artemisa started.")
         
@@ -643,6 +660,8 @@ class Artemisa(object):
         Unregister = False
 
         print "SIP User-Agent listening on: " + self.Local_IP + ":" + self.Local_port
+        
+        
 
         print "Behaviour mode: " + self.behaviour_mode
         if len(self.Servers) == 0:
@@ -662,11 +681,17 @@ class Artemisa(object):
                 self.acc_cb = MyAccountCallback(self.acc, self.lib, self.behaviour_mode, self.Active_mode, self.Passive_mode, self.Aggressive_mode, self.Sound_enabled, self.Playfile)
                 self.acc.set_callback(self.acc_cb)                
 
-       
+        # Convert function ServerXml in a thread and call it.
+        thrServerXml = threading.Thread(target=self.ServerXml)
+        thrServerXml.start()
+        pj.Lib.thread_register(self.lib, thrServerXml.getName()) #Registro de un external thread a pjsua.
+        
+        
         # The keyboard is read:
         self.ReadKeyboard()
 
         # Here finalizes the program when the ReadKeyboard() function is returned.
+        
         self.__del__()
         exit()
     
@@ -698,10 +723,11 @@ class Artemisa(object):
         print "                             (Use these commands carefully)"
         print ""
         print "hangup all                   Hang up all calls"
-        print "reload_extensions            To reload extensions in .conf"
         print ""
         print "show warranty                Show the program warrany"
         print "show license                 Show the program license"
+        print ""
+        print "restart                      To restart Artemisa"
         print ""
         print "s, q, quit, exit             Exit"
      
@@ -710,7 +736,7 @@ class Artemisa(object):
         This method handles the keyboard process.
         """
         CLIprompt = GetCLIprompt()
-    
+            
         while True:
         
             s = raw_input(CLIprompt).strip()
@@ -789,13 +815,11 @@ class Artemisa(object):
                 self.email.Enabled = False
                 logger.info("E-mail reporting off.")
             
-            elif s == "reload_extensions":
-                # Read the extensions configuration in extensions.conf
-                self.LoadExtensions()
-                # Read the registrar servers configuration in servers.conf
-                self.LoadServers()
-                logger.info("Extensios reloaded: OK")
-
+            elif s == 'restart':
+                self.ArtemisaRestart()
+                
+            
+            
             elif s == "show warranty":
                 print ""
                 print "THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY"
@@ -835,8 +859,11 @@ class Artemisa(object):
                 print ""
             
             elif s == "q" or s == "s" or s == "quit" or s == "exit":
+                #thread_xml_s = xml_serv()
+                #thread_xml_s.stop()
                 break
 
+                                        
             elif s.strip() == "":
                 continue
 
@@ -1039,6 +1066,35 @@ class Artemisa(object):
 
         del config            
 
+    def ServerXml(self):
+        global xml_serv
+        xml_serv = SimpleXMLRPCServer(("127.0.0.1", 8000), requestHandler=RequestHandler)
+        ### Function to allow XML-RPC Server to access and execute artemisa methods, which will be run by the XML-RPC Client.
+        xml_serv.register_introspection_functions()
+
+        xml_serv.register_function(pow)
+        
+        logger.info('XML Server Running')
+       
+        def RestartArtemisa():
+            f= open('/dev/stdin','w')
+            f.write('restart\n')
+            #self.ArtemisaRestart()
+        xml_serv.register_function(RestartArtemisa,'restart')
+                 
+        #### Run the xml_serv's main loop
+        print 'XML xml_serv Running...'
+        xml_serv.serve_forever()
+        
+        def AddDelExten(self,exten,usr,passwd):
+            def __init__(self):
+                self.exten = exten
+                self.user = usr
+                self.passwd = passwd
+            def NewExten(self):
+                exten_conf = open('./conf/extensions.conf','w')
+                servers_conf = open('./conf/servers.conf','w')
+    
 
     """
     The following methods do the message capturing part.
@@ -1465,23 +1521,9 @@ class Artemisa(object):
             self.NumCalls += 1
 
             thrAnalyzeMessage.start()
+            
+            
+    
+    
 
-    '''
-    XML-RPC Server/Client - Test
-    ''' 
-    def xml_input(self):
-        
-        thread_xml_s = ThreadXml()
-        #thread_xml_s.start()
-        
-        if(thread_xml_s.start() == 'reload'):
-            # Read the extensions configuration in extensions.conf
-            self.LoadExtensions()
-            # Read the registrar servers configuration in servers.conf
-            self.LoadServers()
-            logger.info("##### Extensios reloaded: OK #####")
-        else:
-            logger.info("##### Unknown command artemisa.py #####")
-             
-        
-
+    
