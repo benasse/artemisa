@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
 # This is part of Artemisa.
@@ -16,18 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Artemisa. If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    # Change the process name.
-    import ctypes
-    libc = ctypes.CDLL('libc.so.6')
-    libc.prctl(15, 'artemisa', 0, 0)
-except:
-    pass
+from threading import Thread		# Import Thread object from higher-level threading interface.	
+from modules.xml_server import *
 
-from core import Artemisa
-
-try:
-    # Creates an instance of object artemisa
-    proc = Artemisa()
-except KeyboardInterrupt:
-    del proc
+class ThreadXml(Thread):			# Class to generate artemisa XML-RPC Servers as a thread
+    def run(self):
+        xml_listen = xml_serv()
+        xml_listen.xml_server_run(a=True)
+        if(xml_listen.xml_arte_reload()=='reload'):
+            return 'reload'
+        else:
+            return ':)'
+            
+            
+        
