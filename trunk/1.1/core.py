@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "1.1.4" will be autimatically replaced by 
+# The following string "1.1.5" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "1.1.4"
+VERSION = "1.1.5"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -680,8 +680,8 @@ class Artemisa(object):
                 self.acc_cb = MyAccountCallback(self.acc, self.lib, self.behaviour_mode, self.Active_mode, self.Passive_mode, self.Aggressive_mode, self.Sound_enabled, self.Playfile)
                 self.acc.set_callback(self.acc_cb)                
 
-        # Convert function ServerXml in a thread and call it.
-        thrServerXml = threading.Thread(target=self.ServerXml)
+        # Convert function XmlServer in a thread and call it.
+        thrServerXml = threading.Thread(target=self.XmlServer)
         thrServerXml.start()
         #pj.Lib.thread_register(self.lib, thrServerXml.getName()) #Registro de un external thread a pjsua.
         
@@ -1075,7 +1075,7 @@ class Artemisa(object):
 
         del config            
 
-    def ServerXml(self):
+    def XmlServer(self):
         """
         Creation of the XML Server
         """
@@ -1083,15 +1083,11 @@ class Artemisa(object):
         xml_serv = SimpleXMLRPCServer(("127.0.0.1", 8000), requestHandler=RequestHandler)
         ### Function to allow XML-RPC Server to access and execute artemisa methods, which will be run by the XML-RPC Client.
         xml_serv.register_introspection_functions()
-
-        xml_serv.register_function(pow)
         
         logger.info('XML Server Running')
        
-    
         xml_serv.register_function(self.ModifyExt,'modify_extension')
-            
-        
+              
         def RestartArtemisa():
             f= open('/dev/stdin','w')
             f.write('restart\n')
@@ -1101,15 +1097,6 @@ class Artemisa(object):
         #### Run the xml_serv's main loop
         print 'XML xml_serv Running...'
         xml_serv.serve_forever()
-        
-        def AddDelExten(self,exten,usr,passwd):
-            def __init__(self):
-                self.exten = exten
-                self.user = usr
-                self.passwd = passwd
-            def NewExten(self):
-                exten_conf = open('./conf/extensions.conf','w')
-                servers_conf = open('./conf/servers.conf','w')
                 
     def ModifyExt(self,mod,ext,user,passwd):
         """
@@ -1121,35 +1108,85 @@ class Artemisa(object):
         config = ConfigParser.ConfigParser()
         config.read(EXTENSIONS_FILE_PATH)
         
+        config1 = ConfigParser.ConfigParser()
+        config1.read(SERVERS_FILE_PATH)
+        
+        ext_aux = []
+        
         # We are going to use a configServer from ConfigParser Class to
         # write in server.conf file. 
-        # configServer = ConfigParser.ConfigParser()
-        # configServer.read(EXTENSIONS_FILE_PATH)
+        #configServer = ConfigParser.ConfigParser()
+        #configServer.read(EXTENSIONS_FILE_PATH)
         
         if mod == 'add':
             if config.has_section(ext):
-                print 'Extension '+ext+' already exists'
-                return 'Extension '+ext+' already exists'
+                print 'Extension '+ext+' already exists in extensions.conf'
+
             else:
                 config.add_section(ext)
                 config.set(ext,username,'"'+user+'"')
                 config.set(ext,password,passwd)
                 with open(EXTENSIONS_FILE_PATH,'wb') as configfile:
                     config.write(configfile)
-                print 'Extension '+ext+' added'
+                print 'Extension '+ext+' added in extensions.conf'
+            
+            if config1.has_option('myproxy','exten'):
+                b = False
+                ext_aux = config1.get('myproxy','exten').split(',')
+                for i in ext_aux:
+                    if ext == i:
+                        print 'extension '+ext+' already exists in servers.conf'
+                        return 'extension '+ext+' already exists.'
+                       
+                aux_str = '%s' % ','.join(map(str, ext_aux))
+                config1.set('myproxy','exten',str(aux_str)+','+ext)
+                with open(SERVERS_FILE_PATH,'wb') as configfile:
+                    config1.write(configfile)
+                print 'Extension '+ext+' added in servers.conf'
                 return 'Extension '+ext+' added'
-                
+                    
+            else:
+                print 'Servers.conf corrupted or incomplete, please check'
+            
         elif mod == 'delete':
             if config.has_section(ext):
                 config.remove_section(ext)
                 with open(EXTENSIONS_FILE_PATH,'wb') as configfile:
                     config.write(configfile)
-                print 'Extension '+ext+' deleted.'
-                return 'Extension '+ext+' deleted.'
+                print 'Extension '+ext+' deleted in extensions.conf'
                 
             else:
-                print 'Extension '+ext+' does not exists try with another one.'
-                return 'Extension '+ext+' does not exists try with another one'
+                print 'Extension '+ext+' does not exists in extensions.conf'
+        
+            if config1.has_option('myproxy','exten'):
+                b = False
+                ext_aux = config1.get('myproxy','exten').split(',')
+                
+                #len_list_aux = len(ext_aux)
+                j=0
+                while j<len(ext_aux):
+                    if ext ==  ext_aux[j]:
+                        del(ext_aux[j])
+                        #len_list_aux = len(ext_aux)
+                        b = True
+                    else:
+                        j=j+1      
+                
+                aux_str = '%s' % ','.join(map(str, ext_aux))
+                config1.set('myproxy','exten',aux_str)
+                with open(SERVERS_FILE_PATH,'wb') as configfile:
+                    config1.write(configfile)    
+                   
+                if not b :
+                    print 'Extension '+ext+' does not exists in servers.conf'
+                    return 'Extension '+ext+' does not exists'
+                
+                print 'Extension '+ext+' deleted in servers.conf'
+                return 'extension '+ext+' deleted' 
+                    
+            else:
+                print 'Extension '+ext+' does not exists.'
+            
         else:
             print 'wrong request please try with "add" or "delete"' 
             return 'wrong request please try with "add" or "delete"'
