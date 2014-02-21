@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "1.1.5" will be autimatically replaced by 
+# The following string "repvernumber" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "1.1.5"
+VERSION = "repvernumber"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -69,6 +69,7 @@ except ImportError:
 
 
 import os
+import getpass
 from time import strftime
 from time import sleep
 from time import time
@@ -400,6 +401,7 @@ class Artemisa(object):
         # Environment configuration
         self.Local_IP = ""                      # Local IP
         self.Local_port = ""                    # Local port
+        self.Local_xml_port = ""                # Local XML Server port
         self.SIPdomain = ""                     # Local SIP domain
         self.UserAgent = ""                     # User-Agent name used by Artemisa 
         self.MaxCalls = 0                       # Max number of calls to handle
@@ -820,14 +822,13 @@ class Artemisa(object):
                 mod = raw_input('add|delete: ').strip()
                 ext = raw_input ('extension: ').strip()
                 user = raw_input ('username: ').strip()
-                passwd = raw_input('password: ').strip()
+                passwd = getpass.getpass('password: ').strip()
                 
                 self.ModifyExt(mod,ext,user,passwd)
                 
             elif s == 'restart':
                 self.ArtemisaRestart()
-                
-            
+                  
             
             elif s == "show warranty":
                 print ""
@@ -1014,6 +1015,15 @@ class Artemisa(object):
                 except:
                     logger.error("local_port in configuration file must be an integer. Set to 5060.")
                     self.Local_port = "5060"
+                
+                self.Local_xml_port = config.get("environment", "local_xml_port")
+                print '########## PORT XML! ######'+self.Local_xml_port
+                
+                try:
+                    int(self.Local_xml_port)
+                except:
+                    logger.error("local_xml_port in configuration file must be an integer. Set to 8000.")
+                    self.Local_xml_port = "8000"
 
                 self.SIPdomain = config.get("environment", "sip_domain")
                 self.UserAgent = config.get("environment", "user_agent")
@@ -1080,8 +1090,8 @@ class Artemisa(object):
         Creation of the XML Server
         """
         global xml_serv
-        xml_serv = SimpleXMLRPCServer(("127.0.0.1", 8000), requestHandler=RequestHandler)
-        ### Function to allow XML-RPC Server to access and execute artemisa methods, which will be run by the XML-RPC Client.
+        xml_serv = SimpleXMLRPCServer((self.Local_IP, int(self.Local_xml_port)), requestHandler=RequestHandler)
+        ## Function to allow XML-RPC Server to access and execute artemisa methods, which will be run by the XML-RPC Client.
         xml_serv.register_introspection_functions()
         
         logger.info('XML Server Running')
@@ -1102,8 +1112,6 @@ class Artemisa(object):
         """
         Modify extensions from file extensions.conf
         """
-        username = 'username'
-        password = 'password'
         
         config = ConfigParser.ConfigParser()
         config.read(EXTENSIONS_FILE_PATH)
@@ -1113,41 +1121,43 @@ class Artemisa(object):
         
         ext_aux = []
         
-        # We are going to use a configServer from ConfigParser Class to
-        # write in server.conf file. 
+        # se usara la instancia configServer de la clase ConfigParser para
+        # escribir en server.conf 
         #configServer = ConfigParser.ConfigParser()
         #configServer.read(EXTENSIONS_FILE_PATH)
         
         if mod == 'add':
             if config.has_section(ext):
                 print 'Extension '+ext+' already exists in extensions.conf'
+                return 'Extension '+ext+' already exists'
 
-            else:
+            elif len(config.sections()) <= 7:
+                
                 config.add_section(ext)
-                config.set(ext,username,'"'+user+'"')
-                config.set(ext,password,passwd)
+                config.set(ext,'username','"'+user+'"')
+                config.set(ext,'password',passwd)
                 with open(EXTENSIONS_FILE_PATH,'wb') as configfile:
                     config.write(configfile)
                 print 'Extension '+ext+' added in extensions.conf'
             
-            if config1.has_option('myproxy','exten'):
-                b = False
-                ext_aux = config1.get('myproxy','exten').split(',')
-                for i in ext_aux:
-                    if ext == i:
-                        print 'extension '+ext+' already exists in servers.conf'
-                        return 'extension '+ext+' already exists.'
+                if config1.has_option('myproxy','exten'):
+                    b = False
+                    ext_aux = config1.get('myproxy','exten').split(',')
+                    for i in ext_aux:
+                        if ext == i:
+                            print 'Extension '+ext+' already exists in servers.conf'
+                            return 'Extension '+ext+' already exists.'
                        
-                aux_str = '%s' % ','.join(map(str, ext_aux))
-                config1.set('myproxy','exten',str(aux_str)+','+ext)
-                with open(SERVERS_FILE_PATH,'wb') as configfile:
-                    config1.write(configfile)
-                print 'Extension '+ext+' added in servers.conf'
-                return 'Extension '+ext+' added'
+                        aux_str = '%s' % ','.join(map(str, ext_aux))
+                        config1.set('myproxy','exten',str(aux_str)+','+ext)
+                        with open(SERVERS_FILE_PATH,'wb') as configfile:
+                            config1.write(configfile)
+                        print 'Extension '+ext+' added in servers.conf'
+                        return 'Extension '+ext+' added'
                     
             else:
-                print 'Servers.conf corrupted or incomplete, please check'
-            
+                print 'Max number of extensions registered. Run another artemisa instance to register more extensions.'
+                return 'Max number of extensions registered. Run another artemisa instance to register more extensions.'
         elif mod == 'delete':
             if config.has_section(ext):
                 config.remove_section(ext)
