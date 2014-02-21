@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "repvernumber" will be autimatically replaced by 
+# The following string "1.1.7" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "repvernumber"
+VERSION = "1.1.7"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -1091,7 +1091,7 @@ class Artemisa(object):
         """
         global xml_serv
         xml_serv = SimpleXMLRPCServer((self.Local_IP, int(self.Local_xml_port)), requestHandler=RequestHandler)
-        ## Function to allow XML-RPC Server to access and execute artemisa methods, which will be run by the XML-RPC Client.
+        ### funcion para permitir a los clientes utilizar metodos que esten implementados en el servidor
         xml_serv.register_introspection_functions()
         
         logger.info('XML Server Running')
@@ -1136,8 +1136,19 @@ class Artemisa(object):
                 config.add_section(ext)
                 config.set(ext,'username','"'+user+'"')
                 config.set(ext,'password',passwd)
+                
                 with open(EXTENSIONS_FILE_PATH,'wb') as configfile:
                     config.write(configfile)
+                
+                archi=open(EXTENSIONS_FILE_PATH,'r')
+                lineS=archi.readlines()
+                archi.close()
+
+                archi=open(EXTENSIONS_FILE_PATH,'w')                
+                archi.write("# Artemisa - Extensions configuration file\n#\n# Be careful when modifying this file!\n\n\n# Here you are able to set up the extensions that shall be used by Artemisa in the registration process. In order to use them, they must be defined in the servers.conf file.\n#\n# The sections name hereunder, such as 3000 in section [3000], refers to a SIP extension and it must be unique in this file, as well as correctly configured in the registrar server.\n\n")
+                archi.writelines(lineS)
+                archi.close()
+                
                 print 'Extension '+ext+' added in extensions.conf'
             
                 if config1.has_option('myproxy','exten'):
@@ -1152,9 +1163,19 @@ class Artemisa(object):
                         config1.set('myproxy','exten',str(aux_str)+','+ext)
                         with open(SERVERS_FILE_PATH,'wb') as configfile:
                             config1.write(configfile)
+                        
+                        archi=open(SERVERS_FILE_PATH,'r')
+                        lineS=archi.readlines()
+                        archi.close()
+
+                        archi=open(SERVERS_FILE_PATH,'w')                
+                        archi.write("# Artemisa - Servers configuration file\n#\n# Be careful when modifying this file!\n\n\n# Here you are able to set the registrar servers configuration that Artemisa shall use to register itself.\n#\n# registrar_time=\n# Is the time in minutes between automatic registrations. This is performed in order to avoid\n# being disconnected from the server because of a lack of activity.\n#\n# nat_keepalive_interal=\n# When dealing with NAT proxies, you can set a value in seconds which indicates the time interval between keep alive messages. If zero is written, then the NAT keep alive messages shall not be sent.\n#\n# exten=\n# In this field you should set the extensions to be used. They must be declared in extensions.conf.\n\n")
+                        archi.writelines(lineS)
+                        archi.close()
+                                                
                         print 'Extension '+ext+' added in servers.conf'
                         return 'Extension '+ext+' added'
-                    
+                       
             else:
                 print 'Max number of extensions registered. Run another artemisa instance to register more extensions.'
                 return 'Max number of extensions registered. Run another artemisa instance to register more extensions.'
@@ -1163,6 +1184,16 @@ class Artemisa(object):
                 config.remove_section(ext)
                 with open(EXTENSIONS_FILE_PATH,'wb') as configfile:
                     config.write(configfile)
+                
+                archi=open(SERVERS_FILE_PATH,'r')
+                lineS=archi.readlines()
+                archi.close()
+
+                archi=open(SERVERS_FILE_PATH,'w')                
+                archi.write("# Artemisa - Extensions configuration file\n#\n# Be careful when modifying this file!\n\n\n# Here you are able to set up the extensions that shall be used by Artemisa in the registration process. In order to use them, they must be defined in the servers.conf file.\n#\n# The sections name hereunder, such as 3000 in section [3000], refers to a SIP extension and it must be unique in this file, as well as correctly configured in the registrar server.\n\n")
+                archi.writelines(lineS)
+                archi.close()
+                
                 print 'Extension '+ext+' deleted in extensions.conf'
                 
             else:
@@ -1190,6 +1221,15 @@ class Artemisa(object):
                 if not b :
                     print 'Extension '+ext+' does not exists in servers.conf'
                     return 'Extension '+ext+' does not exists'
+                
+                archi=open(SERVERS_FILE_PATH,'r')
+                lineS=archi.readlines()
+                archi.close()
+
+                archi=open(SERVERS_FILE_PATH,'w')                
+                archi.write("# Artemisa - Servers configuration file\n#\n# Be careful when modifying this file!\n\n\n# Here you are able to set the registrar servers configuration that Artemisa shall use to register itself.\n#\n# registrar_time=\n# Is the time in minutes between automatic registrations. This is performed in order to avoid\n# being disconnected from the server because of a lack of activity.\n#\n# nat_keepalive_interal=\n# When dealing with NAT proxies, you can set a value in seconds which indicates the time interval between keep alive messages. If zero is written, then the NAT keep alive messages shall not be sent.\n#\n# exten=\n# In this field you should set the extensions to be used. They must be declared in extensions.conf.\n\n")
+                archi.writelines(lineS)
+                archi.close()
                 
                 print 'Extension '+ext+' deleted in servers.conf'
                 return 'extension '+ext+' deleted' 
