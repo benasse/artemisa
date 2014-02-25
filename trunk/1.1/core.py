@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Important note:
-# The following string "1.1.7" will be autimatically replaced by 
+# The following string "repvernumber" will be autimatically replaced by 
 # the clean_and_prepare_for_release.sh script. So, don't modify it!
-VERSION = "1.1.7"
+VERSION = "repvernumber"
 
 # Definition of directories and files
 CONFIG_DIR = "./conf/"
@@ -555,7 +555,7 @@ class Artemisa(object):
         self.CheckCommandLineParameters()
 
 
-        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2011 Mohamed Nassar, Rodrigo do Carmo, and Pablo Masri"
+        print "Artemisa v" + self.VERSION + " Copyright (C) 2009-2013 Mohamed Nassar, Rodrigo do Carmo, Pablo Masri, Mauro Villarroel and Exequiel Barrirero"
         print ""
         print "This program comes with ABSOLUTELY NO WARRANTY; for details type 'show warranty'."
         print "This is free software, and you are welcome to redistribute it under certain"
@@ -660,9 +660,9 @@ class Artemisa(object):
                 
         Unregister = False
 
-        print "SIP User-Agent listening on: " + self.Local_IP + ":" + self.Local_port
-        
-        
+        print "SIP User-Agent  listening on: " + self.Local_IP + ":" + self.Local_port
+        print "XML-RPC service listening on: "+ self.Local_IP  + ":" + self.Local_xml_port
+                   
 
         print "Behaviour mode: " + self.behaviour_mode
         if len(self.Servers) == 0:
@@ -1017,7 +1017,6 @@ class Artemisa(object):
                     self.Local_port = "5060"
                 
                 self.Local_xml_port = config.get("environment", "local_xml_port")
-                print '########## PORT XML! ######'+self.Local_xml_port
                 
                 try:
                     int(self.Local_xml_port)
@@ -1091,10 +1090,11 @@ class Artemisa(object):
         """
         global xml_serv
         xml_serv = SimpleXMLRPCServer((self.Local_IP, int(self.Local_xml_port)), requestHandler=RequestHandler)
-        ### funcion para permitir a los clientes utilizar metodos que esten implementados en el servidor
+        ### Function to allow Clients (XML-RPC connections) to access XML-RPC service methos - API Interface
         xml_serv.register_introspection_functions()
         
-        logger.info('XML Server Running')
+        print '' # necessary to correct the console for a better output visualization
+        #logger.info('XML-RPC service running...')
        
         xml_serv.register_function(self.ModifyExt,'modify_extension')
               
@@ -1103,10 +1103,10 @@ class Artemisa(object):
             f.write('restart\n')
             #self.ArtemisaRestart()
         xml_serv.register_function(RestartArtemisa,'restart')
-                 
-        #### Run the xml_serv's main loop
-        print 'XML xml_serv Running...'
+        
+        #### Run the XML-RPC_service main loop
         xml_serv.serve_forever()
+        
                 
     def ModifyExt(self,mod,ext,user,passwd):
         """
@@ -1128,7 +1128,7 @@ class Artemisa(object):
         
         if mod == 'add':
             if config.has_section(ext):
-                print 'Extension '+ext+' already exists in extensions.conf'
+                logger.info ('Extension '+ext+' already exists in extensions.conf')
                 return 'Extension '+ext+' already exists'
 
             elif len(config.sections()) <= 7:
@@ -1149,14 +1149,14 @@ class Artemisa(object):
                 archi.writelines(lineS)
                 archi.close()
                 
-                print 'Extension '+ext+' added in extensions.conf'
+                logger.info ('Extension '+ext+' added in extensions.conf')
             
                 if config1.has_option('myproxy','exten'):
                     b = False
                     ext_aux = config1.get('myproxy','exten').split(',')
                     for i in ext_aux:
                         if ext == i:
-                            print 'Extension '+ext+' already exists in servers.conf'
+                            logger.info ('Extension '+ext+' already exists in servers.conf')
                             return 'Extension '+ext+' already exists.'
                        
                         aux_str = '%s' % ','.join(map(str, ext_aux))
@@ -1173,11 +1173,11 @@ class Artemisa(object):
                         archi.writelines(lineS)
                         archi.close()
                                                 
-                        print 'Extension '+ext+' added in servers.conf'
+                        logger.info ('Extension '+ext+' added in servers.conf')
                         return 'Extension '+ext+' added'
                        
             else:
-                print 'Max number of extensions registered. Run another artemisa instance to register more extensions.'
+                logger.info ('Max number of extensions registered. Run another artemisa instance to register more extensions.')
                 return 'Max number of extensions registered. Run another artemisa instance to register more extensions.'
         elif mod == 'delete':
             if config.has_section(ext):
@@ -1185,19 +1185,20 @@ class Artemisa(object):
                 with open(EXTENSIONS_FILE_PATH,'wb') as configfile:
                     config.write(configfile)
                 
-                archi=open(SERVERS_FILE_PATH,'r')
+                archi=open(EXTENSIONS_FILE_PATH,'r')
                 lineS=archi.readlines()
                 archi.close()
 
-                archi=open(SERVERS_FILE_PATH,'w')                
+                archi=open(EXTENSIONS_FILE_PATH,'w')                
                 archi.write("# Artemisa - Extensions configuration file\n#\n# Be careful when modifying this file!\n\n\n# Here you are able to set up the extensions that shall be used by Artemisa in the registration process. In order to use them, they must be defined in the servers.conf file.\n#\n# The sections name hereunder, such as 3000 in section [3000], refers to a SIP extension and it must be unique in this file, as well as correctly configured in the registrar server.\n\n")
                 archi.writelines(lineS)
                 archi.close()
                 
-                print 'Extension '+ext+' deleted in extensions.conf'
+                logger.info ('Extension '+ext+' deleted in extensions.conf')
                 
             else:
-                print 'Extension '+ext+' does not exists in extensions.conf'
+                
+                logger.info ('Extension '+ext+' does not exists in extensions.conf')
         
             if config1.has_option('myproxy','exten'):
                 b = False
@@ -1219,7 +1220,17 @@ class Artemisa(object):
                     config1.write(configfile)    
                    
                 if not b :
-                    print 'Extension '+ext+' does not exists in servers.conf'
+                    
+                    archi=open(SERVERS_FILE_PATH,'r')
+                    lineS=archi.readlines()
+                    archi.close()
+
+                    archi=open(SERVERS_FILE_PATH,'w')                
+                    archi.write("# Artemisa - Extensions configuration file\n#\n# Be careful when modifying this file!\n\n\n# Here you are able to set up the extensions that shall be used by Artemisa in the registration process. In order to use them, they must be defined in the servers.conf file.\n#\n# The sections name hereunder, such as 3000 in section [3000], refers to a SIP extension and it must be unique in this file, as well as correctly configured in the registrar server.\n\n")
+                    archi.writelines(lineS)
+                    archi.close()
+                    
+                    logger.info ('Extension '+ext+' does not exists in servers.conf')
                     return 'Extension '+ext+' does not exists'
                 
                 archi=open(SERVERS_FILE_PATH,'r')
@@ -1231,14 +1242,14 @@ class Artemisa(object):
                 archi.writelines(lineS)
                 archi.close()
                 
-                print 'Extension '+ext+' deleted in servers.conf'
+                logger.info ('Extension '+ext+' deleted in servers.conf')
                 return 'extension '+ext+' deleted' 
                     
             else:
-                print 'Extension '+ext+' does not exists.'
+                logger.info ('Extension '+ext+' does not exists.')
             
         else:
-            print 'wrong request please try with "add" or "delete"' 
+            logger.info ('wrong request please try with "add" or "delete"') 
             return 'wrong request please try with "add" or "delete"'
                               
         del config
